@@ -1,0 +1,251 @@
+"use client";
+
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
+
+const STORAGE_KEY = "garudaqua_enquiries";
+
+interface Enquiry {
+    _id: string;
+    name: string;
+    email: string;
+    phone: string;
+    company: string;
+    product: string;
+    quantity: string;
+    message: string;
+    createdAt: string;
+    status: "new" | "contacted" | "closed";
+}
+
+export default function EnquirePage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center text-gray-500">Loading...</div>}>
+            <EnquireForm />
+        </Suspense>
+    );
+}
+
+function EnquireForm() {
+    const searchParams = useSearchParams();
+    const productFromUrl = searchParams.get("product") || "";
+
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        product: productFromUrl,
+        quantity: "",
+        message: "",
+    });
+    const [submitted, setSubmitted] = useState(false);
+
+    useEffect(() => {
+        if (productFromUrl) {
+            setFormData((prev) => ({ ...prev, product: productFromUrl }));
+        }
+    }, [productFromUrl]);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.name.trim() || !formData.phone.trim()) {
+            toast.error("Name and phone number are required");
+            return;
+        }
+
+        const enquiry: Enquiry = {
+            _id: `enq-${Date.now()}`,
+            ...formData,
+            createdAt: new Date().toISOString(),
+            status: "new",
+        };
+
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            const existing: Enquiry[] = stored ? JSON.parse(stored) : [];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([enquiry, ...existing]));
+        } catch {
+            // Ignore storage errors
+        }
+
+        toast.success("Enquiry submitted successfully!");
+        setSubmitted(true);
+    };
+
+    if (submitted) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center px-4">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="max-w-md w-full bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-xl dark:shadow-none dark:border dark:border-white/10 p-8 text-center"
+                >
+                    <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Enquiry Submitted!</h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                        Thank you for your interest. Our team will get back to you within 24 hours.
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                        <Link href="/products" className="px-6 py-2.5 bg-[#0EA5E9] text-white rounded-full hover:bg-[#0369A1] transition text-sm font-medium">
+                            Browse Products
+                        </Link>
+                        <button
+                            onClick={() => {
+                                setSubmitted(false);
+                                setFormData({ name: "", email: "", phone: "", company: "", product: "", quantity: "", message: "" });
+                            }}
+                            className="px-6 py-2.5 border border-gray-300 dark:border-white/20 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-50 dark:hover:bg-white/5 transition text-sm"
+                        >
+                            New Enquiry
+                        </button>
+                    </div>
+                </motion.div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4">
+            <div className="max-w-2xl mx-auto">
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center mb-10"
+                >
+                    <h1 className="text-3xl md:text-4xl font-light text-gray-900 dark:text-gray-100 mb-3">
+                        Product <span className="text-[#0EA5E9]">Enquiry</span>
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
+                        Fill in your details and we&apos;ll get back to you with pricing and availability information.
+                    </p>
+                </motion.div>
+
+                {/* Form */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 p-6 md:p-8"
+                >
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Name & Phone */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name *</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    className="w-full px-4 py-3 border border-gray-300 dark:border-white/20 rounded-xl bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition"
+                                    placeholder="Your full name"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone Number *</label>
+                                <input
+                                    type="tel"
+                                    required
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    className="w-full px-4 py-3 border border-gray-300 dark:border-white/20 rounded-xl bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition"
+                                    placeholder="+91 98765 43210"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Email & Company */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
+                                <input
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    className="w-full px-4 py-3 border border-gray-300 dark:border-white/20 rounded-xl bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition"
+                                    placeholder="you@company.com"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Company / Business Name</label>
+                                <input
+                                    type="text"
+                                    value={formData.company}
+                                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                                    className="w-full px-4 py-3 border border-gray-300 dark:border-white/20 rounded-xl bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition"
+                                    placeholder="Your company name"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Product & Quantity */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Product of Interest</label>
+                                <input
+                                    type="text"
+                                    value={formData.product}
+                                    onChange={(e) => setFormData({ ...formData, product: e.target.value })}
+                                    className="w-full px-4 py-3 border border-gray-300 dark:border-white/20 rounded-xl bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition"
+                                    placeholder="e.g., 500L Water Tank"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Quantity Required</label>
+                                <input
+                                    type="text"
+                                    value={formData.quantity}
+                                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                                    className="w-full px-4 py-3 border border-gray-300 dark:border-white/20 rounded-xl bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition"
+                                    placeholder="e.g., 50 units"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Message */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Additional Details</label>
+                            <textarea
+                                value={formData.message}
+                                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                rows={4}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-white/20 rounded-xl bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-colors resize-none"
+                                placeholder="Tell us about your requirements, preferred delivery timeline, etc."
+                            />
+                        </div>
+
+                        {/* Submit */}
+                        <motion.button
+                            type="submit"
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            className="w-full py-3.5 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-medium text-lg shadow-lg hover:shadow-xl transition-all"
+                        >
+                            Submit Enquiry
+                        </motion.button>
+
+                        <p className="text-xs text-gray-500 dark:text-gray-500 text-center">
+                            By submitting, you agree to be contacted by our sales team regarding your enquiry.
+                        </p>
+                    </form>
+                </motion.div>
+
+                {/* Back link */}
+                <div className="text-center mt-6">
+                    <Link href="/products" className="text-sm text-[#0EA5E9] hover:text-[#0369A1] transition">
+                        &larr; Back to Products
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+}

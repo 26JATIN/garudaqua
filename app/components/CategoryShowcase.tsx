@@ -148,12 +148,12 @@ const CategoryPreview = React.memo(({ category, className }: CategoryPreviewProp
 
       {/* Loading state */}
       {(!isLoaded && !hasError) && category.image && (
-        <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 shimmer" />
+        <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#111] dark:to-black shimmer" />
       )}
 
       {/* Fallback when no image */}
       {(!category.image || hasError) && (
-        <div className="absolute inset-0 bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="absolute inset-0 bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-[#0A0A0A] dark:to-black flex items-center justify-center">
           <div className="text-center text-gray-500 dark:text-gray-400 p-4">
             <Droplets className="w-12 h-12 mx-auto mb-2 opacity-40 text-[#0EA5E9]" />
             <div className="text-sm font-medium mb-1">{category.name}</div>
@@ -184,7 +184,7 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
       className="cursor-pointer group/sub"
     >
       {/* Subcategory Badge */}
-      <div className="relative aspect-square rounded-lg overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 group-hover/sub:border-[#0EA5E9] transition-all duration-300">
+      <div className="relative aspect-square rounded-lg overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#0A0A0A] dark:to-black border border-gray-200 dark:border-white/10 group-hover/sub:border-[#0EA5E9] transition-all duration-300">
         {subcategory.image ? (
           <>
             <Image
@@ -196,7 +196,7 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
               loading="lazy"
             />
             {!isLoaded && (
-              <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 shimmer" />
+              <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#111] dark:to-black shimmer" />
             )}
           </>
         ) : (
@@ -264,7 +264,7 @@ export const Card = React.memo(({
       whileHover={{ y: -8, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={handleOpen}
-      className="cursor-pointer card-hover border border-gray-200 dark:border-white/10 rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-white/50 dark:bg-white/5 shadow-sm hover:shadow-lg"
+      className="cursor-pointer card-hover border border-gray-200 dark:border-white/6 rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-white/50 dark:bg-[#0A0A0A] shadow-sm hover:shadow-lg"
       transition={{ type: "spring", stiffness: 300, damping: 20 }}>
       {cardPreview}
       <div className="space-y-2 sm:space-y-3 md:space-y-4 mt-2 sm:mt-3 md:mt-4">
@@ -272,7 +272,7 @@ export const Card = React.memo(({
           <div className="flex justify-between items-start gap-2">
             <motion.h3
               layoutId={layout ? `title-${card._id || card.name}` : undefined}
-              className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-foreground leading-tight flex-1"
+              className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1"
             >
               {card.name}
             </motion.h3>
@@ -468,7 +468,7 @@ export default function CategoryShowcase() {
   }, [displayedSubcategories, selectedCategory, handleSubcategoryClick]);
 
   return (
-    <section ref={sectionRef} className="bg-background py-8 sm:py-12 lg:py-16">
+    <section ref={sectionRef} className="bg-white dark:bg-black py-8 sm:py-12 lg:py-16">
       <div className="flex flex-col lg:flex-row">
         {/* Sidebar - Filter Section */}
         <div className="w-full lg:w-1/5 p-4 sm:p-6 lg:p-8 xl:p-12 flex flex-col justify-start">
@@ -477,7 +477,7 @@ export default function CategoryShowcase() {
               className={`transform transition-all duration-1500 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-[50vh] opacity-0"
                 }`}
             >
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-4 sm:mb-6 lg:mb-8 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 lg:mb-8 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform">
                 Explore
                 <br />
                 Categories
@@ -550,13 +550,13 @@ export default function CategoryShowcase() {
                           onClick={() => handleCategoryChange(filter)}
                           className={`whitespace-nowrap px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 group ${selectedCategory === filter
                             ? 'bg-linear-to-r from-[#0EA5E9] to-[#0284C7] text-white shadow-lg shadow-[#0EA5E9]/20'
-                            : 'bg-white text-gray-900 dark:bg-[#1A2332] dark:text-gray-100 hover:text-[#0369A1] dark:hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 dark:hover:bg-[#0EA5E9]/10 hover:shadow-md border border-gray-200 dark:border-gray-700 hover:border-[#0EA5E9]/30'
+                            : 'bg-white text-gray-900 dark:bg-[#0A0A0A] dark:text-gray-100 hover:text-[#0369A1] dark:hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 dark:hover:bg-[#0EA5E9]/10 hover:shadow-md border border-gray-200 dark:border-white/10 hover:border-[#0EA5E9]/30'
                             }`}
                         >
                           <span>{filter}</span>
                           <span className={`text-xs px-2 py-1 rounded-full font-semibold transition-all duration-300 ${selectedCategory === filter
                             ? 'bg-white/20 text-white backdrop-blur-sm'
-                            : 'bg-white text-[#0369A1] dark:bg-[#0EA5E9]/20 dark:text-[#0EA5E9] group-hover:bg-[#0EA5E9] group-hover:text-white border border-gray-200 dark:border-transparent'
+                            : 'bg-white text-[#0369A1] dark:bg-[#0EA5E9]/20 dark:text-[#0EA5E9] group-hover:bg-[#0EA5E9] group-hover:text-white border border-gray-200 dark:border-white/10'
                             }`}>
                             {count}
                           </span>
@@ -578,10 +578,10 @@ export default function CategoryShowcase() {
               initial={{ opacity: 0, x: 20 }}
               animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4"
+              className="flex items-center justify-between border-b border-gray-200 dark:border-white/10 pb-4"
             >
               <div>
-                <h3 className="text-lg font-semibold text-foreground">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   {selectedCategory === 'ALL' ? 'All Subcategories' : selectedCategory}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -594,7 +594,7 @@ export default function CategoryShowcase() {
               {selectedCategory !== 'ALL' && (
                 <button
                   onClick={() => setSelectedCategory('ALL')}
-                  className="text-sm text-gray-500 hover:text-foreground transition-colors duration-200 flex items-center gap-2"
+                  className="text-sm text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200 flex items-center gap-2"
                 >
                   <span>Clear filter</span>
                   <span className="text-lg">×</span>
@@ -661,7 +661,7 @@ export default function CategoryShowcase() {
       </div>
 
       {/* Custom Styles for Performance Optimizations */}
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .card-hover {
           will-change: transform;
           transform: translate3d(0, 0, 0);
@@ -692,10 +692,10 @@ export default function CategoryShowcase() {
         }
 
         .dark .skeleton-loader {
-          background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+          background: linear-gradient(90deg, #0A0A0A 25%, #111 50%, #0A0A0A 75%);
           background-size: 200px 100%;
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }

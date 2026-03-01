@@ -146,14 +146,46 @@ export default function BlogManagement() {
         }
     }, []);
 
+    // Get the block-level tag wrapping the current selection
+    const getCurrentBlockTag = useCallback((): string => {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return "p";
+        let node: Node | null = sel.anchorNode;
+        while (node && node !== editorRef.current) {
+            if (node.nodeType === 1) {
+                const tag = (node as Element).tagName.toLowerCase();
+                if (["p", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "div"].includes(tag)) {
+                    return tag;
+                }
+            }
+            node = node.parentNode;
+        }
+        return "p";
+    }, []);
+
     const execFormat = useCallback(
         (command: string, value: string | null = null) => {
+            // Focus the editor so execCommand targets it
+            editorRef.current?.focus();
             restoreSelection();
-            document.execCommand(command, false, value ?? undefined);
+
+            if (command === "formatBlock" && value) {
+                // Toggle: if already this block type, revert to <p>
+                const current = getCurrentBlockTag();
+                const target = value.replace(/[<>]/g, "").toLowerCase();
+                if (current === target) {
+                    document.execCommand("formatBlock", false, "<p>");
+                } else {
+                    document.execCommand("formatBlock", false, value);
+                }
+            } else {
+                document.execCommand(command, false, value ?? undefined);
+            }
+
             saveSelection();
             syncEditorContent();
         },
-        [restoreSelection, saveSelection, syncEditorContent]
+        [restoreSelection, saveSelection, syncEditorContent, getCurrentBlockTag]
     );
 
     const preventFocusLoss = useCallback((e: React.MouseEvent) => {
@@ -344,13 +376,13 @@ export default function BlogManagement() {
                                 <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("italic")} className="p-1.5 rounded hover:bg-gray-200 italic text-sm" title="Italic">I</button>
                                 <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("underline")} className="p-1.5 rounded hover:bg-gray-200 underline text-sm" title="Underline">U</button>
                                 <span className="w-px h-5 bg-gray-300 mx-1"></span>
-                                <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("formatBlock", "h2")} className="p-1.5 rounded hover:bg-gray-200 text-sm font-semibold" title="Heading 2">H2</button>
-                                <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("formatBlock", "h3")} className="p-1.5 rounded hover:bg-gray-200 text-sm font-semibold" title="Heading 3">H3</button>
-                                <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("formatBlock", "p")} className="p-1.5 rounded hover:bg-gray-200 text-sm" title="Paragraph">P</button>
+                                <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("formatBlock", "<h2>")} className="p-1.5 rounded hover:bg-gray-200 text-sm font-semibold" title="Heading 2">H2</button>
+                                <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("formatBlock", "<h3>")} className="p-1.5 rounded hover:bg-gray-200 text-sm font-semibold" title="Heading 3">H3</button>
+                                <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("formatBlock", "<p>")} className="p-1.5 rounded hover:bg-gray-200 text-sm" title="Paragraph">P</button>
                                 <span className="w-px h-5 bg-gray-300 mx-1"></span>
                                 <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("insertUnorderedList")} className="p-1.5 rounded hover:bg-gray-200 text-sm" title="Bullet List">UL</button>
                                 <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("insertOrderedList")} className="p-1.5 rounded hover:bg-gray-200 text-sm" title="Numbered List">OL</button>
-                                <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("formatBlock", "blockquote")} className="p-1.5 rounded hover:bg-gray-200 text-sm" title="Quote">Q</button>
+                                <button type="button" onMouseDown={preventFocusLoss} onClick={() => execFormat("formatBlock", "<blockquote>")} className="p-1.5 rounded hover:bg-gray-200 text-sm" title="Quote">Q</button>
                                 <span className="w-px h-5 bg-gray-300 mx-1"></span>
                                 <button type="button" onMouseDown={preventFocusLoss} onClick={() => {
                                     const url = prompt("Enter link URL:");
@@ -363,10 +395,11 @@ export default function BlogManagement() {
                             <div
                                 ref={editorRef}
                                 contentEditable
+                                suppressContentEditableWarning
                                 onInput={syncEditorContent}
                                 onMouseUp={saveSelection}
                                 onKeyUp={saveSelection}
-                                className="min-h-64 p-4 prose prose-sm max-w-none focus:outline-none"
+                                className="min-h-64 p-4 blog-content focus:outline-none"
                             />
                         </div>
                     </div>

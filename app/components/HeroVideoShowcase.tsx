@@ -17,6 +17,69 @@ interface HeroVideo {
 
 const STORAGE_KEY = "garudaqua_admin_hero_videos";
 
+const sampleVideos: HeroVideo[] = [
+    {
+        _id: "sample-1",
+        title: "3-Layer Water Tank Manufacturing",
+        description: "See how our ISI-certified 3-layer water tanks are manufactured with precision rotomolding technology.",
+        videoUrl: "https://videos.pexels.com/video-files/3191572/3191572-uhd_2560_1440_25fps.mp4",
+        thumbnailUrl: "",
+        order: 1,
+        isActive: true,
+        duration: 30,
+        linkedProductId: "",
+        linkedProductSlug: "3-layer-water-tank",
+    },
+    {
+        _id: "sample-2",
+        title: "PVC Pipe Pressure Testing",
+        description: "Our PVC pipes undergo rigorous pressure testing to ensure leak-proof performance in every installation.",
+        videoUrl: "https://videos.pexels.com/video-files/3205828/3205828-uhd_2560_1440_25fps.mp4",
+        thumbnailUrl: "",
+        order: 2,
+        isActive: true,
+        duration: 25,
+        linkedProductId: "",
+        linkedProductSlug: "pvc-pipes",
+    },
+    {
+        _id: "sample-3",
+        title: "Underground Tank Installation",
+        description: "Watch a complete underground tank installation — engineered to withstand soil pressure and last for decades.",
+        videoUrl: "https://videos.pexels.com/video-files/2491284/2491284-uhd_2560_1440_24fps.mp4",
+        thumbnailUrl: "",
+        order: 3,
+        isActive: true,
+        duration: 35,
+        linkedProductId: "",
+        linkedProductSlug: "underground-tank",
+    },
+    {
+        _id: "sample-4",
+        title: "CPVC Hot Water Piping System",
+        description: "CPVC pipes designed for hot water applications — heat resistant up to 93°C with superior joint strength.",
+        videoUrl: "https://videos.pexels.com/video-files/3194277/3194277-uhd_2560_1440_30fps.mp4",
+        thumbnailUrl: "",
+        order: 4,
+        isActive: true,
+        duration: 28,
+        linkedProductId: "",
+        linkedProductSlug: "cpvc-pipes",
+    },
+    {
+        _id: "sample-5",
+        title: "Overhead Tank Durability Test",
+        description: "Our overhead tanks are UV-stabilized and weather-tested for extreme Indian climates — from Rajasthan heat to Kerala monsoons.",
+        videoUrl: "https://videos.pexels.com/video-files/2611510/2611510-uhd_2560_1440_24fps.mp4",
+        thumbnailUrl: "",
+        order: 5,
+        isActive: true,
+        duration: 22,
+        linkedProductId: "",
+        linkedProductSlug: "overhead-tank",
+    },
+];
+
 export default function VideoShowcaseSection() {
     const [videos, setVideos] = useState<HeroVideo[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -24,14 +87,16 @@ export default function VideoShowcaseSection() {
     const [isMuted, setIsMuted] = useState(true);
     const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
     const videoElementRefs = useRef<(HTMLVideoElement | null)[]>([]);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             const all: HeroVideo[] = stored ? JSON.parse(stored) : [];
-            setVideos(all.filter((v) => v.isActive).sort((a, b) => a.order - b.order));
+            const active = all.filter((v) => v.isActive).sort((a, b) => a.order - b.order);
+            setVideos(active.length > 0 ? active : sampleVideos);
         } catch {
-            setVideos([]);
+            setVideos(sampleVideos);
         }
         setLoading(false);
     }, []);
@@ -65,29 +130,30 @@ export default function VideoShowcaseSection() {
 
     const scrollToVideo = useCallback((index: number) => {
         setCurrentIndex(index);
-        videoRefs.current[index]?.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "center",
-        });
+        const container = scrollContainerRef.current;
+        const card = videoRefs.current[index];
+        if (container && card) {
+            const scrollLeft = card.offsetLeft - container.offsetLeft - (container.clientWidth / 2) + (card.clientWidth / 2);
+            container.scrollTo({ left: scrollLeft, behavior: "smooth" });
+        }
     }, []);
 
     if (loading) {
         return (
-            <section className="py-20 bg-linear-to-b from-gray-50 to-white">
+            <section className="py-20 bg-linear-to-b from-gray-50 to-white dark:from-black dark:to-[#0A0A0A]">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-10">
-                        <div className="h-4 bg-gray-200 rounded w-32 mx-auto mb-4 animate-pulse" />
-                        <div className="h-8 bg-gray-200 rounded-lg w-64 mx-auto mb-3 animate-pulse" />
-                        <div className="h-4 bg-gray-200 rounded w-80 mx-auto animate-pulse" />
+                        <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-32 mx-auto mb-4 animate-pulse" />
+                        <div className="h-8 bg-gray-200 dark:bg-white/10 rounded-lg w-64 mx-auto mb-3 animate-pulse" />
+                        <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-80 mx-auto animate-pulse" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {Array.from({ length: 3 }).map((_, i) => (
                             <div key={i} className="rounded-2xl overflow-hidden">
-                                <div className="aspect-video bg-gray-200 animate-pulse" />
+                                <div className="aspect-video bg-gray-200 dark:bg-white/10 animate-pulse" />
                                 <div className="p-4 space-y-2">
-                                    <div className="h-5 bg-gray-200 rounded w-2/3 animate-pulse" />
-                                    <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse" />
+                                    <div className="h-5 bg-gray-200 dark:bg-white/10 rounded w-2/3 animate-pulse" />
+                                    <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-1/2 animate-pulse" />
                                 </div>
                             </div>
                         ))}
@@ -100,7 +166,7 @@ export default function VideoShowcaseSection() {
     if (videos.length === 0) return null;
 
     return (
-        <section className="py-20 bg-linear-to-b from-gray-50 to-white overflow-hidden">
+        <section className="py-20 bg-linear-to-b from-gray-50 to-white dark:from-black dark:to-[#0A0A0A] overflow-hidden">
             <div className="container mx-auto px-4">
                 {/* Section Header */}
                 <motion.div
@@ -110,17 +176,17 @@ export default function VideoShowcaseSection() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-4">
+                    <h2 className="text-4xl md:text-5xl font-light text-gray-900 dark:text-gray-100 mb-4">
                         Products in <span className="text-[#0EA5E9]">Action</span>
                     </h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                         See our water tanks and piping solutions showcased in real-world applications
                     </p>
                 </motion.div>
 
                 {/* Video Carousel */}
                 <div className="relative">
-                    <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 px-4 md:px-0" style={{ scrollbarWidth: "none" }}>
+                    <div ref={scrollContainerRef} className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 px-4 md:px-0" style={{ scrollbarWidth: "none" }}>
                         {videos.map((video, index) => (
                             <motion.div
                                 key={video._id}
@@ -180,7 +246,7 @@ export default function VideoShowcaseSection() {
 
                                 {/* Video Number */}
                                 <div className="text-center mt-4">
-                                    <span className="text-sm text-gray-500">
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
                                         {String(index + 1).padStart(2, "0")} / {String(videos.length).padStart(2, "0")}
                                     </span>
                                 </div>
@@ -194,7 +260,7 @@ export default function VideoShowcaseSection() {
                             <button
                                 onClick={() => scrollToVideo(Math.max(0, currentIndex - 1))}
                                 disabled={currentIndex === 0}
-                                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white shadow-lg items-center justify-center text-gray-900 hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white dark:bg-[#0A0A0A] shadow-lg dark:shadow-white/5 items-center justify-center text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed z-10"
                                 aria-label="Previous video"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,7 +270,7 @@ export default function VideoShowcaseSection() {
                             <button
                                 onClick={() => scrollToVideo(Math.min(videos.length - 1, currentIndex + 1))}
                                 disabled={currentIndex === videos.length - 1}
-                                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white shadow-lg items-center justify-center text-gray-900 hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white dark:bg-[#0A0A0A] shadow-lg dark:shadow-white/5 items-center justify-center text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed z-10"
                                 aria-label="Next video"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

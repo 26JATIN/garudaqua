@@ -1,6 +1,11 @@
 import Hero from './components/hero';
 import CategoryShowcase from './components/CategoryShowcase';
 import Footer from './components/Footer';
+import Benefits from './components/Benefits';
+import Newsletter from './components/Newsletter';
+import VideoShowcaseSection from './components/HeroVideoShowcase';
+import ImageGallery from './components/ImageGallery';
+import Testimonials from './components/Testimonials';
 export default function Home() {
   return (
     <main className="min-h-screen relative overflow-x-hidden">
@@ -11,8 +16,14 @@ export default function Home() {
       <Hero />
       {/*Category Showcase*/}
       <CategoryShowcase />
-      {/*Footer*/}
+      <Benefits/>
+      <ImageGallery/>
+      <VideoShowcaseSection/>
+      <Testimonials/>
+      <Newsletter/>
       <Footer/>
+      
+      
     </main>
   );
 }
