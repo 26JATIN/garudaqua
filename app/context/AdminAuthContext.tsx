@@ -1,77 +1,77 @@
 "use client";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useCallback,
+} from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 interface AdminUser {
-    name: string;
-    email: string;
-    isAdmin: boolean;
+  name: string;
+  email: string;
+  isAdmin: boolean;
 }
 
 interface AdminAuthContextType {
-    user: AdminUser | null;
-    loading: boolean;
-    login: (email: string, password: string) => boolean;
-    logout: () => void;
+  user: AdminUser | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType>({
-    user: null,
-    loading: true,
-    login: () => false,
-    logout: () => {},
+  user: null,
+  loading: true,
+  login: async () => false,
+  logout: () => {},
 });
 
-// Hardcoded admin credentials — change these as needed
-const ADMIN_EMAIL = "admin@garudaqua.com";
-const ADMIN_PASSWORD = "admin123";
-const STORAGE_KEY = "garudaqua_admin_auth";
-
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<AdminUser | null>(null);
-    const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const [loginLoading, setLoginLoading] = useState(false);
 
-    useEffect(() => {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                const parsed = JSON.parse(stored) as AdminUser;
-                if (parsed.isAdmin) {
-                    setUser(parsed);
-                }
-            }
-        } catch {
-            localStorage.removeItem(STORAGE_KEY);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+  const user: AdminUser | null = session?.user
+    ? {
+        name: session.user.name || "Admin",
+        email: session.user.email || "",
+        isAdmin: true,
+      }
+    : null;
 
-    const login = (email: string, password: string): boolean => {
-        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-            const adminUser: AdminUser = {
-                name: "Admin",
-                email: ADMIN_EMAIL,
-                isAdmin: true,
-            };
-            setUser(adminUser);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(adminUser));
-            return true;
-        }
+  const loading = status === "loading" || loginLoading;
+
+  const login = useCallback(
+    async (email: string, password: string): Promise<boolean> => {
+      setLoginLoading(true);
+      try {
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
+        return !result?.error;
+      } catch {
         return false;
-    };
+      } finally {
+        setLoginLoading(false);
+      }
+    },
+    []
+  );
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem(STORAGE_KEY);
-    };
+  const logout = useCallback(() => {
+    signOut({ redirect: false });
+  }, []);
 
-    return (
-        <AdminAuthContext.Provider value={{ user, loading, login, logout }}>
-            {children}
-        </AdminAuthContext.Provider>
-    );
+  return (
+    <AdminAuthContext.Provider value={{ user, loading, login, logout }}>
+      {children}
+    </AdminAuthContext.Provider>
+  );
 }
 
 export function useAdminAuth() {
-    return useContext(AdminAuthContext);
+  return useContext(AdminAuthContext);
 }

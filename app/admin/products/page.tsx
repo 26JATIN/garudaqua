@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
@@ -22,11 +22,11 @@ interface ProductVariant {
 }
 
 interface Product {
-    _id: string;
+    id: string;
     name: string;
     description: string;
-    category: string;
-    subcategory: string;
+    category: { id: string; name: string } | string;
+    subcategory: { id: string; name: string } | string;
     image: string;
     images: string[];
     isActive: boolean;
@@ -47,118 +47,109 @@ interface Product {
     variants: ProductVariant[];
 }
 
-// ===== Static categories for water tanks & pipes =====
-const STATIC_CATEGORIES = [
-    { _id: "cat-1", name: "Water Tanks" },
-    { _id: "cat-2", name: "Pipes & Fittings" },
-    { _id: "cat-3", name: "Bathroom Fittings" },
-];
-
-// ===== Static initial products =====
-const INITIAL_PRODUCTS: Product[] = [
-    {
-        _id: "p1",
-        name: "3 Layer Water Tank - 500L",
-        description: "Premium 3-layer water tank with food-grade inner layer",
-        category: "Water Tanks",
-        subcategory: "",
-        image: "/products/tank-500l.jpg",
-        images: ["/products/tank-500l.jpg"],
-        isActive: true,
-        tags: ["Water Tank", "3 Layer", "500L"],
-        hasVariants: false,
-        variantOptions: [],
-        variants: [],
-    },
-    {
-        _id: "p2",
-        name: "CPVC Pipe - 1 inch",
-        description: "Hot & cold water supply CPVC pipe, ISI certified",
-        category: "Pipes & Fittings",
-        subcategory: "",
-        image: "/products/cpvc-pipe.jpg",
-        images: ["/products/cpvc-pipe.jpg"],
-        isActive: true,
-        tags: ["CPVC", "Pipe", "1 inch"],
-        hasVariants: true,
-        variantOptions: [
-            {
-                name: "Length",
-                displayName: "Pipe Length",
-                type: "select",
-                required: true,
-                values: [
-                    { name: "3m", displayName: "3 Meters", colorCode: null, isAvailable: true },
-                    { name: "6m", displayName: "6 Meters", colorCode: null, isAvailable: true },
-                ],
-            },
-        ],
-        variants: [
-            { sku: "CPVC-1IN-3M", optionCombination: { Length: "3m" }, isActive: true },
-            { sku: "CPVC-1IN-6M", optionCombination: { Length: "6m" }, isActive: true },
-        ],
-    },
-];
-
-const STORAGE_KEY = "garudaqua_admin_products";
+interface Category {
+    id: string;
+    name: string;
+}
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<"list" | "new">("list");
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-    const [mounted, setMounted] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("all");
 
-    useEffect(() => {
-        setMounted(true);
+    const fetchProducts = useCallback(async () => {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                setProducts(JSON.parse(stored));
-            } else {
-                setProducts(INITIAL_PRODUCTS);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_PRODUCTS));
-            }
+            const res = await fetch("/api/admin/products");
+            if (!res.ok) throw new Error("Failed to fetch products");
+            const data = await res.json();
+            setProducts(data);
         } catch {
-            setProducts(INITIAL_PRODUCTS);
+            toast.error("Failed to load products");
         }
-        setLoading(false);
     }, []);
 
-    const saveProducts = (updated: Product[]) => {
-        setProducts(updated);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    };
+    const fetchCategories = useCallback(async () => {
+        try {
+            const res = await fetch("/api/admin/categories");
+            if (!res.ok) throw new Error("Failed to fetch categories");
+            const data = await res.json();
+            setCategories(data);
+        } catch {
+            toast.error("Failed to load categories");
+        }
+    }, []);
 
-    const handleCreateProduct = (formData: Omit<Product, "_id">) => {
-        const newProduct: Product = {
-            ...formData,
-            _id: `p-${Date.now()}`,
+    useEffect(() => {
+        const init = async () => {
+            setLoading(true);
+            await Promise.all([fetchProducts(), fetchCategories()]);
+            setLoading(false);
         };
-        const updated = [newProduct, ...products];
-        saveProducts(updated);
-        setActiveTab("list");
-        toast.success("Product created successfully");
+        init();
+    }, [fetchProducts, fetchCategories]);
+
+    const handleCreateProduct = async (formData: Record<string, unknown>) => {
+        try {
+            const res = await fetch("/api/admin/products", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || "Failed to create product");
+            }
+            await fetchProducts();
+            setActiveTab("list");
+            toast.success("Product created successfully");
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Failed to create product";
+            toast.error(message);
+        }
     };
 
-    const handleUpdateProduct = (formData: Omit<Product, "_id">) => {
+    const handleUpdateProduct = async (formData: Record<string, unknown>) => {
         if (!editingProduct) return;
-        const updated = products.map((p) =>
-            p._id === editingProduct._id ? { ...formData, _id: editingProduct._id } : p
-        );
-        saveProducts(updated);
-        setEditingProduct(null);
-        setActiveTab("list");
-        toast.success("Product updated successfully");
+        try {
+            const res = await fetch(`/api/admin/products/${editingProduct.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || "Failed to update product");
+            }
+            await fetchProducts();
+            setEditingProduct(null);
+            setActiveTab("list");
+            toast.success("Product updated successfully");
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Failed to update product";
+            toast.error(message);
+        }
     };
 
-    const handleDeleteProduct = (id: string) => {
+    const handleDeleteProduct = async (id: string) => {
         if (!confirm("Are you sure you want to delete this product?")) return;
-        const updated = products.filter((p) => p._id !== id);
-        saveProducts(updated);
-        toast.success("Product deleted");
+        try {
+            const res = await fetch(`/api/admin/products/${id}`, {
+                method: "DELETE",
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || "Failed to delete product");
+            }
+            await fetchProducts();
+            toast.success("Product deleted");
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Failed to delete product";
+            toast.error(message);
+        }
     };
 
     const handleEdit = (product: Product) => {
@@ -166,16 +157,20 @@ export default function AdminProductsPage() {
         setActiveTab("new");
     };
 
+    const getCategoryName = (cat: { id: string; name: string } | string): string => {
+        if (typeof cat === "string") return cat;
+        return cat?.name || "";
+    };
+
     const filteredProducts = products.filter((p) => {
         const matchesSearch =
             !searchTerm ||
             p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.tags.some((t) => t.toLowerCase().includes(searchTerm.toLowerCase()));
-        const matchesCategory = categoryFilter === "all" || p.category === categoryFilter;
+            p.tags?.some((t) => t.toLowerCase().includes(searchTerm.toLowerCase()));
+        const catName = getCategoryName(p.category);
+        const matchesCategory = categoryFilter === "all" || catName === categoryFilter;
         return matchesSearch && matchesCategory;
     });
-
-    if (!mounted) return null;
 
     return (
         <AdminLayout>
@@ -236,8 +231,8 @@ export default function AdminProductsPage() {
                                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
                             >
                                 <option value="all">All Categories</option>
-                                {STATIC_CATEGORIES.map((cat) => (
-                                    <option key={cat._id} value={cat.name}>
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.name}>
                                         {cat.name}
                                     </option>
                                 ))}
@@ -272,7 +267,7 @@ export default function AdminProductsPage() {
                                 setActiveTab("list");
                                 setEditingProduct(null);
                             }}
-                            categories={STATIC_CATEGORIES}
+                            categories={categories}
                         />
                     </div>
                 )}

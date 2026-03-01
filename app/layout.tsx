@@ -4,6 +4,7 @@ import "./globals.css";
 import { NavbarProvider } from "./context/NavbarContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import ConditionalNavbar from "./components/ConditionalNavbar";
+import Providers from "./components/Providers";
 // import PWARegister from "./components/PWARegister";
 // import InstallPrompt from "./components/InstallPrompt";
 import { Toaster } from "sonner";
@@ -26,7 +27,7 @@ export const viewport = {
 
 export const metadata = {
   title: "Garud",
-  description: "Garud Aqua Solution - A Bond of Trust & Quality in Water Tanks, Pipes & Fittings",
+  description: "Garud Aqua Solutions - A Bond of Trust & Quality in Water Tanks, Pipes & Fittings",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -71,15 +72,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}} />
       </head>
       <body className={`${inter.className} bg-white dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
-        <ThemeToaster />
-        <ThemeProvider>
-          <NavbarProvider>
-            <ConditionalNavbar />
-            <main>
-              {children}
-            </main>
-          </NavbarProvider>
-        </ThemeProvider>
+        <Providers>
+          <ThemeToaster />
+          <ThemeProvider>
+            <NavbarProvider>
+              <ConditionalNavbar />
+              <main>
+                {children}
+              </main>
+            </NavbarProvider>
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

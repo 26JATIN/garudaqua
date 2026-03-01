@@ -1,51 +1,37 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
 
 // ===== Types =====
 interface Category {
-    _id: string;
+    id: string;
     name: string;
     description: string;
     image: string;
     sortOrder: number;
     isActive: boolean;
+    _count?: { subcategories: number; products: number };
 }
 
 interface Subcategory {
-    _id: string;
+    id: string;
     name: string;
     description: string;
     image: string;
     categoryId: string;
     order: number;
     isActive: boolean;
+    category?: { id: string; name: string };
 }
-
-// ===== Initial static data =====
-const INITIAL_CATEGORIES: Category[] = [
-    { _id: "cat-1", name: "Water Tanks", description: "Multi-layer and single-layer water storage tanks", image: "", sortOrder: 1, isActive: true },
-    { _id: "cat-2", name: "Pipes & Fittings", description: "PVC, CPVC, and uPVC pipes with fittings", image: "", sortOrder: 2, isActive: true },
-    { _id: "cat-3", name: "Bathroom Fittings", description: "Taps, showers, and bathroom accessories", image: "", sortOrder: 3, isActive: true },
-];
-
-const INITIAL_SUBCATEGORIES: Subcategory[] = [
-    { _id: "sub-1", name: "Overhead Tanks", description: "Roof-mounted water tanks", image: "", categoryId: "cat-1", order: 1, isActive: true },
-    { _id: "sub-2", name: "Underground Tanks", description: "Below-ground water storage", image: "", categoryId: "cat-1", order: 2, isActive: true },
-    { _id: "sub-3", name: "CPVC Pipes", description: "Hot & cold water CPVC pipes", image: "", categoryId: "cat-2", order: 1, isActive: true },
-    { _id: "sub-4", name: "PVC Pipes", description: "Cold water PVC pipes", image: "", categoryId: "cat-2", order: 2, isActive: true },
-    { _id: "sub-5", name: "Pipe Fittings", description: "Elbows, tees, couplings", image: "", categoryId: "cat-2", order: 3, isActive: true },
-];
-
-const CAT_STORAGE = "garudaqua_admin_categories";
-const SUBCAT_STORAGE = "garudaqua_admin_subcategories";
 
 export default function CategoriesAdmin() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [activeTab, setActiveTab] = useState<"categories" | "subcategories">("categories");
     const [showForm, setShowForm] = useState(false);
     const [showSubForm, setShowSubForm] = useState(false);
@@ -56,53 +42,134 @@ export default function CategoriesAdmin() {
     const [catForm, setCatForm] = useState({ name: "", description: "", image: "", sortOrder: 0, isActive: true });
     const [subForm, setSubForm] = useState({ name: "", description: "", image: "", categoryId: "", order: 0, isActive: true });
 
-    useEffect(() => {
+    // ===== Fetch Categories =====
+    const fetchCategories = useCallback(async () => {
         try {
-            const storedCats = localStorage.getItem(CAT_STORAGE);
-            const storedSubs = localStorage.getItem(SUBCAT_STORAGE);
-            setCategories(storedCats ? JSON.parse(storedCats) : INITIAL_CATEGORIES);
-            setSubcategories(storedSubs ? JSON.parse(storedSubs) : INITIAL_SUBCATEGORIES);
-            if (!storedCats) localStorage.setItem(CAT_STORAGE, JSON.stringify(INITIAL_CATEGORIES));
-            if (!storedSubs) localStorage.setItem(SUBCAT_STORAGE, JSON.stringify(INITIAL_SUBCATEGORIES));
-        } catch {
-            setCategories(INITIAL_CATEGORIES);
-            setSubcategories(INITIAL_SUBCATEGORIES);
+            const res = await fetch("/api/admin/categories");
+            if (!res.ok) throw new Error("Failed to fetch categories");
+            const data = await res.json();
+            setCategories(data);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+            toast.error("Failed to load categories");
         }
-        setLoading(false);
     }, []);
 
-    const saveCats = (updated: Category[]) => {
-        setCategories(updated);
-        localStorage.setItem(CAT_STORAGE, JSON.stringify(updated));
-    };
+    // ===== Fetch Subcategories =====
+    const fetchSubcategories = useCallback(async () => {
+        try {
+            const res = await fetch("/api/admin/subcategories");
+            if (!res.ok) throw new Error("Failed to fetch subcategories");
+            const data = await res.json();
+            setSubcategories(data);
+        } catch (error) {
+            console.error("Error fetching subcategories:", error);
+            toast.error("Failed to load subcategories");
+        }
+    }, []);
 
-    const saveSubs = (updated: Subcategory[]) => {
-        setSubcategories(updated);
-        localStorage.setItem(SUBCAT_STORAGE, JSON.stringify(updated));
-    };
+    // ===== Initial Load =====
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            await Promise.all([fetchCategories(), fetchSubcategories()]);
+            setLoading(false);
+        };
+        loadData();
+    }, [fetchCategories, fetchSubcategories]);
+
+    // ===== Image Upload via Cloudinary =====
+    const uploadImage = useCallback(async (file: File, folder: string): Promise<string | null> => {
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folder", folder);
+            const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+            if (!res.ok) throw new Error("Upload failed");
+            const { url } = await res.json();
+            return url;
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            toast.error("Failed to upload image");
+            return null;
+        } finally {
+            setUploading(false);
+        }
+    }, []);
+
+    const pickImage = useCallback((onPicked: (url: string) => void) => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = async (e: Event) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+            const url = await uploadImage(file, "garudaqua/categories");
+            if (url) onPicked(url);
+        };
+        input.click();
+    }, [uploadImage]);
 
     // ===== Category CRUD =====
-    const handleCatSubmit = (e: React.FormEvent) => {
+    const handleCatSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!catForm.name.trim()) { toast.error("Name is required"); return; }
 
-        if (editingCat) {
-            const updated = categories.map((c) => c._id === editingCat._id ? { ...editingCat, ...catForm } : c);
-            saveCats(updated);
-            toast.success("Category updated");
-        } else {
-            const newCat: Category = { _id: `cat-${Date.now()}`, ...catForm };
-            saveCats([...categories, newCat]);
-            toast.success("Category created");
+        setSaving(true);
+        try {
+            if (editingCat) {
+                const res = await fetch(`/api/admin/categories/${editingCat.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(catForm),
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || "Failed to update category");
+                }
+                toast.success("Category updated");
+            } else {
+                const res = await fetch("/api/admin/categories", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(catForm),
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || "Failed to create category");
+                }
+                toast.success("Category created");
+            }
+            await fetchCategories();
+            resetCatForm();
+        } catch (error) {
+            console.error("Error saving category:", error);
+            toast.error(error instanceof Error ? error.message : "Failed to save category");
+        } finally {
+            setSaving(false);
         }
-        resetCatForm();
-    };
+    }, [catForm, editingCat, fetchCategories]);
 
-    const handleDeleteCat = (id: string) => {
+    const handleDeleteCat = useCallback(async (id: string) => {
         if (!confirm("Delete this category? Subcategories under it will be orphaned.")) return;
-        saveCats(categories.filter((c) => c._id !== id));
-        toast.success("Category deleted");
-    };
+
+        setSaving(true);
+        try {
+            const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || "Failed to delete category");
+            }
+            toast.success("Category deleted");
+            await Promise.all([fetchCategories(), fetchSubcategories()]);
+        } catch (error) {
+            console.error("Error deleting category:", error);
+            toast.error(error instanceof Error ? error.message : "Failed to delete category");
+        } finally {
+            setSaving(false);
+        }
+    }, [fetchCategories, fetchSubcategories]);
 
     const startEditCat = (cat: Category) => {
         setEditingCat(cat);
@@ -117,27 +184,64 @@ export default function CategoriesAdmin() {
     };
 
     // ===== Subcategory CRUD =====
-    const handleSubSubmit = (e: React.FormEvent) => {
+    const handleSubSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!subForm.name.trim() || !subForm.categoryId) { toast.error("Name and category are required"); return; }
 
-        if (editingSub) {
-            const updated = subcategories.map((s) => s._id === editingSub._id ? { ...editingSub, ...subForm } : s);
-            saveSubs(updated);
-            toast.success("Subcategory updated");
-        } else {
-            const newSub: Subcategory = { _id: `sub-${Date.now()}`, ...subForm };
-            saveSubs([...subcategories, newSub]);
-            toast.success("Subcategory created");
+        setSaving(true);
+        try {
+            if (editingSub) {
+                const res = await fetch(`/api/admin/subcategories/${editingSub.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(subForm),
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || "Failed to update subcategory");
+                }
+                toast.success("Subcategory updated");
+            } else {
+                const res = await fetch("/api/admin/subcategories", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(subForm),
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || "Failed to create subcategory");
+                }
+                toast.success("Subcategory created");
+            }
+            await fetchSubcategories();
+            resetSubForm();
+        } catch (error) {
+            console.error("Error saving subcategory:", error);
+            toast.error(error instanceof Error ? error.message : "Failed to save subcategory");
+        } finally {
+            setSaving(false);
         }
-        resetSubForm();
-    };
+    }, [subForm, editingSub, fetchSubcategories]);
 
-    const handleDeleteSub = (id: string) => {
+    const handleDeleteSub = useCallback(async (id: string) => {
         if (!confirm("Delete this subcategory?")) return;
-        saveSubs(subcategories.filter((s) => s._id !== id));
-        toast.success("Subcategory deleted");
-    };
+
+        setSaving(true);
+        try {
+            const res = await fetch(`/api/admin/subcategories/${id}`, { method: "DELETE" });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || "Failed to delete subcategory");
+            }
+            toast.success("Subcategory deleted");
+            await Promise.all([fetchCategories(), fetchSubcategories()]);
+        } catch (error) {
+            console.error("Error deleting subcategory:", error);
+            toast.error(error instanceof Error ? error.message : "Failed to delete subcategory");
+        } finally {
+            setSaving(false);
+        }
+    }, [fetchCategories, fetchSubcategories]);
 
     const startEditSub = (sub: Subcategory) => {
         setEditingSub(sub);
@@ -151,24 +255,10 @@ export default function CategoriesAdmin() {
         setShowSubForm(false);
     };
 
-    const pickImage = (onPicked: (dataUrl: string) => void) => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        input.onchange = (e: Event) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => onPicked(ev.target?.result as string);
-            reader.readAsDataURL(file);
-        };
-        input.click();
-    };
-
     const filteredCats = categories.filter((c) => !searchTerm || c.name.toLowerCase().includes(searchTerm.toLowerCase()));
     const filteredSubs = subcategories.filter((s) => !searchTerm || s.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const getCatName = (catId: string) => categories.find((c) => c._id === catId)?.name || "Unknown";
+    const getCatName = (catId: string) => categories.find((c) => c.id === catId)?.name || "Unknown";
 
     if (loading) {
         return (
@@ -246,8 +336,10 @@ export default function CategoriesAdmin() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
-                                <button type="button" onClick={() => pickImage((url) => setCatForm((prev) => ({ ...prev, image: url })))}
-                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Upload Image</button>
+                                <button type="button" disabled={uploading} onClick={() => pickImage((url) => setCatForm((prev) => ({ ...prev, image: url })))}
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {uploading ? "Uploading..." : "Upload Image"}
+                                </button>
                                 {catForm.image && <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100"><Image src={catForm.image} alt="Preview" fill className="object-cover" /></div>}
                                 <label className="flex items-center gap-2 ml-auto">
                                     <input type="checkbox" checked={catForm.isActive} onChange={(e) => setCatForm({ ...catForm, isActive: e.target.checked })}
@@ -256,7 +348,9 @@ export default function CategoriesAdmin() {
                                 </label>
                             </div>
                             <div className="flex gap-3 pt-2">
-                                <button type="submit" className="px-5 py-2 bg-[#0EA5E9] text-white rounded-lg hover:bg-[#0369A1] transition text-sm font-medium">{editingCat ? "Update" : "Create"}</button>
+                                <button type="submit" disabled={saving || uploading} className="px-5 py-2 bg-[#0EA5E9] text-white rounded-lg hover:bg-[#0369A1] transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {saving ? "Saving..." : editingCat ? "Update" : "Create"}
+                                </button>
                                 <button type="button" onClick={resetCatForm} className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">Cancel</button>
                             </div>
                         </form>
@@ -279,7 +373,7 @@ export default function CategoriesAdmin() {
                                     <select required value={subForm.categoryId} onChange={(e) => setSubForm({ ...subForm, categoryId: e.target.value })}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent">
                                         <option value="">Select Category</option>
-                                        {categories.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
+                                        {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
                                 </div>
                                 <div className="md:col-span-2">
@@ -294,8 +388,10 @@ export default function CategoriesAdmin() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
-                                <button type="button" onClick={() => pickImage((url) => setSubForm((prev) => ({ ...prev, image: url })))}
-                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm">Upload Image</button>
+                                <button type="button" disabled={uploading} onClick={() => pickImage((url) => setSubForm((prev) => ({ ...prev, image: url })))}
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {uploading ? "Uploading..." : "Upload Image"}
+                                </button>
                                 {subForm.image && <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100"><Image src={subForm.image} alt="Preview" fill className="object-cover" /></div>}
                                 <label className="flex items-center gap-2 ml-auto">
                                     <input type="checkbox" checked={subForm.isActive} onChange={(e) => setSubForm({ ...subForm, isActive: e.target.checked })}
@@ -304,7 +400,9 @@ export default function CategoriesAdmin() {
                                 </label>
                             </div>
                             <div className="flex gap-3 pt-2">
-                                <button type="submit" className="px-5 py-2 bg-[#0EA5E9] text-white rounded-lg hover:bg-[#0369A1] transition text-sm font-medium">{editingSub ? "Update" : "Create"}</button>
+                                <button type="submit" disabled={saving || uploading} className="px-5 py-2 bg-[#0EA5E9] text-white rounded-lg hover:bg-[#0369A1] transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {saving ? "Saving..." : editingSub ? "Update" : "Create"}
+                                </button>
                                 <button type="button" onClick={resetSubForm} className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">Cancel</button>
                             </div>
                         </form>
@@ -319,7 +417,7 @@ export default function CategoriesAdmin() {
                                 <div className="p-8 text-center text-gray-500">No categories found</div>
                             ) : (
                                 filteredCats.sort((a, b) => a.sortOrder - b.sortOrder).map((cat) => (
-                                    <div key={cat._id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition">
+                                    <div key={cat.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition">
                                         <div className="w-14 h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                                             {cat.image ? (
                                                 <Image src={cat.image} alt={cat.name} width={56} height={56} className="object-cover w-full h-full" />
@@ -335,15 +433,15 @@ export default function CategoriesAdmin() {
                                             <div className="flex items-center gap-2 mt-1">
                                                 <span className="text-xs text-gray-400">Order: {cat.sortOrder}</span>
                                                 <span className="text-xs text-gray-400">|</span>
-                                                <span className="text-xs text-gray-400">{subcategories.filter((s) => s.categoryId === cat._id).length} subcategories</span>
+                                                <span className="text-xs text-gray-400">{cat._count?.subcategories ?? 0} subcategories</span>
                                             </div>
                                         </div>
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${cat.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                                             {cat.isActive ? "Active" : "Inactive"}
                                         </span>
                                         <div className="flex gap-2">
-                                            <button onClick={() => startEditCat(cat)} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium">Edit</button>
-                                            <button onClick={() => handleDeleteCat(cat._id)} className="text-red-600 hover:text-red-500 text-sm font-medium">Delete</button>
+                                            <button onClick={() => startEditCat(cat)} disabled={saving} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium disabled:opacity-50">Edit</button>
+                                            <button onClick={() => handleDeleteCat(cat.id)} disabled={saving} className="text-red-600 hover:text-red-500 text-sm font-medium disabled:opacity-50">Delete</button>
                                         </div>
                                     </div>
                                 ))
@@ -360,7 +458,7 @@ export default function CategoriesAdmin() {
                                 <div className="p-8 text-center text-gray-500">No subcategories found</div>
                             ) : (
                                 filteredSubs.sort((a, b) => a.order - b.order).map((sub) => (
-                                    <div key={sub._id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition">
+                                    <div key={sub.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition">
                                         <div className="w-14 h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                                             {sub.image ? (
                                                 <Image src={sub.image} alt={sub.name} width={56} height={56} className="object-cover w-full h-full" />
@@ -373,14 +471,14 @@ export default function CategoriesAdmin() {
                                         <div className="flex-1 min-w-0">
                                             <h3 className="text-sm font-semibold text-gray-900">{sub.name}</h3>
                                             <p className="text-xs text-gray-500 line-clamp-1">{sub.description}</p>
-                                            <span className="text-xs text-[#0EA5E9] mt-1 inline-block">{getCatName(sub.categoryId)}</span>
+                                            <span className="text-xs text-[#0EA5E9] mt-1 inline-block">{sub.category?.name || getCatName(sub.categoryId)}</span>
                                         </div>
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${sub.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                                             {sub.isActive ? "Active" : "Inactive"}
                                         </span>
                                         <div className="flex gap-2">
-                                            <button onClick={() => startEditSub(sub)} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium">Edit</button>
-                                            <button onClick={() => handleDeleteSub(sub._id)} className="text-red-600 hover:text-red-500 text-sm font-medium">Delete</button>
+                                            <button onClick={() => startEditSub(sub)} disabled={saving} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium disabled:opacity-50">Edit</button>
+                                            <button onClick={() => handleDeleteSub(sub.id)} disabled={saving} className="text-red-600 hover:text-red-500 text-sm font-medium disabled:opacity-50">Delete</button>
                                         </div>
                                     </div>
                                 ))

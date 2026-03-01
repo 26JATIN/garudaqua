@@ -6,14 +6,15 @@ import { toast } from "sonner";
 
 // ===== Types =====
 interface BlogPost {
-    _id: string;
+    id: string;
     title: string;
     slug: string;
     excerpt: string;
     content: string;
     category: string;
     tags: string[];
-    featuredImage: { url: string; alt: string };
+    featuredImage: string;
+    featuredAlt: string;
     isPublished: boolean;
     readTime: number;
     author: string;
@@ -36,53 +37,6 @@ const CATEGORY_LABELS: Record<string, string> = {
     other: "Other",
 };
 
-const INITIAL_BLOGS: BlogPost[] = [
-    {
-        _id: "b1",
-        title: "How to Choose the Right Water Tank for Your Home",
-        slug: "how-to-choose-right-water-tank",
-        excerpt: "Selecting the perfect water tank involves considering capacity, material, placement, and budget.",
-        content: "<h2>Choosing the Right Water Tank</h2><p>When selecting a water tank for your home, consider these key factors...</p>",
-        category: "water-tank-guide",
-        tags: ["Water Tanks", "Buying Guide"],
-        featuredImage: { url: "", alt: "" },
-        isPublished: true,
-        readTime: 6,
-        author: "Garud Aqua Team",
-        publishedAt: "2025-03-15",
-    },
-    {
-        _id: "b2",
-        title: "PVC vs CPVC Pipes: Which One Should You Use?",
-        slug: "pvc-vs-cpvc-pipes-comparison",
-        excerpt: "Understanding the differences between PVC and CPVC pipes for your plumbing needs.",
-        content: "<h2>PVC vs CPVC</h2><p>Both PVC and CPVC are popular piping materials, but they serve different purposes...</p>",
-        category: "plumbing-tips",
-        tags: ["PVC Pipes", "CPVC Pipes"],
-        featuredImage: { url: "", alt: "" },
-        isPublished: true,
-        readTime: 5,
-        author: "Garud Aqua Team",
-        publishedAt: "2025-03-01",
-    },
-    {
-        _id: "b3",
-        title: "5 Essential Tips to Maintain Your Water Tank",
-        slug: "water-tank-maintenance-tips",
-        excerpt: "Regular maintenance ensures clean water and extends your tank lifespan.",
-        content: "<h2>Tank Maintenance</h2><p>Keeping your water tank clean is essential for your family's health...</p>",
-        category: "maintenance",
-        tags: ["Maintenance", "Water Tanks"],
-        featuredImage: { url: "", alt: "" },
-        isPublished: true,
-        readTime: 4,
-        author: "Garud Aqua Team",
-        publishedAt: "2025-02-20",
-    },
-];
-
-const STORAGE_KEY = "garudaqua_admin_blogs_full";
-
 export default function BlogManagement() {
     const [blogs, setBlogs] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
@@ -92,6 +46,8 @@ export default function BlogManagement() {
     const [statusFilter, setStatusFilter] = useState("all");
     const [categoryFilter, setCategoryFilter] = useState("all");
     const [imagePreview, setImagePreview] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<Range | null>(null);
 
@@ -102,27 +58,29 @@ export default function BlogManagement() {
         content: "",
         category: "other",
         tags: "",
-        featuredImage: { url: "", alt: "" },
+        featuredImage: "",
+        featuredAlt: "",
         isPublished: false,
         readTime: 5,
         author: "Garud Aqua Team",
     });
 
-    useEffect(() => {
+    const fetchBlogs = useCallback(async () => {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            setBlogs(stored ? JSON.parse(stored) : INITIAL_BLOGS);
-            if (!stored) localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_BLOGS));
+            const res = await fetch("/api/admin/blogs");
+            if (!res.ok) throw new Error("Failed to fetch");
+            const data = await res.json();
+            setBlogs(data);
         } catch {
-            setBlogs(INITIAL_BLOGS);
+            toast.error("Failed to load blog posts");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }, []);
 
-    const saveBlogs = (updated: BlogPost[]) => {
-        setBlogs(updated);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    };
+    useEffect(() => {
+        fetchBlogs();
+    }, [fetchBlogs]);
 
     // ===== Editor helpers =====
     const syncEditorContent = useCallback(() => {
@@ -146,7 +104,6 @@ export default function BlogManagement() {
         }
     }, []);
 
-    // Get the block-level tag wrapping the current selection
     const getCurrentBlockTag = useCallback((): string => {
         const sel = window.getSelection();
         if (!sel || sel.rangeCount === 0) return "p";
@@ -165,12 +122,10 @@ export default function BlogManagement() {
 
     const execFormat = useCallback(
         (command: string, value: string | null = null) => {
-            // Focus the editor so execCommand targets it
             editorRef.current?.focus();
             restoreSelection();
 
             if (command === "formatBlock" && value) {
-                // Toggle: if already this block type, revert to <p>
                 const current = getCurrentBlockTag();
                 const target = value.replace(/[<>]/g, "").toLowerCase();
                 if (current === target) {
@@ -196,7 +151,7 @@ export default function BlogManagement() {
     const generateSlug = (title: string) =>
         title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (editorRef.current) {
             formData.content = editorRef.current.innerHTML;
@@ -206,28 +161,48 @@ export default function BlogManagement() {
         const tags = formData.tags.split(",").map((t) => t.trim()).filter(Boolean);
         const slug = formData.slug || generateSlug(formData.title);
 
-        if (editingBlog) {
-            const updated = blogs.map((b) =>
-                b._id === editingBlog._id
-                    ? { ...editingBlog, ...formData, slug, tags }
-                    : b
-            );
-            saveBlogs(updated);
-            toast.success("Blog updated");
-        } else {
-            const newBlog: BlogPost = {
-                _id: `blog-${Date.now()}`,
-                ...formData,
+        setSubmitting(true);
+        try {
+            const body = {
+                title: formData.title,
                 slug,
+                excerpt: formData.excerpt,
+                content: formData.content,
+                category: formData.category,
                 tags,
-                publishedAt: new Date().toISOString().split("T")[0],
+                featuredImage: formData.featuredImage,
+                featuredAlt: formData.featuredAlt,
+                isPublished: formData.isPublished,
+                readTime: formData.readTime,
+                author: formData.author,
             };
-            saveBlogs([newBlog, ...blogs]);
-            toast.success("Blog created");
+
+            if (editingBlog) {
+                const res = await fetch(`/api/admin/blogs/${editingBlog.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body),
+                });
+                if (!res.ok) throw new Error("Failed to update");
+                toast.success("Blog updated");
+            } else {
+                const res = await fetch("/api/admin/blogs", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body),
+                });
+                if (!res.ok) throw new Error("Failed to create");
+                toast.success("Blog created");
+            }
+            setShowForm(false);
+            setEditingBlog(null);
+            resetForm();
+            fetchBlogs();
+        } catch {
+            toast.error("Failed to save blog post");
+        } finally {
+            setSubmitting(false);
         }
-        setShowForm(false);
-        setEditingBlog(null);
-        resetForm();
     };
 
     const handleEdit = (blog: BlogPost) => {
@@ -239,12 +214,13 @@ export default function BlogManagement() {
             content: blog.content,
             category: blog.category,
             tags: blog.tags?.join(", ") || "",
-            featuredImage: blog.featuredImage || { url: "", alt: "" },
+            featuredImage: blog.featuredImage || "",
+            featuredAlt: blog.featuredAlt || "",
             isPublished: blog.isPublished,
             readTime: blog.readTime || 5,
             author: blog.author || "Garud Aqua Team",
         });
-        setImagePreview(blog.featuredImage?.url || "");
+        setImagePreview(blog.featuredImage || "");
         setShowForm(true);
         setTimeout(() => {
             if (editorRef.current) {
@@ -253,10 +229,16 @@ export default function BlogManagement() {
         }, 50);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (!confirm("Delete this blog post?")) return;
-        saveBlogs(blogs.filter((b) => b._id !== id));
-        toast.success("Blog deleted");
+        try {
+            const res = await fetch(`/api/admin/blogs/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete");
+            setBlogs(blogs.filter((b) => b.id !== id));
+            toast.success("Blog deleted");
+        } catch {
+            toast.error("Failed to delete blog");
+        }
     };
 
     const resetForm = () => {
@@ -267,7 +249,8 @@ export default function BlogManagement() {
             content: "",
             category: "other",
             tags: "",
-            featuredImage: { url: "", alt: "" },
+            featuredImage: "",
+            featuredAlt: "",
             isPublished: false,
             readTime: 5,
             author: "Garud Aqua Team",
@@ -276,30 +259,32 @@ export default function BlogManagement() {
         if (editorRef.current) editorRef.current.innerHTML = "";
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         if (!file.type.startsWith("image/")) { toast.error("Please upload an image"); return; }
         if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
 
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const dataUrl = ev.target?.result as string;
-            setFormData((prev) => ({
-                ...prev,
-                featuredImage: { ...prev.featuredImage, url: dataUrl },
-            }));
-            setImagePreview(dataUrl);
-            toast.success("Image selected");
-        };
-        reader.readAsDataURL(file);
+        setUploading(true);
+        try {
+            const fd = new FormData();
+            fd.append("file", file);
+            fd.append("folder", "garudaqua/blogs");
+            const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+            if (!res.ok) throw new Error("Upload failed");
+            const { url } = await res.json();
+            setFormData((prev) => ({ ...prev, featuredImage: url }));
+            setImagePreview(url);
+            toast.success("Image uploaded");
+        } catch {
+            toast.error("Failed to upload image");
+        } finally {
+            setUploading(false);
+        }
     };
 
     const removeImage = () => {
-        setFormData((prev) => ({
-            ...prev,
-            featuredImage: { ...prev.featuredImage, url: "" },
-        }));
+        setFormData((prev) => ({ ...prev, featuredImage: "" }));
         setImagePreview("");
     };
 
@@ -461,20 +446,20 @@ export default function BlogManagement() {
                                 </button>
                             </div>
                         ) : (
-                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-[#0EA5E9] transition">
+                            <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-[#0EA5E9] transition ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
                                 <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                 </svg>
-                                <span className="text-sm text-gray-500">Click to upload image</span>
-                                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                <span className="text-sm text-gray-500">{uploading ? "Uploading..." : "Click to upload image"}</span>
+                                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
                             </label>
                         )}
                         {imagePreview && (
                             <div className="mt-2">
                                 <input
                                     type="text"
-                                    value={formData.featuredImage.alt}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, featuredImage: { ...prev.featuredImage, alt: e.target.value } }))}
+                                    value={formData.featuredAlt}
+                                    onChange={(e) => setFormData((prev) => ({ ...prev, featuredAlt: e.target.value }))}
                                     placeholder="Image alt text"
                                     className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent text-sm"
                                 />
@@ -496,8 +481,8 @@ export default function BlogManagement() {
 
                     {/* Actions */}
                     <div className="flex gap-3 pt-4 border-t">
-                        <button type="submit" className="px-6 py-2.5 bg-[#0EA5E9] text-white rounded-xl hover:bg-[#0369A1] transition font-medium text-sm">
-                            {editingBlog ? "Update Article" : "Create Article"}
+                        <button type="submit" disabled={submitting || uploading} className="px-6 py-2.5 bg-[#0EA5E9] text-white rounded-xl hover:bg-[#0369A1] transition font-medium text-sm disabled:opacity-50">
+                            {submitting ? "Saving..." : editingBlog ? "Update Article" : "Create Article"}
                         </button>
                         <button type="button" onClick={() => { setShowForm(false); setEditingBlog(null); resetForm(); }}
                             className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition text-sm">
@@ -572,11 +557,11 @@ export default function BlogManagement() {
                     </div>
                 ) : (
                     filteredBlogs.map((blog) => (
-                        <div key={blog._id} className="flex items-start gap-4 p-4 hover:bg-gray-50 transition">
+                        <div key={blog.id} className="flex items-start gap-4 p-4 hover:bg-gray-50 transition">
                             {/* Thumbnail */}
-                            {blog.featuredImage?.url && (
+                            {blog.featuredImage && (
                                 <div className="w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                                    <Image src={blog.featuredImage.url} alt={blog.featuredImage.alt || blog.title} width={80} height={56} className="w-full h-full object-cover" />
+                                    <Image src={blog.featuredImage} alt={blog.featuredAlt || blog.title} width={80} height={56} className="w-full h-full object-cover" />
                                 </div>
                             )}
                             {/* Content */}
@@ -588,7 +573,7 @@ export default function BlogManagement() {
                                         {CATEGORY_LABELS[blog.category] || blog.category}
                                     </span>
                                     <span className="text-xs text-gray-400">{blog.readTime} min read</span>
-                                    <span className="text-xs text-gray-400">{blog.publishedAt}</span>
+                                    <span className="text-xs text-gray-400">{new Date(blog.publishedAt).toLocaleDateString()}</span>
                                     {blog.tags?.slice(0, 2).map((tag) => (
                                         <span key={tag} className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{tag}</span>
                                     ))}
@@ -601,7 +586,7 @@ export default function BlogManagement() {
                             {/* Actions */}
                             <div className="flex gap-2 shrink-0">
                                 <button onClick={() => handleEdit(blog)} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium">Edit</button>
-                                <button onClick={() => handleDelete(blog._id)} className="text-red-600 hover:text-red-500 text-sm font-medium">Delete</button>
+                                <button onClick={() => handleDelete(blog.id)} className="text-red-600 hover:text-red-500 text-sm font-medium">Delete</button>
                             </div>
                         </div>
                     ))

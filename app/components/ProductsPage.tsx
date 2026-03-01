@@ -4,29 +4,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
 
 // ===== Type Definitions =====
 interface Category {
-    _id: string;
+    id: string;
     name: string;
     image?: string;
 }
 
 interface Subcategory {
-    _id: string;
+    id: string;
     name: string;
     image?: string;
-    category: { _id: string; name: string };
+    category: { id: string; name: string };
 }
 
 interface Product {
-    _id: string;
+    id: string;
     name: string;
+    slug?: string;
     image?: string;
+    images?: string[];
     description?: string;
-    price: number;
-    category: string;
-    subcategory?: { _id: string; name: string };
+    category: { id: string; name: string } | string;
+    subcategory?: { id: string; name: string };
     createdAt?: string;
 }
 
@@ -35,38 +37,12 @@ interface ProductCardProps {
     index: number;
 }
 
-// ===== STATIC DATA =====
-const staticCategories: Category[] = [
-    { _id: "cat1", name: "Water Tanks", image: "/categories/water-tanks.png" },
-    { _id: "cat2", name: "Pipes & Fittings", image: "/categories/pipes-fittings.png" },
-];
 
-const staticSubcategories: Subcategory[] = [
-    { _id: "sub1", name: "Overhead Tanks", image: "/subcategories/overhead-tanks.png", category: { _id: "cat1", name: "Water Tanks" } },
-    { _id: "sub2", name: "Underground Tanks", image: "/subcategories/underground-tanks.png", category: { _id: "cat1", name: "Water Tanks" } },
-    { _id: "sub3", name: "Loft Tanks", image: "/subcategories/loft-tanks.png", category: { _id: "cat1", name: "Water Tanks" } },
-    { _id: "sub4", name: "PVC Pipes", image: "/subcategories/pvc-pipes.png", category: { _id: "cat2", name: "Pipes & Fittings" } },
-    { _id: "sub5", name: "CPVC Pipes", image: "/subcategories/cpvc-pipes.png", category: { _id: "cat2", name: "Pipes & Fittings" } },
-];
-
-const staticProducts: Product[] = [
-    { _id: "p1", name: "500L Overhead Water Tank", image: "/products/tank-500l.png", price: 3500, category: "Water Tanks", subcategory: { _id: "sub1", name: "Overhead Tanks" }, createdAt: "2025-01-15" },
-    { _id: "p2", name: "1000L Overhead Water Tank", image: "/products/tank-1000l.png", price: 6500, category: "Water Tanks", subcategory: { _id: "sub1", name: "Overhead Tanks" }, createdAt: "2025-02-10" },
-    { _id: "p3", name: "2000L Overhead Water Tank", image: "/products/tank-2000l.png", price: 11000, category: "Water Tanks", subcategory: { _id: "sub1", name: "Overhead Tanks" }, createdAt: "2025-03-05" },
-    { _id: "p4", name: "3000L Underground Tank", image: "/products/tank-underground-3000l.png", price: 18000, category: "Water Tanks", subcategory: { _id: "sub2", name: "Underground Tanks" }, createdAt: "2025-01-20" },
-    { _id: "p5", name: "5000L Underground Tank", image: "/products/tank-underground-5000l.png", price: 28000, category: "Water Tanks", subcategory: { _id: "sub2", name: "Underground Tanks" }, createdAt: "2025-02-25" },
-    { _id: "p6", name: "300L Loft Tank", image: "/products/tank-loft-300l.png", price: 2200, category: "Water Tanks", subcategory: { _id: "sub3", name: "Loft Tanks" }, createdAt: "2025-03-12" },
-    { _id: "p7", name: "750L Overhead Water Tank", image: "/products/tank-750l.png", price: 4800, category: "Water Tanks", subcategory: { _id: "sub1", name: "Overhead Tanks" }, createdAt: "2025-04-01" },
-    { _id: "p8", name: "1500L Underground Tank", image: "/products/tank-underground-1500l.png", price: 13500, category: "Water Tanks", subcategory: { _id: "sub2", name: "Underground Tanks" }, createdAt: "2025-04-10" },
-    { _id: "p9", name: "500L Loft Tank", image: "/products/tank-loft-500l.png", price: 3200, category: "Water Tanks", subcategory: { _id: "sub3", name: "Loft Tanks" }, createdAt: "2025-04-15" },
-    { _id: "p10", name: "1 Inch PVC Pipe (10ft)", image: "/products/pvc-pipe-1inch.png", price: 180, category: "Pipes & Fittings", subcategory: { _id: "sub4", name: "PVC Pipes" }, createdAt: "2025-01-25" },
-    { _id: "p11", name: "2 Inch PVC Pipe (10ft)", image: "/products/pvc-pipe-2inch.png", price: 350, category: "Pipes & Fittings", subcategory: { _id: "sub4", name: "PVC Pipes" }, createdAt: "2025-02-05" },
-    { _id: "p12", name: "3 Inch PVC Pipe (10ft)", image: "/products/pvc-pipe-3inch.png", price: 520, category: "Pipes & Fittings", subcategory: { _id: "sub4", name: "PVC Pipes" }, createdAt: "2025-02-20" },
-    { _id: "p13", name: "1/2 Inch CPVC Pipe (10ft)", image: "/products/cpvc-pipe-half.png", price: 280, category: "Pipes & Fittings", subcategory: { _id: "sub5", name: "CPVC Pipes" }, createdAt: "2025-03-08" },
-    { _id: "p14", name: "3/4 Inch CPVC Pipe (10ft)", image: "/products/cpvc-pipe-3quarter.png", price: 380, category: "Pipes & Fittings", subcategory: { _id: "sub5", name: "CPVC Pipes" }, createdAt: "2025-03-20" },
-    { _id: "p15", name: "1 Inch CPVC Pipe (10ft)", image: "/products/cpvc-pipe-1inch.png", price: 450, category: "Pipes & Fittings", subcategory: { _id: "sub5", name: "CPVC Pipes" }, createdAt: "2025-04-05" },
-];
-// ===== END STATIC DATA =====
+// Helper to get category name from Product (handles both string and object formats)
+function getCategoryName(category: Product["category"]): string {
+    if (typeof category === "string") return category;
+    return category?.name || "";
+}
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -79,14 +55,106 @@ export default function ProductsPage() {
     const [viewMode, setViewMode] = useState("grid");
     const [currentPage, setCurrentPage] = useState(1);
 
+    // API data states
+    const [categories, setCategories] = useState<Category[]>([{ id: "all", name: "All" }]);
+    const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [totalProducts, setTotalProducts] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+    const [loadingSubcategories, setLoadingSubcategories] = useState(true);
+    const [loadingProducts, setLoadingProducts] = useState(true);
+
     const productsGridRef = useRef<HTMLDivElement>(null);
     const categoryScrollRef = useRef<HTMLDivElement>(null);
     const subcategoryScrollRef = useRef<HTMLDivElement>(null);
+    const initialParamsLoaded = useRef(false);
 
-    const categories: Category[] = useMemo(
-        () => [{ _id: "all", name: "All" }, ...staticCategories],
-        []
-    );
+    // Fetch categories on mount
+    useEffect(() => {
+        async function fetchCategories() {
+            try {
+                const res = await fetch("/api/categories");
+                if (!res.ok) throw new Error("Failed to fetch categories");
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    setCategories([{ id: "all", name: "All" }, ...data]);
+                }
+            } catch {
+                toast.error("Failed to load categories");
+            } finally {
+                setLoadingCategories(false);
+            }
+        }
+        fetchCategories();
+    }, []);
+
+    // Fetch subcategories on mount
+    useEffect(() => {
+        async function fetchSubcategories() {
+            try {
+                const res = await fetch("/api/subcategories");
+                if (!res.ok) throw new Error("Failed to fetch subcategories");
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    setSubcategories(data);
+                }
+            } catch {
+                toast.error("Failed to load subcategories");
+            } finally {
+                setLoadingSubcategories(false);
+            }
+        }
+        fetchSubcategories();
+    }, []);
+
+    // Read URL params on mount
+    useEffect(() => {
+        const searchFromUrl = searchParams.get("search");
+        const categoryFromUrl = searchParams.get("category");
+        const subcategoryFromUrl = searchParams.get("subcategory");
+        const sortFromUrl = searchParams.get("sort");
+
+        if (searchFromUrl) setSearchTerm(searchFromUrl);
+        if (categoryFromUrl) setSelectedCategory(categoryFromUrl);
+        if (subcategoryFromUrl) setSelectedSubcategory(subcategoryFromUrl);
+        if (sortFromUrl) setSortBy(sortFromUrl);
+        initialParamsLoaded.current = true;
+    }, [searchParams]);
+
+    // Fetch products when filters change
+    useEffect(() => {
+        if (!initialParamsLoaded.current) return;
+
+        async function fetchProducts() {
+            setLoadingProducts(true);
+            try {
+                const params = new URLSearchParams();
+                if (selectedCategory !== "All") params.set("category", selectedCategory);
+                if (selectedSubcategory !== "All") params.set("subcategory", selectedSubcategory);
+                if (searchTerm.trim()) params.set("search", searchTerm.trim());
+                params.set("page", String(currentPage));
+                params.set("limit", String(PRODUCTS_PER_PAGE));
+                if (sortBy !== "featured") params.set("sort", sortBy);
+
+                const res = await fetch(`/api/products?${params.toString()}`);
+                if (!res.ok) throw new Error("Failed to fetch products");
+                const data = await res.json();
+
+                if (data.products && Array.isArray(data.products)) {
+                    setProducts(data.products);
+                    setTotalProducts(data.total || data.products.length);
+                    setTotalPages(data.totalPages || Math.ceil((data.total || data.products.length) / PRODUCTS_PER_PAGE));
+                }
+            } catch {
+                toast.error("Failed to load products");
+            } finally {
+                setLoadingProducts(false);
+            }
+        }
+
+        fetchProducts();
+    }, [selectedCategory, selectedSubcategory, searchTerm, sortBy, currentPage]);
 
     // Scroll a container left or right
     const scrollByAmount = useCallback((ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
@@ -128,73 +196,15 @@ export default function ProductsPage() {
         return () => clearTimeout(timer);
     }, [selectedSubcategory, scrollSelectedToCenter]);
 
-    // Read URL params on mount
-    useEffect(() => {
-        const searchFromUrl = searchParams.get("search");
-        const categoryFromUrl = searchParams.get("category");
-        const subcategoryFromUrl = searchParams.get("subcategory");
-        const sortFromUrl = searchParams.get("sort");
-
-        if (searchFromUrl) setSearchTerm(searchFromUrl);
-        if (categoryFromUrl) setSelectedCategory(categoryFromUrl);
-        if (subcategoryFromUrl) setSelectedSubcategory(subcategoryFromUrl);
-        if (sortFromUrl) setSortBy(sortFromUrl);
-    }, [searchParams]);
-
     // Filtered subcategories based on selected category
     const visibleSubcategories = useMemo(() => {
-        if (selectedCategory === "All") return staticSubcategories;
-        return staticSubcategories.filter(
+        if (selectedCategory === "All") return subcategories;
+        return subcategories.filter(
             (sub) => sub.category.name === selectedCategory
         );
-    }, [selectedCategory]);
+    }, [selectedCategory, subcategories]);
 
-    // Filter and sort products
-    const filteredProducts = useMemo(() => {
-        let result = [...staticProducts];
-
-        // Category filter
-        if (selectedCategory !== "All") {
-            result = result.filter((p) => p.category === selectedCategory);
-        }
-
-        // Subcategory filter
-        if (selectedSubcategory !== "All") {
-            result = result.filter((p) => p.subcategory?._id === selectedSubcategory);
-        }
-
-        // Search filter
-        if (searchTerm.trim()) {
-            const term = searchTerm.toLowerCase();
-            result = result.filter(
-                (p) =>
-                    p.name.toLowerCase().includes(term) ||
-                    p.category.toLowerCase().includes(term) ||
-                    p.subcategory?.name.toLowerCase().includes(term) ||
-                    p.description?.toLowerCase().includes(term)
-            );
-        }
-
-        // Sort
-        if (sortBy === "price-low") {
-            result.sort((a, b) => a.price - b.price);
-        } else if (sortBy === "price-high") {
-            result.sort((a, b) => b.price - a.price);
-        } else if (sortBy === "newest") {
-            result.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
-        }
-
-        return result;
-    }, [selectedCategory, selectedSubcategory, searchTerm, sortBy]);
-
-    // Pagination
-    const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
-    const paginatedProducts = useMemo(() => {
-        const start = (currentPage - 1) * PRODUCTS_PER_PAGE;
-        return filteredProducts.slice(start, start + PRODUCTS_PER_PAGE);
-    }, [filteredProducts, currentPage]);
-
-    // Reset page when filters change
+    // Reset page when filters change (not page itself)
     useEffect(() => {
         setCurrentPage(1);
     }, [selectedCategory, selectedSubcategory, searchTerm, sortBy]);
@@ -231,6 +241,34 @@ export default function ProductsPage() {
         productsGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
+    // Loading skeleton for products grid
+    const ProductsLoadingSkeleton = () => (
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+            {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm">
+                    <div className="relative aspect-4/5 bg-gray-200 dark:bg-gray-800 animate-pulse" />
+                    <div className="p-3 md:p-4 lg:p-6 space-y-2 md:space-y-3">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse w-3/4" />
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse w-1/2" />
+                        <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded animate-pulse w-1/3" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+
+    // Loading skeleton for categories
+    const CategoriesLoadingSkeleton = () => (
+        <div className="flex gap-3 md:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
+            {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5 md:gap-2 min-w-16 md:min-w-19 lg:min-w-20">
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse" />
+                    <div className="h-3 w-12 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                </div>
+            ))}
+        </div>
+    );
+
     return (
         <div className="min-h-screen bg-linear-to-b from-white via-[#FAFAFA] to-white dark:from-black dark:via-[#050505] dark:to-black pt-4 md:pt-6 lg:pt-8 pb-6 md:pb-8 lg:pb-12">
             <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
@@ -249,7 +287,7 @@ export default function ProductsPage() {
                     </h1>
                     <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-light max-w-2xl mx-auto">
                         {searchTerm
-                            ? `Found ${filteredProducts.length} ${filteredProducts.length === 1 ? "product" : "products"} matching your search`
+                            ? `Found ${totalProducts} ${totalProducts === 1 ? "product" : "products"} matching your search`
                             : "Explore our range of water tanks, pipes & fittings"}
                     </p>
 
@@ -283,85 +321,89 @@ export default function ProductsPage() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="mb-6 md:mb-8 lg:mb-10"
                 >
-                    <div className="relative group/scroll">
-                        {/* Left Arrow */}
-                        <button
-                            onClick={() => scrollByAmount(categoryScrollRef, "left")}
-                            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-white/90 shadow-md border border-gray-200 text-[#0369A1] hover:bg-[#0EA5E9] hover:text-white hover:border-[#0EA5E9] transition-all duration-200 opacity-0 group-hover/scroll:opacity-100 -translate-x-1"
-                            aria-label="Scroll categories left"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
+                    {loadingCategories ? (
+                        <CategoriesLoadingSkeleton />
+                    ) : (
+                        <div className="relative group/scroll">
+                            {/* Left Arrow */}
+                            <button
+                                onClick={() => scrollByAmount(categoryScrollRef, "left")}
+                                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-white/90 shadow-md border border-gray-200 text-[#0369A1] hover:bg-[#0EA5E9] hover:text-white hover:border-[#0EA5E9] transition-all duration-200 opacity-0 group-hover/scroll:opacity-100 -translate-x-1"
+                                aria-label="Scroll categories left"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
 
-                        <div ref={categoryScrollRef} className="flex gap-3 md:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
-                            {categories.map((category) => (
-                                <motion.button
-                                    key={category.name}
-                                    data-category-selected={selectedCategory === category.name ? "true" : undefined}
-                                    whileHover={{ scale: 1.05, y: -2 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => handleCategoryClick(category.name)}
-                                    className="flex flex-col items-center gap-1.5 md:gap-2 min-w-16 md:min-w-19 lg:min-w-20 group"
-                                >
-                                    <div
-                                        className={`relative rounded-full p-0.75 transition-all duration-300 ${
-                                            selectedCategory === category.name
-                                                ? "bg-linear-to-tr from-[#0EA5E9] via-[#38BDF8] to-[#0369A1]"
-                                                : "bg-linear-to-tr from-gray-200 to-gray-300 group-hover:from-[#0EA5E9]/50 group-hover:to-[#0369A1]/50"
-                                        }`}
+                            <div ref={categoryScrollRef} className="flex gap-3 md:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
+                                {categories.map((category) => (
+                                    <motion.button
+                                        key={category.name}
+                                        data-category-selected={selectedCategory === category.name ? "true" : undefined}
+                                        whileHover={{ scale: 1.05, y: -2 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => handleCategoryClick(category.name)}
+                                        className="flex flex-col items-center gap-1.5 md:gap-2 min-w-16 md:min-w-19 lg:min-w-20 group"
                                     >
-                                        <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
-                                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
-                                                {category.image ? (
-                                                    <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <svg className="w-6 h-6 md:w-7 md:h-7 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                                    </svg>
-                                                )}
+                                        <div
+                                            className={`relative rounded-full p-0.75 transition-all duration-300 ${
+                                                selectedCategory === category.name
+                                                    ? "bg-linear-to-tr from-[#0EA5E9] via-[#38BDF8] to-[#0369A1]"
+                                                    : "bg-linear-to-tr from-gray-200 to-gray-300 group-hover:from-[#0EA5E9]/50 group-hover:to-[#0369A1]/50"
+                                            }`}
+                                        >
+                                            <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
+                                                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
+                                                    {category.image ? (
+                                                        <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <svg className="w-6 h-6 md:w-7 md:h-7 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                                        </svg>
+                                                    )}
+                                                </div>
                                             </div>
+
+                                            {selectedCategory === category.name && (
+                                                <motion.div
+                                                    layoutId="activeRing"
+                                                    className="absolute -inset-0.5 rounded-full"
+                                                    style={{
+                                                        background: "linear-gradient(135deg, #0EA5E9, #0369A1)",
+                                                        filter: "blur(4px)",
+                                                        opacity: 0.4,
+                                                    }}
+                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                />
+                                            )}
                                         </div>
 
-                                        {selectedCategory === category.name && (
-                                            <motion.div
-                                                layoutId="activeRing"
-                                                className="absolute -inset-0.5 rounded-full"
-                                                style={{
-                                                    background: "linear-gradient(135deg, #0EA5E9, #0369A1)",
-                                                    filter: "blur(4px)",
-                                                    opacity: 0.4,
-                                                }}
-                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                            />
-                                        )}
-                                    </div>
+                                        <span
+                                            className={`text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center ${
+                                                selectedCategory === category.name
+                                                    ? "text-[#0EA5E9] font-medium"
+                                                    : "text-[#2C2C2C] dark:text-gray-100 group-hover:text-[#0EA5E9]"
+                                            }`}
+                                        >
+                                            {category.name}
+                                        </span>
+                                    </motion.button>
+                                ))}
+                            </div>
 
-                                    <span
-                                        className={`text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center ${
-                                            selectedCategory === category.name
-                                                ? "text-[#0EA5E9] font-medium"
-                                                : "text-[#2C2C2C] dark:text-gray-100 group-hover:text-[#0EA5E9]"
-                                        }`}
-                                    >
-                                        {category.name}
-                                    </span>
-                                </motion.button>
-                            ))}
+                            {/* Right Arrow */}
+                            <button
+                                onClick={() => scrollByAmount(categoryScrollRef, "right")}
+                                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-white/90 shadow-md border border-gray-200 text-[#0369A1] hover:bg-[#0EA5E9] hover:text-white hover:border-[#0EA5E9] transition-all duration-200 opacity-0 group-hover/scroll:opacity-100 translate-x-1"
+                                aria-label="Scroll categories right"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
                         </div>
-
-                        {/* Right Arrow */}
-                        <button
-                            onClick={() => scrollByAmount(categoryScrollRef, "right")}
-                            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-white/90 shadow-md border border-gray-200 text-[#0369A1] hover:bg-[#0EA5E9] hover:text-white hover:border-[#0EA5E9] transition-all duration-200 opacity-0 group-hover/scroll:opacity-100 translate-x-1"
-                            aria-label="Scroll categories right"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
-                    </div>
+                    )}
                 </motion.div>
 
                 {/* Subcategory Filters */}
@@ -456,16 +498,16 @@ export default function ProductsPage() {
                                 {/* Subcategory badges */}
                                 {visibleSubcategories.map((subcategory) => (
                                     <motion.button
-                                        key={subcategory._id}
-                                        data-subcategory-selected={selectedSubcategory === subcategory._id ? "true" : undefined}
+                                        key={subcategory.id}
+                                        data-subcategory-selected={selectedSubcategory === subcategory.id ? "true" : undefined}
                                         whileHover={{ scale: 1.05, y: -2 }}
                                         whileTap={{ scale: 0.95 }}
-                                        onClick={() => handleSubcategoryClick(subcategory._id)}
+                                        onClick={() => handleSubcategoryClick(subcategory.id)}
                                         className="flex flex-col items-center gap-1.5 md:gap-2 min-w-17.5 md:min-w-20 lg:min-w-22.5 group"
                                     >
                                         <div
                                             className={`relative rounded-full p-0.75 transition-all duration-300 ${
-                                                selectedSubcategory === subcategory._id
+                                                selectedSubcategory === subcategory.id
                                                     ? "bg-linear-to-tr from-[#0EA5E9] via-[#38BDF8] to-[#0369A1]"
                                                     : "bg-linear-to-tr from-gray-200 to-gray-300 group-hover:from-[#0EA5E9]/50 group-hover:to-[#0369A1]/50"
                                             }`}
@@ -481,7 +523,7 @@ export default function ProductsPage() {
                                                     )}
                                                 </div>
                                             </div>
-                                            {selectedSubcategory === subcategory._id && (
+                                            {selectedSubcategory === subcategory.id && (
                                                 <motion.div
                                                     layoutId="activeSubcategory"
                                                     className="absolute -inset-0.5 rounded-full"
@@ -492,7 +534,7 @@ export default function ProductsPage() {
                                         </div>
                                         <span
                                             className={`text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center line-clamp-2 leading-tight max-w-17.5 md:max-w-20 lg:max-w-22.5 ${
-                                                selectedSubcategory === subcategory._id
+                                                selectedSubcategory === subcategory.id
                                                     ? "text-[#0EA5E9] font-medium"
                                                     : "text-[#2C2C2C] dark:text-gray-100 group-hover:text-[#0EA5E9]"
                                             }`}
@@ -529,7 +571,7 @@ export default function ProductsPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                         <span className="text-xs md:text-sm font-medium text-[#2C2C2C] dark:text-gray-200">
-                            {filteredProducts.length} {filteredProducts.length === 1 ? "Product" : "Products"}
+                            {totalProducts} {totalProducts === 1 ? "Product" : "Products"}
                             {selectedCategory !== "All" && (
                                 <span className="hidden sm:inline"> in {selectedCategory}</span>
                             )}
@@ -550,8 +592,6 @@ export default function ProductsPage() {
                             >
                                 <option value="featured">Featured</option>
                                 <option value="newest">Newest</option>
-                                <option value="price-low">Price ↑</option>
-                                <option value="price-high">Price ↓</option>
                             </select>
                             <svg className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -586,7 +626,9 @@ export default function ProductsPage() {
                 </motion.div>
 
                 {/* Products Grid/List */}
-                {paginatedProducts.length === 0 ? (
+                {loadingProducts ? (
+                    <ProductsLoadingSkeleton />
+                ) : products.length === 0 ? (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -620,11 +662,11 @@ export default function ProductsPage() {
                                     : "space-y-4"
                             }
                         >
-                            {paginatedProducts.map((product, index) =>
+                            {products.map((product, index) =>
                                 viewMode === "grid" ? (
-                                    <ProductCard key={product._id} product={product} index={index} />
+                                    <ProductCard key={product.id} product={product} index={index} />
                                 ) : (
-                                    <ProductListItem key={product._id} product={product} index={index} />
+                                    <ProductListItem key={product.id} product={product} index={index} />
                                 )
                             )}
                         </motion.div>
@@ -632,7 +674,7 @@ export default function ProductsPage() {
                 )}
 
                 {/* Pagination */}
-                {paginatedProducts.length > 0 && totalPages > 1 && (
+                {products.length > 0 && totalPages > 1 && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -642,8 +684,8 @@ export default function ProductsPage() {
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                             Showing{" "}
                             <span className="font-medium text-[#0EA5E9]">{(currentPage - 1) * PRODUCTS_PER_PAGE + 1}</span> to{" "}
-                            <span className="font-medium text-[#0EA5E9]">{Math.min(currentPage * PRODUCTS_PER_PAGE, filteredProducts.length)}</span>{" "}
-                            of <span className="font-medium text-[#0EA5E9]">{filteredProducts.length}</span> products
+                            <span className="font-medium text-[#0EA5E9]">{Math.min(currentPage * PRODUCTS_PER_PAGE, totalProducts)}</span>{" "}
+                            of <span className="font-medium text-[#0EA5E9]">{totalProducts}</span> products
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -712,6 +754,9 @@ export default function ProductsPage() {
 
 // ===== Grid Product Card =====
 function ProductCard({ product, index }: ProductCardProps) {
+    const categoryName = getCategoryName(product.category);
+    const productHref = `/products/${product.slug || product.id}`;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -719,7 +764,7 @@ function ProductCard({ product, index }: ProductCardProps) {
             transition={{ duration: 0.5, delay: index * 0.1 }}
             className="group"
         >
-            <Link href={`/products/${product._id}`} className="block">
+            <Link href={productHref} className="block">
                 <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1 md:group-hover:-translate-y-2">
                     <div className="relative aspect-4/5 overflow-hidden bg-gray-100 dark:bg-gray-800">
                         {product.image ? (
@@ -738,7 +783,7 @@ function ProductCard({ product, index }: ProductCardProps) {
                         )}
                         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1">
                             <span className="bg-white/90 backdrop-blur-sm text-[#0EA5E9] text-[10px] md:text-xs px-2 py-1 rounded-full font-medium">
-                                {product.category}
+                                {categoryName}
                             </span>
                             {product.subcategory?.name && (
                                 <span className="bg-[#0EA5E9]/90 backdrop-blur-sm text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium">
@@ -751,9 +796,6 @@ function ProductCard({ product, index }: ProductCardProps) {
                         <h3 className="text-[#2C2C2C] dark:text-gray-100 font-light text-sm md:text-base lg:text-lg mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors line-clamp-2">
                             {product.name}
                         </h3>
-                        <p className="text-[#2C2C2C] dark:text-gray-200 font-medium text-sm md:text-base lg:text-xl">
-                            ₹{product.price.toLocaleString("en-IN")}
-                        </p>
                     </div>
                 </div>
             </Link>
@@ -763,6 +805,9 @@ function ProductCard({ product, index }: ProductCardProps) {
 
 // ===== List Product Item =====
 function ProductListItem({ product, index }: ProductCardProps) {
+    const categoryName = getCategoryName(product.category);
+    const productHref = `/products/${product.slug || product.id}`;
+
     return (
         <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -770,7 +815,7 @@ function ProductListItem({ product, index }: ProductCardProps) {
             transition={{ duration: 0.4, delay: index * 0.05 }}
             className="group"
         >
-            <Link href={`/products/${product._id}`} className="block">
+            <Link href={productHref} className="block">
                 <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl p-3 md:p-4 lg:p-6 shadow-sm hover:shadow-lg transition-all duration-300 group-hover:border-[#0EA5E9]/20 border border-transparent dark:border-white/6">
                     <div className="flex gap-3 md:gap-4 lg:gap-6">
                         <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-48 xl:h-48 shrink-0 relative bg-gray-100 dark:bg-gray-800 rounded-lg md:rounded-xl overflow-hidden">
@@ -792,7 +837,7 @@ function ProductListItem({ product, index }: ProductCardProps) {
                         <div className="flex-1 flex flex-col justify-center min-w-0">
                             <div className="flex items-center gap-2 mb-1 sm:mb-2">
                                 <p className="text-[10px] sm:text-xs text-[#0EA5E9] font-medium tracking-wide uppercase">
-                                    {product.category}
+                                    {categoryName}
                                 </p>
                                 {product.subcategory?.name && (
                                     <>
@@ -806,9 +851,6 @@ function ProductListItem({ product, index }: ProductCardProps) {
                             <h3 className="text-sm sm:text-base md:text-lg lg:text-xl text-[#2C2C2C] dark:text-gray-100 font-light mb-1 sm:mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors line-clamp-2">
                                 {product.name}
                             </h3>
-                            <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-[#2C2C2C] dark:text-gray-200 font-medium">
-                                ₹{product.price.toLocaleString("en-IN")}
-                            </p>
                         </div>
                     </div>
                 </div>

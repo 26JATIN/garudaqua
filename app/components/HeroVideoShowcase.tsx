@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 
 interface HeroVideo {
-    _id: string;
+    id: string;
     title: string;
     description: string;
     videoUrl: string;
@@ -12,73 +12,7 @@ interface HeroVideo {
     isActive: boolean;
     duration: number;
     linkedProductId: string;
-    linkedProductSlug: string;
 }
-
-const STORAGE_KEY = "garudaqua_admin_hero_videos";
-
-const sampleVideos: HeroVideo[] = [
-    {
-        _id: "sample-1",
-        title: "3-Layer Water Tank Manufacturing",
-        description: "See how our ISI-certified 3-layer water tanks are manufactured with precision rotomolding technology.",
-        videoUrl: "https://videos.pexels.com/video-files/3191572/3191572-uhd_2560_1440_25fps.mp4",
-        thumbnailUrl: "",
-        order: 1,
-        isActive: true,
-        duration: 30,
-        linkedProductId: "",
-        linkedProductSlug: "3-layer-water-tank",
-    },
-    {
-        _id: "sample-2",
-        title: "PVC Pipe Pressure Testing",
-        description: "Our PVC pipes undergo rigorous pressure testing to ensure leak-proof performance in every installation.",
-        videoUrl: "https://videos.pexels.com/video-files/3205828/3205828-uhd_2560_1440_25fps.mp4",
-        thumbnailUrl: "",
-        order: 2,
-        isActive: true,
-        duration: 25,
-        linkedProductId: "",
-        linkedProductSlug: "pvc-pipes",
-    },
-    {
-        _id: "sample-3",
-        title: "Underground Tank Installation",
-        description: "Watch a complete underground tank installation — engineered to withstand soil pressure and last for decades.",
-        videoUrl: "https://videos.pexels.com/video-files/2491284/2491284-uhd_2560_1440_24fps.mp4",
-        thumbnailUrl: "",
-        order: 3,
-        isActive: true,
-        duration: 35,
-        linkedProductId: "",
-        linkedProductSlug: "underground-tank",
-    },
-    {
-        _id: "sample-4",
-        title: "CPVC Hot Water Piping System",
-        description: "CPVC pipes designed for hot water applications — heat resistant up to 93°C with superior joint strength.",
-        videoUrl: "https://videos.pexels.com/video-files/3194277/3194277-uhd_2560_1440_30fps.mp4",
-        thumbnailUrl: "",
-        order: 4,
-        isActive: true,
-        duration: 28,
-        linkedProductId: "",
-        linkedProductSlug: "cpvc-pipes",
-    },
-    {
-        _id: "sample-5",
-        title: "Overhead Tank Durability Test",
-        description: "Our overhead tanks are UV-stabilized and weather-tested for extreme Indian climates — from Rajasthan heat to Kerala monsoons.",
-        videoUrl: "https://videos.pexels.com/video-files/2611510/2611510-uhd_2560_1440_24fps.mp4",
-        thumbnailUrl: "",
-        order: 5,
-        isActive: true,
-        duration: 22,
-        linkedProductId: "",
-        linkedProductSlug: "overhead-tank",
-    },
-];
 
 export default function VideoShowcaseSection() {
     const [videos, setVideos] = useState<HeroVideo[]>([]);
@@ -89,17 +23,22 @@ export default function VideoShowcaseSection() {
     const videoElementRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+    const fetchVideos = useCallback(async () => {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            const all: HeroVideo[] = stored ? JSON.parse(stored) : [];
-            const active = all.filter((v) => v.isActive).sort((a, b) => a.order - b.order);
-            setVideos(active.length > 0 ? active : sampleVideos);
+            const res = await fetch("/api/hero-videos");
+            if (!res.ok) throw new Error("Failed to fetch hero videos");
+            const data: HeroVideo[] = await res.json();
+            setVideos(data);
         } catch {
-            setVideos(sampleVideos);
+            // API failed
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }, []);
+
+    useEffect(() => {
+        fetchVideos();
+    }, [fetchVideos]);
 
     // Auto-play videos when they come into view
     useEffect(() => {
@@ -189,7 +128,7 @@ export default function VideoShowcaseSection() {
                     <div ref={scrollContainerRef} className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 px-4 md:px-0" style={{ scrollbarWidth: "none" }}>
                         {videos.map((video, index) => (
                             <motion.div
-                                key={video._id}
+                                key={video.id}
                                 ref={(el: HTMLDivElement | null) => { videoRefs.current[index] = el; }}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}

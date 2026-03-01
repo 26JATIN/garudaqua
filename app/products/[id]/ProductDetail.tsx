@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -7,128 +7,44 @@ import Image from "next/image";
 import { toast } from "sonner";
 
 // ===== Type Definitions =====
-interface Product {
-    _id: string;
+interface VariantOptionValue {
     name: string;
+    displayName: string;
+    colorCode: string | null;
+    isAvailable: boolean;
+}
+
+interface VariantOption {
+    name: string;
+    displayName: string;
+    type: string;
+    required: boolean;
+    values: VariantOptionValue[];
+}
+
+interface Product {
+    id: string;
+    name: string;
+    slug?: string;
     image?: string;
     images?: string[];
     description?: string;
-    price: number;
-    category: string;
-    subcategory?: { _id: string; name: string };
+    category: { id: string; name: string } | string;
+    subcategory?: { id: string; name: string };
     specs?: { label: string; value: string }[];
+    hasVariants?: boolean;
+    variantOptions?: VariantOption[];
+    variants?: unknown[];
+    guarantee?: string;
     createdAt?: string;
 }
 
-// ===== STATIC DATA (same as ProductsPage) =====
-const staticProducts: Product[] = [
-    {
-        _id: "p1", name: "500L Overhead Water Tank", image: "/products/tank-500l.png",
-        price: 3500, category: "Water Tanks", subcategory: { _id: "sub1", name: "Overhead Tanks" },
-        description: "Durable 500-litre overhead water tank made from food-grade, UV-stabilised plastic. Designed for long life with excellent insulation properties. Ideal for residential use.",
-        specs: [{ label: "Capacity", value: "500 Litres" }, { label: "Material", value: "Food-grade LLDPE" }, { label: "Colour", value: "Black / White" }, { label: "Warranty", value: "5 Years" }],
-        createdAt: "2025-01-15",
-    },
-    {
-        _id: "p2", name: "1000L Overhead Water Tank", image: "/products/tank-1000l.png",
-        price: 6500, category: "Water Tanks", subcategory: { _id: "sub1", name: "Overhead Tanks" },
-        description: "High-capacity 1000-litre overhead water tank built with multi-layer technology for superior strength. Perfect for families and small commercial setups.",
-        specs: [{ label: "Capacity", value: "1000 Litres" }, { label: "Material", value: "Food-grade LLDPE" }, { label: "Colour", value: "Black / White" }, { label: "Warranty", value: "5 Years" }],
-        createdAt: "2025-02-10",
-    },
-    {
-        _id: "p3", name: "2000L Overhead Water Tank", image: "/products/tank-2000l.png",
-        price: 11000, category: "Water Tanks", subcategory: { _id: "sub1", name: "Overhead Tanks" },
-        description: "Premium 2000-litre overhead water tank with triple-layer protection against UV rays and algae. Suitable for large households and commercial applications.",
-        specs: [{ label: "Capacity", value: "2000 Litres" }, { label: "Material", value: "Triple-layer LLDPE" }, { label: "Colour", value: "Black" }, { label: "Warranty", value: "5 Years" }],
-        createdAt: "2025-03-05",
-    },
-    {
-        _id: "p4", name: "3000L Underground Tank", image: "/products/tank-underground-3000l.png",
-        price: 18000, category: "Water Tanks", subcategory: { _id: "sub2", name: "Underground Tanks" },
-        description: "Heavy-duty 3000-litre underground water storage tank. Engineered for high compressive strength to withstand soil pressure. Leak-proof and crack-resistant.",
-        specs: [{ label: "Capacity", value: "3000 Litres" }, { label: "Material", value: "High-density PE" }, { label: "Type", value: "Underground" }, { label: "Warranty", value: "7 Years" }],
-        createdAt: "2025-01-20",
-    },
-    {
-        _id: "p5", name: "5000L Underground Tank", image: "/products/tank-underground-5000l.png",
-        price: 28000, category: "Water Tanks", subcategory: { _id: "sub2", name: "Underground Tanks" },
-        description: "Large-capacity 5000-litre underground storage tank for commercial and institutional use. Seamless construction ensures zero leakage.",
-        specs: [{ label: "Capacity", value: "5000 Litres" }, { label: "Material", value: "High-density PE" }, { label: "Type", value: "Underground" }, { label: "Warranty", value: "7 Years" }],
-        createdAt: "2025-02-25",
-    },
-    {
-        _id: "p6", name: "300L Loft Tank", image: "/products/tank-loft-300l.png",
-        price: 2200, category: "Water Tanks", subcategory: { _id: "sub3", name: "Loft Tanks" },
-        description: "Compact 300-litre loft tank designed for tight spaces. Lightweight yet sturdy, easy to install in lofts and elevated platforms.",
-        specs: [{ label: "Capacity", value: "300 Litres" }, { label: "Material", value: "Food-grade LLDPE" }, { label: "Type", value: "Loft / Compact" }, { label: "Warranty", value: "5 Years" }],
-        createdAt: "2025-03-12",
-    },
-    {
-        _id: "p7", name: "750L Overhead Water Tank", image: "/products/tank-750l.png",
-        price: 4800, category: "Water Tanks", subcategory: { _id: "sub1", name: "Overhead Tanks" },
-        description: "Mid-range 750-litre overhead tank offering the perfect balance of capacity and space. Multi-layer construction for durability.",
-        specs: [{ label: "Capacity", value: "750 Litres" }, { label: "Material", value: "Food-grade LLDPE" }, { label: "Colour", value: "Black / White" }, { label: "Warranty", value: "5 Years" }],
-        createdAt: "2025-04-01",
-    },
-    {
-        _id: "p8", name: "1500L Underground Tank", image: "/products/tank-underground-1500l.png",
-        price: 13500, category: "Water Tanks", subcategory: { _id: "sub2", name: "Underground Tanks" },
-        description: "Robust 1500-litre underground water tank with reinforced walls. Ideal for residential rainwater harvesting and storage.",
-        specs: [{ label: "Capacity", value: "1500 Litres" }, { label: "Material", value: "High-density PE" }, { label: "Type", value: "Underground" }, { label: "Warranty", value: "7 Years" }],
-        createdAt: "2025-04-10",
-    },
-    {
-        _id: "p9", name: "500L Loft Tank", image: "/products/tank-loft-500l.png",
-        price: 3200, category: "Water Tanks", subcategory: { _id: "sub3", name: "Loft Tanks" },
-        description: "Versatile 500-litre loft tank with slim profile. Fits in compact loft spaces while providing ample water storage.",
-        specs: [{ label: "Capacity", value: "500 Litres" }, { label: "Material", value: "Food-grade LLDPE" }, { label: "Type", value: "Loft / Compact" }, { label: "Warranty", value: "5 Years" }],
-        createdAt: "2025-04-15",
-    },
-    {
-        _id: "p10", name: "1 Inch PVC Pipe (10ft)", image: "/products/pvc-pipe-1inch.png",
-        price: 180, category: "Pipes & Fittings", subcategory: { _id: "sub4", name: "PVC Pipes" },
-        description: "Standard 1-inch PVC pipe, 10 feet length. Suitable for cold water supply lines. Smooth interior for optimal water flow.",
-        specs: [{ label: "Diameter", value: "1 Inch (25mm)" }, { label: "Length", value: "10 ft (3m)" }, { label: "Material", value: "uPVC" }, { label: "Pressure Rating", value: "6 kg/cm²" }],
-        createdAt: "2025-01-25",
-    },
-    {
-        _id: "p11", name: "2 Inch PVC Pipe (10ft)", image: "/products/pvc-pipe-2inch.png",
-        price: 350, category: "Pipes & Fittings", subcategory: { _id: "sub4", name: "PVC Pipes" },
-        description: "Heavy-duty 2-inch PVC pipe for main water supply and drainage. Corrosion-resistant and long-lasting.",
-        specs: [{ label: "Diameter", value: "2 Inch (50mm)" }, { label: "Length", value: "10 ft (3m)" }, { label: "Material", value: "uPVC" }, { label: "Pressure Rating", value: "6 kg/cm²" }],
-        createdAt: "2025-02-05",
-    },
-    {
-        _id: "p12", name: "3 Inch PVC Pipe (10ft)", image: "/products/pvc-pipe-3inch.png",
-        price: 520, category: "Pipes & Fittings", subcategory: { _id: "sub4", name: "PVC Pipes" },
-        description: "Large 3-inch PVC pipe for commercial plumbing and agricultural applications. Impact-resistant and easy to install.",
-        specs: [{ label: "Diameter", value: "3 Inch (75mm)" }, { label: "Length", value: "10 ft (3m)" }, { label: "Material", value: "uPVC" }, { label: "Pressure Rating", value: "6 kg/cm²" }],
-        createdAt: "2025-02-20",
-    },
-    {
-        _id: "p13", name: "1/2 Inch CPVC Pipe (10ft)", image: "/products/cpvc-pipe-half.png",
-        price: 280, category: "Pipes & Fittings", subcategory: { _id: "sub5", name: "CPVC Pipes" },
-        description: "Premium 1/2-inch CPVC pipe rated for hot and cold water supply. Withstands temperatures up to 93°C. Ideal for residential plumbing.",
-        specs: [{ label: "Diameter", value: "1/2 Inch (15mm)" }, { label: "Length", value: "10 ft (3m)" }, { label: "Material", value: "CPVC" }, { label: "Max Temp", value: "93°C" }],
-        createdAt: "2025-03-08",
-    },
-    {
-        _id: "p14", name: "3/4 Inch CPVC Pipe (10ft)", image: "/products/cpvc-pipe-3quarter.png",
-        price: 380, category: "Pipes & Fittings", subcategory: { _id: "sub5", name: "CPVC Pipes" },
-        description: "Reliable 3/4-inch CPVC pipe for hot and cold water distribution. Chemical-resistant and suitable for high-pressure applications.",
-        specs: [{ label: "Diameter", value: "3/4 Inch (20mm)" }, { label: "Length", value: "10 ft (3m)" }, { label: "Material", value: "CPVC" }, { label: "Max Temp", value: "93°C" }],
-        createdAt: "2025-03-20",
-    },
-    {
-        _id: "p15", name: "1 Inch CPVC Pipe (10ft)", image: "/products/cpvc-pipe-1inch.png",
-        price: 450, category: "Pipes & Fittings", subcategory: { _id: "sub5", name: "CPVC Pipes" },
-        description: "Professional-grade 1-inch CPVC pipe for main hot water supply lines. Excellent flow capacity and thermal resistance.",
-        specs: [{ label: "Diameter", value: "1 Inch (25mm)" }, { label: "Length", value: "10 ft (3m)" }, { label: "Material", value: "CPVC" }, { label: "Max Temp", value: "93°C" }],
-        createdAt: "2025-04-05",
-    },
-];
-// ===== END STATIC DATA =====
+// Helper to get category name from Product (handles both string and object formats)
+function getCategoryName(category: Product["category"]): string {
+    if (typeof category === "string") return category;
+    return category?.name || "";
+}
+
 
 // Mobile swipeable image gallery
 function MobileImageGallery({ images, productName }: { images: string[]; productName: string }) {
@@ -243,22 +159,108 @@ function MobileImageGallery({ images, productName }: { images: string[]; product
     );
 }
 
+// Loading skeleton UI
+function ProductDetailSkeleton() {
+    return (
+        <div className="min-h-screen bg-linear-to-b from-white via-[#FAFAFA] to-white dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] pt-4 md:pt-6 lg:pt-8 pb-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Breadcrumb skeleton */}
+                <div className="flex items-center space-x-2 mb-8">
+                    <div className="h-4 w-12 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                    <div className="h-4 w-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                    <div className="h-4 w-16 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                    <div className="h-4 w-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                    <div className="h-4 w-32 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
+                    {/* Image skeleton */}
+                    <div className="space-y-4">
+                        <div className="aspect-square bg-gray-200 dark:bg-gray-800 rounded-3xl animate-pulse" />
+                        <div className="hidden lg:grid grid-cols-4 gap-4">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="aspect-square bg-gray-200 dark:bg-gray-800 rounded-2xl animate-pulse" />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Details skeleton */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-2">
+                            <div className="h-8 w-24 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse" />
+                            <div className="h-8 w-28 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse" />
+                        </div>
+                        <div className="h-10 w-3/4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                        <div className="space-y-2">
+                            <div className="h-5 w-20 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                            <div className="h-4 w-full bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                            <div className="h-4 w-full bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                            <div className="h-4 w-2/3 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                        </div>
+                        <div className="bg-gray-100 dark:bg-gray-900 rounded-2xl p-6 space-y-3">
+                            <div className="h-5 w-28 bg-gray-200 dark:bg-gray-800 rounded animate-pulse mb-4" />
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="flex justify-between">
+                                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="h-14 w-full bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ===== Main Component =====
-export default function ProductDetail({ productId }: { productId: string }) {
+export default function ProductDetail({ slug }: { slug: string }) {
     const router = useRouter();
     const [selectedImage, setSelectedImage] = useState(0);
+    const [product, setProduct] = useState<Product | null>(null);
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
 
-    const product = staticProducts.find((p) => p._id === productId);
+    // Fetch product data
+    useEffect(() => {
+        async function fetchProduct() {
+            setLoading(true);
+            setNotFound(false);
+            setSelectedImage(0);
 
-    // Related products from same category, excluding current
-    const relatedProducts = product
-        ? staticProducts.filter((p) => p.category === product.category && p._id !== product._id).slice(0, 4)
-        : [];
+            try {
+                const res = await fetch(`/api/products/${slug}`);
+                if (!res.ok) {
+                    setNotFound(true);
+                    return;
+                }
+                const data = await res.json();
+
+                if (data.product) {
+                    setProduct(data.product);
+                    if (data.related && Array.isArray(data.related)) {
+                        setRelatedProducts(data.related);
+                    }
+                } else {
+                    setNotFound(true);
+                }
+            } catch {
+                setNotFound(true);
+                toast.error("Failed to load product details");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchProduct();
+    }, [slug]);
 
     const handleShare = async () => {
         const url = window.location.href;
         const title = product?.name || "Check out this product";
-        const text = `${product?.name} - Garud Aqua Solutions${product?.price ? `\n₹${product.price.toLocaleString("en-IN")}` : ""}\n${url}`;
+        const text = `${product?.name} - Garud Aqua Solutions\n${url}`;
 
         if (navigator.share) {
             try {
@@ -285,8 +287,13 @@ export default function ProductDetail({ productId }: { productId: string }) {
         }
     };
 
+    // Loading state
+    if (loading) {
+        return <ProductDetailSkeleton />;
+    }
+
     // Product not found
-    if (!product) {
+    if (notFound || !product) {
         return (
             <div className="min-h-screen pt-4 md:pt-6 lg:pt-8 bg-linear-to-b from-white to-[#FAFAFA] dark:from-black dark:to-[#0A0A0A]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -319,6 +326,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
         );
     }
 
+    const categoryName = getCategoryName(product.category);
     const displayImages = product.images && product.images.length > 0 ? product.images : product.image ? [product.image] : [];
 
     return (
@@ -437,7 +445,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
                         <div className="flex items-center justify-between">
                             <div className="inline-flex items-center gap-2">
                                 <span className="bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium px-4 py-2 rounded-full">
-                                    {product.category}
+                                    {categoryName}
                                 </span>
                                 {product.subcategory?.name && (
                                     <span className="bg-[#0369A1]/10 text-[#0369A1] text-sm font-medium px-4 py-2 rounded-full">
@@ -461,13 +469,6 @@ export default function ProductDetail({ productId }: { productId: string }) {
                             {product.name}
                         </h1>
 
-                        {/* Price */}
-                        <div className="py-4 border-y border-gray-200 dark:border-white/6">
-                            <span className="text-4xl font-light text-[#2C2C2C] dark:text-gray-100">
-                                ₹{product.price.toLocaleString("en-IN")}
-                            </span>
-                        </div>
-
                         {/* Description */}
                         {product.description && (
                             <div>
@@ -475,6 +476,51 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                 <p className="text-gray-600 dark:text-gray-400 font-light leading-relaxed">
                                     {product.description}
                                 </p>
+                            </div>
+                        )}
+
+                        {/* Available Options */}
+                        {product.hasVariants && product.variantOptions && product.variantOptions.length > 0 && (
+                            <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-5 dark:border dark:border-white/6">
+                                <h3 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100">Available Options</h3>
+                                {product.variantOptions.map((option) => {
+                                    const availableValues = option.values.filter((v) => v.isAvailable);
+                                    if (availableValues.length === 0) return null;
+                                    return (
+                                        <div key={option.name} className="space-y-3">
+                                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                                {option.displayName}
+                                            </p>
+                                            {option.type === "color" ? (
+                                                <div className="flex flex-wrap gap-4">
+                                                    {availableValues.map((value) => (
+                                                        <div key={value.name} className="flex flex-col items-center gap-1.5">
+                                                            <div
+                                                                className="w-8 h-8 rounded-full ring-2 ring-gray-200 dark:ring-white/10 hover:ring-[#0EA5E9] transition-all cursor-default"
+                                                                style={{ backgroundColor: value.colorCode || "#ccc" }}
+                                                                title={value.displayName}
+                                                            />
+                                                            <span className="text-xs text-gray-500 dark:text-gray-400 font-light">
+                                                                {value.displayName}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {availableValues.map((value) => (
+                                                        <span
+                                                            key={value.name}
+                                                            className="px-3 py-1.5 rounded-full text-sm font-light bg-[#0EA5E9]/10 text-[#0EA5E9]"
+                                                        >
+                                                            {value.displayName}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
 
@@ -506,9 +552,9 @@ export default function ProductDetail({ productId }: { productId: string }) {
                         </Link>
 
                         {/* Features */}
-                        <div className="grid grid-cols-2 gap-4 pt-6">
+                        <div className={`grid gap-4 pt-6 ${product.guarantee ? "grid-cols-3" : "grid-cols-2"}`}>
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
                                     <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
@@ -518,30 +564,21 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                     <p className="text-xs text-gray-500 dark:text-gray-400 font-light">Quality Assured</p>
                                 </div>
                             </div>
+                            {product.guarantee && (
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
+                                        <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Guarantee</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-light">{product.guarantee}</p>
+                                    </div>
+                                </div>
+                            )}
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Warranty</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-light">Up to 7 Years</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Free Delivery</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-light">On All Orders</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
                                     <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
@@ -570,11 +607,11 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                     Similar Products
                                 </h2>
                                 <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-light">
-                                    More from {product.subcategory?.name || product.category}
+                                    More from {product.subcategory?.name || categoryName}
                                 </p>
                             </div>
                             <Link
-                                href={`/products?category=${encodeURIComponent(product.category)}`}
+                                href={`/products?category=${encodeURIComponent(categoryName)}`}
                                 className="hidden md:flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
                                 View All
@@ -585,7 +622,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                             {relatedProducts.map((relatedProduct, index) => (
-                                <Link key={relatedProduct._id} href={`/products/${relatedProduct._id}`}>
+                                <Link key={relatedProduct.id} href={`/products/${relatedProduct.slug || relatedProduct.id}`}>
                                     <motion.div
                                         initial={{ opacity: 0, y: 20 }}
                                         whileInView={{ opacity: 1, y: 0 }}
@@ -618,9 +655,6 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                                 <h3 className="text-sm md:text-base font-light text-[#2C2C2C] dark:text-gray-200 mb-1 md:mb-2 line-clamp-2 group-hover:text-[#0EA5E9] transition-colors leading-tight">
                                                     {relatedProduct.name}
                                                 </h3>
-                                                <p className="text-base md:text-lg font-medium text-[#2C2C2C] dark:text-gray-100">
-                                                    ₹{relatedProduct.price.toLocaleString("en-IN")}
-                                                </p>
                                             </div>
                                         </div>
                                     </motion.div>
@@ -630,7 +664,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
                         {/* Mobile View All Button */}
                         <div className="md:hidden mt-6 text-center">
                             <Link
-                                href={`/products?category=${encodeURIComponent(product.category)}`}
+                                href={`/products?category=${encodeURIComponent(categoryName)}`}
                                 className="inline-flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
                                 View All Similar Products

@@ -12,12 +12,21 @@ function AdminLoginScreen() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-        const success = login(email, password);
-        if (!success) {
-            setError("Invalid email or password");
+        setIsSubmitting(true);
+        try {
+            const success = await login(email, password);
+            if (!success) {
+                setError("Invalid email or password");
+            }
+        } catch {
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -30,7 +39,7 @@ function AdminLoginScreen() {
                             <span className="text-white font-bold text-xl">G</span>
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
-                        <p className="text-sm text-gray-500 mt-1">Garud Aqua Solution</p>
+                        <p className="text-sm text-gray-500 mt-1">Garud Aqua Solutions</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
@@ -67,9 +76,10 @@ function AdminLoginScreen() {
 
                         <button
                             type="submit"
-                            className="w-full py-3 bg-[#0EA5E9] text-white rounded-lg font-medium hover:bg-[#0369A1] transition"
+                            disabled={isSubmitting}
+                            className="w-full py-3 bg-[#0EA5E9] text-white rounded-lg font-medium hover:bg-[#0369A1] transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Sign In
+                            {isSubmitting ? "Signing In..." : "Sign In"}
                         </button>
                     </form>
                 </div>
@@ -206,6 +216,15 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
             ),
         },
         {
+            path: "/admin/hero-slides",
+            label: "Hero Slides",
+            icon: (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            ),
+        },
+        {
             path: "/admin/gallery",
             label: "Gallery",
             icon: (
@@ -238,7 +257,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                                 </div>
                                 <div>
                                     <h1 className="text-lg lg:text-xl font-bold text-gray-900">Admin Panel</h1>
-                                    <p className="text-xs lg:text-sm text-gray-500 hidden sm:block">Garud Aqua Solution</p>
+                                    <p className="text-xs lg:text-sm text-gray-500 hidden sm:block">Garud Aqua Solutions</p>
                                 </div>
                             </div>
                         </div>

@@ -10,11 +10,11 @@ interface Variant {
 }
 
 interface Product {
-    _id: string;
+    id: string;
     name: string;
     description: string;
-    category: string;
-    subcategory: string;
+    category: { id: string; name: string } | string;
+    subcategory: { id: string; name: string } | string;
     image: string;
     images: string[];
     isActive: boolean;
@@ -39,6 +39,18 @@ interface ProductListProps {
     products?: Product[];
     onEdit: (product: Product) => void;
     onDelete: (id: string) => void;
+}
+
+function getCategoryName(cat: { id: string; name: string } | string | undefined): string {
+    if (!cat) return "";
+    if (typeof cat === "string") return cat;
+    return cat.name || "";
+}
+
+function getSubcategoryName(sub: { id: string; name: string } | string | undefined): string {
+    if (!sub) return "";
+    if (typeof sub === "string") return sub;
+    return sub.name || "";
 }
 
 export default function ProductList({ products = [], onEdit, onDelete }: ProductListProps) {
@@ -94,8 +106,11 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                             </tr>
                         ) : (
                             safeProducts.flatMap((product) => {
+                                const categoryDisplay = getCategoryName(product.category);
+                                const subcategoryDisplay = getSubcategoryName(product.subcategory);
+
                                 const rows = [
-                                    <tr key={product._id} className="hover:bg-gray-50">
+                                    <tr key={product.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center">
                                                 <div className="h-14 w-14 shrink-0">
@@ -124,9 +139,9 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                            {product.category}
-                                            {product.subcategory && (
-                                                <span className="text-gray-400 ml-1">/ {product.subcategory}</span>
+                                            {categoryDisplay}
+                                            {subcategoryDisplay && (
+                                                <span className="text-gray-400 ml-1">/ {subcategoryDisplay}</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -159,7 +174,7 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                                                         Edit
                                                     </button>
                                                     <button
-                                                        onClick={() => onDelete(product._id)}
+                                                        onClick={() => onDelete(product.id)}
                                                         className="text-red-600 hover:text-red-500 transition-colors"
                                                     >
                                                         Delete
@@ -167,10 +182,10 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                                                 </div>
                                                 {product.hasVariants && (
                                                     <button
-                                                        onClick={() => toggleVariantDisplay(product._id)}
+                                                        onClick={() => toggleVariantDisplay(product.id)}
                                                         className="text-xs text-blue-600 hover:text-blue-500 transition-colors flex items-center"
                                                     >
-                                                        {expandedProducts.has(product._id) ? "Hide" : "View"} Variants
+                                                        {expandedProducts.has(product.id) ? "Hide" : "View"} Variants
                                                     </button>
                                                 )}
                                             </div>
@@ -178,9 +193,9 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                                     </tr>,
                                 ];
 
-                                if (product.hasVariants && expandedProducts.has(product._id)) {
+                                if (product.hasVariants && expandedProducts.has(product.id)) {
                                     rows.push(
-                                        <tr key={`${product._id}-variants`} className="bg-gray-50">
+                                        <tr key={`${product.id}-variants`} className="bg-gray-50">
                                             <td colSpan={5} className="px-6 py-4">
                                                 <div className="bg-white rounded-lg border p-4">
                                                     <h4 className="font-medium text-gray-900 mb-3">
@@ -243,114 +258,118 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                         </div>
                     </div>
                 ) : (
-                    safeProducts.map((product) => (
-                        <div key={product._id} className="p-4 bg-white hover:bg-gray-50 transition-colors">
-                            <div className="flex items-start gap-3 mb-3">
-                                <div className="h-16 w-16 shrink-0">
-                                    {product.image ? (
-                                        <Image
-                                            src={product.image}
-                                            alt={product.name}
-                                            width={64}
-                                            height={64}
-                                            className="h-16 w-16 rounded-lg object-cover"
-                                        />
-                                    ) : (
-                                        <div className="h-16 w-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                                            <span className="text-gray-400 text-xs">No Img</span>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2">
-                                        {product.name}
-                                    </h3>
-                                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                                        <span className="text-xs text-gray-500">{product.category}</span>
-                                        {product.hasVariants && (
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                {product.variants?.length || 0} variants
-                                            </span>
+                    safeProducts.map((product) => {
+                        const categoryDisplay = getCategoryName(product.category);
+
+                        return (
+                            <div key={product.id} className="p-4 bg-white hover:bg-gray-50 transition-colors">
+                                <div className="flex items-start gap-3 mb-3">
+                                    <div className="h-16 w-16 shrink-0">
+                                        {product.image ? (
+                                            <Image
+                                                src={product.image}
+                                                alt={product.name}
+                                                width={64}
+                                                height={64}
+                                                className="h-16 w-16 rounded-lg object-cover"
+                                            />
+                                        ) : (
+                                            <div className="h-16 w-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                <span className="text-gray-400 text-xs">No Img</span>
+                                            </div>
                                         )}
                                     </div>
-                                </div>
-                                <span
-                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                        product.isActive
-                                            ? "text-green-800 bg-green-100"
-                                            : "text-red-800 bg-red-100"
-                                    }`}
-                                >
-                                    {product.isActive ? "Active" : "Inactive"}
-                                </span>
-                            </div>
-
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => onEdit(product)}
-                                    className="flex-1 bg-[#0EA5E9] text-white px-3 py-2 rounded-lg hover:bg-[#0369A1] transition-colors text-sm font-medium"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => onDelete(product._id)}
-                                    className="flex-1 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-                                >
-                                    Delete
-                                </button>
-                                {product.hasVariants && (
-                                    <button
-                                        onClick={() => toggleVariantDisplay(product._id)}
-                                        className="px-3 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium"
-                                    >
-                                        {expandedProducts.has(product._id) ? "Hide" : "Variants"}
-                                    </button>
-                                )}
-                            </div>
-
-                            {product.hasVariants && expandedProducts.has(product._id) && (
-                                <div className="mt-3 bg-gray-50 rounded-lg p-3">
-                                    <h4 className="font-medium text-gray-900 mb-2 text-sm">
-                                        Variants ({product.variants?.length || 0})
-                                    </h4>
-                                    {product.variants && product.variants.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {product.variants.map((variant, index) => (
-                                                <div key={index} className="border rounded-lg p-2 bg-white">
-                                                    <div className="flex justify-between items-start mb-1">
-                                                        <div className="font-medium text-xs text-gray-900">
-                                                            {variant.sku}
-                                                        </div>
-                                                        <div
-                                                            className={`px-1.5 py-0.5 rounded-full text-xs ${
-                                                                variant.isActive
-                                                                    ? "bg-green-100 text-green-800"
-                                                                    : "bg-red-100 text-red-800"
-                                                            }`}
-                                                        >
-                                                            {variant.isActive ? "Active" : "Inactive"}
-                                                        </div>
-                                                    </div>
-                                                    {variant.optionCombination &&
-                                                        Object.entries(variant.optionCombination).map(
-                                                            ([key, value]) => (
-                                                                <div key={key} className="text-xs text-gray-600">
-                                                                    <span className="font-medium">{key}:</span> {value}
-                                                                </div>
-                                                            )
-                                                        )}
-                                                </div>
-                                            ))}
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2">
+                                            {product.name}
+                                        </h3>
+                                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                                            <span className="text-xs text-gray-500">{categoryDisplay}</span>
+                                            {product.hasVariants && (
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {product.variants?.length || 0} variants
+                                                </span>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <p className="text-center py-4 text-gray-500 text-xs">
-                                            No variants configured
-                                        </p>
+                                    </div>
+                                    <span
+                                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                            product.isActive
+                                                ? "text-green-800 bg-green-100"
+                                                : "text-red-800 bg-red-100"
+                                        }`}
+                                    >
+                                        {product.isActive ? "Active" : "Inactive"}
+                                    </span>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => onEdit(product)}
+                                        className="flex-1 bg-[#0EA5E9] text-white px-3 py-2 rounded-lg hover:bg-[#0369A1] transition-colors text-sm font-medium"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={() => onDelete(product.id)}
+                                        className="flex-1 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                                    >
+                                        Delete
+                                    </button>
+                                    {product.hasVariants && (
+                                        <button
+                                            onClick={() => toggleVariantDisplay(product.id)}
+                                            className="px-3 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium"
+                                        >
+                                            {expandedProducts.has(product.id) ? "Hide" : "Variants"}
+                                        </button>
                                     )}
                                 </div>
-                            )}
-                        </div>
-                    ))
+
+                                {product.hasVariants && expandedProducts.has(product.id) && (
+                                    <div className="mt-3 bg-gray-50 rounded-lg p-3">
+                                        <h4 className="font-medium text-gray-900 mb-2 text-sm">
+                                            Variants ({product.variants?.length || 0})
+                                        </h4>
+                                        {product.variants && product.variants.length > 0 ? (
+                                            <div className="space-y-2">
+                                                {product.variants.map((variant, index) => (
+                                                    <div key={index} className="border rounded-lg p-2 bg-white">
+                                                        <div className="flex justify-between items-start mb-1">
+                                                            <div className="font-medium text-xs text-gray-900">
+                                                                {variant.sku}
+                                                            </div>
+                                                            <div
+                                                                className={`px-1.5 py-0.5 rounded-full text-xs ${
+                                                                    variant.isActive
+                                                                        ? "bg-green-100 text-green-800"
+                                                                        : "bg-red-100 text-red-800"
+                                                                }`}
+                                                            >
+                                                                {variant.isActive ? "Active" : "Inactive"}
+                                                            </div>
+                                                        </div>
+                                                        {variant.optionCombination &&
+                                                            Object.entries(variant.optionCombination).map(
+                                                                ([key, value]) => (
+                                                                    <div key={key} className="text-xs text-gray-600">
+                                                                        <span className="font-medium">{key}:</span> {value}
+                                                                    </div>
+                                                                )
+                                                            )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-center py-4 text-gray-500 text-xs">
+                                                No variants configured
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })
                 )}
             </div>
 

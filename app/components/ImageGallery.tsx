@@ -1,5 +1,5 @@
 "use client";
-import "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
@@ -10,18 +10,51 @@ interface GalleryItem {
     text: string;
 }
 
-const galleryItems: GalleryItem[] = [
-    { image: "/gallery/water-tank-1.png", text: "3-Layer Water Tank" },
-    { image: "/gallery/overhead-tank.png", text: "Overhead Tank" },
-    { image: "/gallery/underground-tank.png", text: "Underground Tank" },
-    { image: "/gallery/pvc-pipes.png", text: "PVC Pipes" },
-    { image: "/gallery/cpvc-pipes.png", text: "CPVC Pipes" },
-    { image: "/gallery/loft-tank.png", text: "Loft Tank" },
-    { image: "/gallery/pipe-fittings.png", text: "Pipe Fittings" },
-    { image: "/gallery/industrial-tank.png", text: "Industrial Tank" },
-];
+interface ApiGalleryItem {
+    id: string;
+    title: string;
+    description: string;
+    alt: string;
+    mediaType: string;
+    mediaUrl: string;
+    thumbnailUrl: string;
+    order: number;
+    isActive: boolean;
+    tags: string[];
+}
 
 export default function ImageGallery() {
+    const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchGallery = useCallback(async () => {
+        try {
+            const res = await fetch("/api/gallery");
+            if (!res.ok) throw new Error("Failed to fetch gallery");
+            const data: ApiGalleryItem[] = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                const imageItems = data
+                    .filter((item) => item.mediaType === "IMAGE")
+                    .map((item) => ({
+                        image: item.mediaUrl,
+                        text: item.title,
+                    }));
+                setGalleryItems(imageItems);
+            }
+        } catch {
+            // API failed
+        }
+    }, []);
+
+    useEffect(() => {
+        async function loadData() {
+            setIsLoading(true);
+            await fetchGallery();
+            setIsLoading(false);
+        }
+        loadData();
+    }, [fetchGallery]);
+
     if (galleryItems.length === 0) {
         return null;
     }
@@ -62,15 +95,21 @@ export default function ImageGallery() {
 
                 {/* Circular Gallery */}
                 <div className="h-100 sm:h-125 md:h-150 lg:h-175 xl:h-200 w-full">
-                    <CircularGallery
-                        items={galleryItems}
-                        bend={3}
-                        textColor="#0EA5E9"
-                        borderRadius={0.05}
-                        font="bold 30px sans-serif"
-                        scrollSpeed={2}
-                        scrollEase={0.05}
-                    />
+                    {isLoading ? (
+                        <div className="flex items-center justify-center h-full">
+                            <div className="w-12 h-12 border-2 border-[#0EA5E9]/30 border-t-[#0EA5E9] rounded-full animate-spin" />
+                        </div>
+                    ) : (
+                        <CircularGallery
+                            items={galleryItems}
+                            bend={3}
+                            textColor="#0EA5E9"
+                            borderRadius={0.05}
+                            font="bold 30px sans-serif"
+                            scrollSpeed={2}
+                            scrollEase={0.05}
+                        />
+                    )}
                 </div>
 
                 {/* Bottom hint */}

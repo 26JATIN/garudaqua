@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ===== Types =====
@@ -18,24 +18,10 @@ interface VariantOption {
     values: OptionValue[];
 }
 
-interface Variant {
-    sku: string;
-    optionCombination: Record<string, string>;
-    isActive: boolean;
-}
-
-interface ProductData {
-    name?: string;
-    [key: string]: unknown;
-}
-
 interface VariantManagerProps {
-    productData: ProductData;
-    onVariantsChange?: (hasVariants: boolean, variants: Variant[]) => void;
-    onOptionsChange?: (options: VariantOption[]) => void;
+    onOptionsChange?: (hasVariants: boolean, options: VariantOption[]) => void;
     hasVariants?: boolean;
     variantOptions?: VariantOption[];
-    variants?: Variant[];
 }
 
 // Common variant options for water tanks & pipes
@@ -73,33 +59,29 @@ const commonOptionTypes = [
 ];
 
 export default function VariantManager({
-    productData,
-    onVariantsChange,
     onOptionsChange,
     hasVariants = false,
     variantOptions = [],
-    variants = [],
 }: VariantManagerProps) {
     const [localHasVariants, setLocalHasVariants] = useState(hasVariants);
     const [localOptions, setLocalOptions] = useState<VariantOption[]>(variantOptions);
-    const [localVariants, setLocalVariants] = useState<Variant[]>(variants);
 
     useEffect(() => {
         setLocalHasVariants(hasVariants);
         setLocalOptions(variantOptions || []);
-        setLocalVariants(variants || []);
-    }, [hasVariants, variantOptions, variants]);
+    }, [hasVariants, variantOptions]);
+
+    const onOptionsChangeRef = useRef(onOptionsChange);
+    onOptionsChangeRef.current = onOptionsChange;
 
     useEffect(() => {
-        onVariantsChange?.(localHasVariants, localVariants);
-        onOptionsChange?.(localOptions);
-    }, [localHasVariants, localVariants, localOptions, onVariantsChange, onOptionsChange]);
+        onOptionsChangeRef.current?.(localHasVariants, localOptions);
+    }, [localHasVariants, localOptions]);
 
     const handleEnableVariants = (enabled: boolean) => {
         setLocalHasVariants(enabled);
         if (!enabled) {
             setLocalOptions([]);
-            setLocalVariants([]);
         }
     };
 
@@ -150,64 +132,6 @@ export default function VariantManager({
         const updated = [...localOptions];
         updated.splice(index, 1);
         setLocalOptions(updated);
-        regenerateVariants(updated);
-    };
-
-    const generateCombinations = (options: VariantOption[]): Record<string, string>[] => {
-        const optionsWithValues = options.filter((opt) => opt.values.length > 0);
-        if (optionsWithValues.length === 0) return [];
-
-        const combinations: Record<string, string>[] = [];
-        const generate = (current: Record<string, string>, depth: number) => {
-            if (depth === optionsWithValues.length) {
-                combinations.push({ ...current });
-                return;
-            }
-            const option = optionsWithValues[depth];
-            option.values.forEach((value) => {
-                current[option.name] = value.name;
-                generate(current, depth + 1);
-            });
-        };
-        generate({}, 0);
-        return combinations;
-    };
-
-    const regenerateVariants = (options: VariantOption[] = localOptions) => {
-        if (options.length === 0) {
-            setLocalVariants([]);
-            return;
-        }
-
-        const combinations = generateCombinations(options);
-        const newVariants: Variant[] = combinations.map((combo, index) => {
-            const existing = localVariants.find(
-                (v) => JSON.stringify(v.optionCombination) === JSON.stringify(combo)
-            );
-            if (existing) return existing;
-
-            const productName = productData.name || "PROD";
-            const skuBase = String(productName).replace(/\s+/g, "-").substring(0, 10).toUpperCase();
-            return {
-                sku: `${skuBase}-V${index + 1}`,
-                optionCombination: combo,
-                isActive: true,
-            };
-        });
-
-        setLocalVariants(newVariants);
-    };
-
-    const updateVariant = (index: number, field: keyof Variant, value: string | boolean) => {
-        const updated = [...localVariants];
-        updated[index] = { ...updated[index], [field]: value };
-        setLocalVariants(updated);
-    };
-
-    const removeVariant = (index: number) => {
-        const updated = [...localVariants];
-        updated.splice(index, 1);
-        setLocalVariants(updated);
     };
 
     const addCommonOption = (common: (typeof commonOptionTypes)[number]) => {
@@ -230,10 +154,10 @@ export default function VariantManager({
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                        Product Variants
+                        Available Options
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                        Add variants for different sizes, capacities, colors, or materials
+                        Add available options like colors, capacities, sizes, or materials
                     </p>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -245,7 +169,7 @@ export default function VariantManager({
                         className="w-4 h-4 text-[#0EA5E9] border-gray-300 rounded focus:ring-[#0EA5E9]"
                     />
                     <label htmlFor="hasVariants" className="text-xs sm:text-sm text-gray-700">
-                        Enable variants
+                        Enable options
                     </label>
                 </div>
             </div>
@@ -258,11 +182,10 @@ export default function VariantManager({
                         exit={{ opacity: 0, height: 0 }}
                         className="space-y-6"
                     >
-                        {/* Variant Options Section */}
                         <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4">
                                 <h4 className="text-sm sm:text-base font-medium text-gray-900">
-                                    Variant Options
+                                    Option Types
                                 </h4>
                                 <button
                                     type="button"
@@ -395,75 +318,7 @@ export default function VariantManager({
                                     </div>
                                 </div>
                             ))}
-
-                            {localOptions.length > 0 && (
-                                <div className="mt-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => regenerateVariants()}
-                                        className="w-full bg-[#0EA5E9] text-white px-4 py-2.5 rounded-md hover:bg-[#0369A1] transition-colors text-sm sm:text-base"
-                                    >
-                                        Generate Variants (
-                                        {localOptions.reduce((acc, opt) => acc * Math.max(opt.values.length, 1), 1)}{" "}
-                                        combinations)
-                                    </button>
-                                </div>
-                            )}
                         </div>
-
-                        {/* Generated Variants */}
-                        {localVariants.length > 0 && (
-                            <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                                <h4 className="text-sm sm:text-base font-medium text-gray-900 mb-4">
-                                    Generated Variants ({localVariants.length})
-                                </h4>
-                                <div className="space-y-3">
-                                    {localVariants.map((variant, index) => (
-                                        <div key={index} className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4">
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-700 mb-1">SKU</label>
-                                                    <input
-                                                        type="text"
-                                                        value={variant.sku}
-                                                        onChange={(e) => updateVariant(index, "sku", e.target.value)}
-                                                        className="w-full text-sm border border-gray-300 rounded px-2 py-1.5"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-700 mb-1">Combination</label>
-                                                    <div className="text-xs text-gray-600 bg-gray-50 px-2 py-1.5 rounded min-h-8.5 flex items-center">
-                                                        {Object.entries(variant.optionCombination || {})
-                                                            .map(([key, value]) => `${key}: ${value}`)
-                                                            .join(", ")}
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-end gap-2">
-                                                    <div className="flex items-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={variant.isActive}
-                                                            onChange={(e) => updateVariant(index, "isActive", e.target.checked)}
-                                                            className="w-4 h-4 text-[#0EA5E9] border-gray-300 rounded"
-                                                        />
-                                                        <span className="ml-2 text-xs sm:text-sm text-gray-700">Active</span>
-                                                    </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeVariant(index)}
-                                                        className="text-red-600 hover:text-red-700 p-1.5"
-                                                    >
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
                     </motion.div>
                 )}
             </AnimatePresence>

@@ -45,7 +45,7 @@ function createTextTexture(gl: any, text: string, font = 'bold 30px monospace', 
 }
 
 class Title {
-  gl: any; plane: any; renderer: any; text: any; textColor: any; screen: any; font: any; mesh: any;
+  gl: any; plane: any; renderer: any; text: any; textColor: any; screen: any; font: any; baseFont: any; mesh: any;
   constructor({ gl, plane, renderer, text, textColor = '#545050', font = '30px sans-serif', screen }: any) {
     autoBind(this);
     this.gl = gl;
@@ -54,6 +54,7 @@ class Title {
     this.text = text;
     this.textColor = textColor;
     this.screen = screen;
+    this.baseFont = font;
     this.font = this.getResponsiveFont(font);
     this.createMesh();
   }
@@ -112,6 +113,26 @@ class Title {
     this.mesh.scale.set(textWidth, textHeight, 1);
     this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.05;
     this.mesh.setParent(this.plane);
+  }
+  onResize(screen: any) {
+    this.screen = screen;
+    const newFont = this.getResponsiveFont(this.baseFont);
+    if (newFont !== this.font) {
+      this.font = newFont;
+      // Remove old mesh and recreate
+      if (this.mesh) {
+        this.mesh.setParent(null);
+      }
+      this.createMesh();
+    } else if (this.mesh) {
+      // Just update scale/position to match new plane size
+      const { width, height } = createTextTexture(this.gl, this.text, this.font, this.textColor);
+      const aspect = width / height;
+      const textHeight = this.plane.scale.y * 0.15;
+      const textWidth = textHeight * aspect;
+      this.mesh.scale.set(textWidth, textHeight, 1);
+      this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.05;
+    }
   }
 }
 
@@ -280,6 +301,9 @@ class Media {
       }
     }
 
+    // Reset wrap-around offset so cards recalculate positions cleanly
+    this.extra = 0;
+
     const isMobile = this.screen.width <= 768;
     const isTablet = this.screen.width > 768 && this.screen.width <= 1024;
 
@@ -314,17 +338,22 @@ class Media {
     this.width = this.plane.scale.x + this.padding;
     this.widthTotal = this.width * this.length;
     this.x = this.width * this.index;
+
+    // Update title text size/position
+    if (this.title) {
+      this.title.onResize(this.screen);
+    }
   }
 }
 
 class App {
-  container: any; responsiveBend: number; scrollSpeed: number;
+  container: any; bend!: number; responsiveBend!: number; scrollSpeed!: number;
   scroll: any; onCheckDebounce: any; renderer: any; gl: any;
   camera: any; scene: any; planeGeometry: any; mediasImages: any[];
   medias: any[]; screen: any; viewport: any; raf: number;
   isDown: boolean; start: number; startY: number; hasMoved: boolean;
-  directionLocked: boolean;
-  boundOnResize: any; boundOnWheel: any; boundOnTouchDown: any;
+  directionLocked: boolean; resizeObserver!: ResizeObserver | null;
+  boundOnWheel: any; boundOnTouchDown: any;
   boundOnTouchMove: any; boundOnTouchUp: any;
 
   constructor(
@@ -349,7 +378,9 @@ class App {
     this.startY = 0;
     this.hasMoved = false;
     this.directionLocked = false;
+    this.resizeObserver = null;
 
+    this.bend = bend;
     const isMobile = window.innerWidth <= 768;
     this.responsiveBend = isMobile ? Math.min(bend * 0.6, 1.8) : bend;
     this.scrollSpeed = scrollSpeed;
@@ -470,8 +501,27 @@ class App {
     const height = 2 * Math.tan(fov / 2) * this.camera.position.z;
     const width = height * this.camera.aspect;
     this.viewport = { width, height };
+
+    // Recalculate responsive bend for new screen size
+    const isMobile = this.screen.width <= 768;
+    this.responsiveBend = isMobile ? Math.min(this.bend * 0.6, 1.8) : this.bend;
+
     if (this.medias) {
-      this.medias.forEach(media => media.onResize({ screen: this.screen, viewport: this.viewport }));
+      // Figure out which card index we're closest to before resize changes widths
+      const oldWidth = this.medias[0]?.width || 1;
+      const currentIndex = Math.round(this.scroll.current / oldWidth);
+
+      // Resize all media cards and update their bend
+      this.medias.forEach(media => {
+        media.bend = this.responsiveBend;
+        media.onResize({ screen: this.screen, viewport: this.viewport });
+      });
+
+      // Snap scroll to the same card index with new card width
+      const newWidth = this.medias[0]?.width || 1;
+      this.scroll.current = currentIndex * newWidth;
+      this.scroll.target = currentIndex * newWidth;
+      this.scroll.last = this.scroll.current;
     }
   }
   update() {
@@ -485,13 +535,15 @@ class App {
     this.raf = window.requestAnimationFrame(this.update.bind(this));
   }
   addEventListeners() {
-    this.boundOnResize = this.onResize.bind(this);
     this.boundOnWheel = this.onWheel.bind(this);
     this.boundOnTouchDown = this.onTouchDown.bind(this);
     this.boundOnTouchMove = this.onTouchMove.bind(this);
     this.boundOnTouchUp = this.onTouchUp.bind(this);
 
-    window.addEventListener('resize', this.boundOnResize);
+    // Use ResizeObserver on container — fires after CSS breakpoints settle
+    this.resizeObserver = new ResizeObserver(() => { this.onResize(); });
+    this.resizeObserver.observe(this.container);
+
     this.container.addEventListener('mousewheel', this.boundOnWheel);
     this.container.addEventListener('wheel', this.boundOnWheel);
     this.container.addEventListener('mousedown', this.boundOnTouchDown);
@@ -503,7 +555,10 @@ class App {
   }
   destroy() {
     window.cancelAnimationFrame(this.raf);
-    window.removeEventListener('resize', this.boundOnResize);
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
     if (this.container) {
       this.container.removeEventListener('mousewheel', this.boundOnWheel);
       this.container.removeEventListener('wheel', this.boundOnWheel);

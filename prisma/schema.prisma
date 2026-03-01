@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ===================== ADMIN AUTH =====================
+model AdminUser {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  isAdmin   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+// ===================== CATEGORIES =====================
+model Category {
+  id            String        @id @default(cuid())
+  name          String        @unique
+  description   String        @default("")
+  image         String        @default("")
+  sortOrder     Int           @default(0)
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  subcategories Subcategory[]
+  products      Product[]
+
+  @@index([sortOrder])
+  @@index([isActive])
+  @@map("categories")
+}
+
+// ===================== SUBCATEGORIES =====================
+model Subcategory {
+  id          String    @id @default(cuid())
+  name        String
+  description String    @default("")
+  image       String    @default("")
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@unique([name, categoryId])
+  @@index([categoryId])
+  @@index([order])
+  @@index([isActive])
+  @@map("subcategories")
+}
+
+// ===================== PRODUCTS =====================
+model Product {
+  id             String      @id @default(cuid())
+  name           String
+  slug           String      @unique
+  description    String      @default("")
+  image          String      @default("")
+  images         String[]    @default([])
+  isActive       Boolean     @default(true)
+  tags           String[]    @default([])
+  hasVariants    Boolean     @default(false)
+  variantOptions Json        @default("[]")
+  variants       Json        @default("[]")
+  specs          Json        @default("[]")
+  guarantee      String      @default("")
+  categoryId     String
+  category       Category    @relation(fields: [categoryId], references: [id])
+  subcategoryId  String?
+  subcategory    Subcategory? @relation(fields: [subcategoryId], references: [id])
+  heroVideos     HeroVideo[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([isActive])
+  @@map("products")
+}
+
+// ===================== HERO VIDEOS =====================
+model HeroVideo {
+  id              String   @id @default(cuid())
+  title           String
+  description     String   @default("")
+  videoUrl        String
+  thumbnailUrl    String   @default("")
+  order           Int      @default(0)
+  isActive        Boolean  @default(true)
+  duration        Int      @default(0)
+  linkedProductId String?
+  linkedProduct   Product? @relation(fields: [linkedProductId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([order])
+  @@index([isActive])
+  @@map("hero_videos")
+}
+
+// ===================== ENQUIRIES =====================
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+model Enquiry {
+  id        String        @id @default(cuid())
+  name      String
+  email     String        @default("")
+  phone     String
+  company   String        @default("")
+  product   String        @default("")
+  quantity  String        @default("")
+  message   String        @default("")
+  status    EnquiryStatus @default(NEW)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("enquiries")
+}
+
+// ===================== BLOG POSTS =====================
+model BlogPost {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  excerpt       String   @default("")
+  content       String   @default("")
+  category      String   @default("other")
+  tags          String[] @default([])
+  featuredImage String   @default("")
+  featuredAlt   String   @default("")
+  isPublished   Boolean  @default(false)
+  readTime      Int      @default(5)
+  author        String   @default("Garud Aqua Team")
+  publishedAt   DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([category])
+  @@index([publishedAt])
+  @@map("blog_posts")
+}
+
+// ===================== GALLERY ITEMS =====================
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model GalleryItem {
+  id           String    @id @default(cuid())
+  title        String
+  description  String    @default("")
+  alt          String    @default("")
+  mediaType    MediaType @default(IMAGE)
+  mediaUrl     String
+  thumbnailUrl String    @default("")
+  order        Int       @default(0)
+  isActive     Boolean   @default(true)
+  tags         String[]  @default([])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([order])
+  @@index([isActive])
+  @@index([mediaType])
+  @@map("gallery_items")
+}
+
+// ===================== HERO SLIDES =====================
+model HeroSlide {
+  id          String   @id @default(cuid())
+  image       String
+  mobileImage String   @default("")
+  title       String   @default("")
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+  @@index([isActive])
+  @@map("hero_slides")
+}

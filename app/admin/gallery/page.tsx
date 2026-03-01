@@ -1,15 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
 
-// ===== Types =====
 interface GalleryItem {
-    _id: string;
+    id: string;
     title: string;
     description: string;
-    mediaType: "image" | "video";
+    mediaType: "IMAGE" | "VIDEO";
     mediaUrl: string;
     thumbnailUrl: string;
     alt: string;
@@ -18,19 +17,16 @@ interface GalleryItem {
     tags: string[];
 }
 
-const STORAGE_KEY = "garudaqua_admin_gallery";
-
-const INITIAL_ITEMS: GalleryItem[] = [];
-
 export default function AdminGalleryPage() {
     const [items, setItems] = useState<GalleryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
+    const [uploading, setUploading] = useState(false);
     const [formData, setFormData] = useState({
         title: "",
         description: "",
-        mediaType: "image" as "image" | "video",
+        mediaType: "IMAGE" as "IMAGE" | "VIDEO",
         mediaUrl: "",
         thumbnailUrl: "",
         alt: "",
@@ -39,36 +35,51 @@ export default function AdminGalleryPage() {
         tags: [] as string[],
     });
 
-    useEffect(() => {
+    const fetchItems = useCallback(async () => {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            setItems(stored ? JSON.parse(stored) : INITIAL_ITEMS);
-            if (!stored) localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_ITEMS));
+            const res = await fetch("/api/admin/gallery");
+            if (!res.ok) throw new Error("Failed to fetch");
+            const data = await res.json();
+            setItems(data);
         } catch {
-            setItems(INITIAL_ITEMS);
+            toast.error("Failed to load gallery items");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }, []);
 
-    const saveItems = (updated: GalleryItem[]) => {
-        setItems(updated);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    };
+    useEffect(() => {
+        fetchItems();
+    }, [fetchItems]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.title.trim()) { toast.error("Title is required"); return; }
+        if (!formData.mediaUrl) { toast.error("Media file is required"); return; }
 
-        if (editingItem) {
-            const updated = items.map((i) => i._id === editingItem._id ? { ...editingItem, ...formData } : i);
-            saveItems(updated);
-            toast.success("Item updated");
-        } else {
-            const newItem: GalleryItem = { _id: `gal-${Date.now()}`, ...formData };
-            saveItems([...items, newItem]);
-            toast.success("Item added");
+        try {
+            if (editingItem) {
+                const res = await fetch(`/api/admin/gallery/${editingItem.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData),
+                });
+                if (!res.ok) throw new Error("Failed to update");
+                toast.success("Item updated");
+            } else {
+                const res = await fetch("/api/admin/gallery", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData),
+                });
+                if (!res.ok) throw new Error("Failed to create");
+                toast.success("Item added");
+            }
+            resetForm();
+            fetchItems();
+        } catch {
+            toast.error("Failed to save item");
         }
-        resetForm();
     };
 
     const handleEdit = (item: GalleryItem) => {
@@ -87,14 +98,20 @@ export default function AdminGalleryPage() {
         setShowForm(true);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (!confirm("Delete this item?")) return;
-        saveItems(items.filter((i) => i._id !== id));
-        toast.success("Item deleted");
+        try {
+            const res = await fetch(`/api/admin/gallery/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete");
+            setItems(items.filter((i) => i.id !== id));
+            toast.success("Item deleted");
+        } catch {
+            toast.error("Failed to delete item");
+        }
     };
 
     const resetForm = () => {
-        setFormData({ title: "", description: "", mediaType: "image", mediaUrl: "", thumbnailUrl: "", alt: "", order: 0, isActive: true, tags: [] });
+        setFormData({ title: "", description: "", mediaType: "IMAGE", mediaUrl: "", thumbnailUrl: "", alt: "", order: 0, isActive: true, tags: [] });
         setEditingItem(null);
         setShowForm(false);
     };
@@ -102,20 +119,28 @@ export default function AdminGalleryPage() {
     const handleMediaSelect = (field: "mediaUrl" | "thumbnailUrl") => {
         const input = document.createElement("input");
         input.type = "file";
-        input.accept = field === "mediaUrl" && formData.mediaType === "video"
+        input.accept = field === "mediaUrl" && formData.mediaType === "VIDEO"
             ? "video/mp4,video/webm"
             : "image/jpeg,image/jpg,image/png,image/webp";
 
-        input.onchange = (e: Event) => {
+        input.onchange = async (e: Event) => {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const dataUrl = ev.target?.result as string;
-                setFormData((prev) => ({ ...prev, [field]: dataUrl, alt: prev.alt || file.name.replace(/\.[^/.]+$/, "") }));
-                toast.success("File selected");
-            };
-            reader.readAsDataURL(file);
+            setUploading(true);
+            try {
+                const fd = new FormData();
+                fd.append("file", file);
+                fd.append("folder", "garudaqua/gallery");
+                const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+                if (!res.ok) throw new Error("Upload failed");
+                const { url } = await res.json();
+                setFormData((prev) => ({ ...prev, [field]: url, alt: prev.alt || file.name.replace(/\.[^/.]+$/, "") }));
+                toast.success("File uploaded");
+            } catch {
+                toast.error("Failed to upload file");
+            } finally {
+                setUploading(false);
+            }
         };
         input.click();
     };
@@ -136,7 +161,6 @@ export default function AdminGalleryPage() {
                     </button>
                 </div>
 
-                {/* Form */}
                 {showForm && (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                         <h2 className="text-lg font-bold text-gray-900 mb-4">{editingItem ? "Edit Media" : "Add New Media"}</h2>
@@ -149,22 +173,22 @@ export default function AdminGalleryPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Media Type *</label>
-                                    <select value={formData.mediaType} onChange={(e) => setFormData({ ...formData, mediaType: e.target.value as "image" | "video" })}
+                                    <select value={formData.mediaType} onChange={(e) => setFormData({ ...formData, mediaType: e.target.value as "IMAGE" | "VIDEO" })}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent">
-                                        <option value="image">Image</option>
-                                        <option value="video">Video</option>
+                                        <option value="IMAGE">Image</option>
+                                        <option value="VIDEO">Video</option>
                                     </select>
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Media File *</label>
                                     <div className="flex items-center gap-3">
-                                        <button type="button" onClick={() => handleMediaSelect("mediaUrl")}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
-                                            Upload {formData.mediaType === "video" ? "Video" : "Image"}
+                                        <button type="button" onClick={() => handleMediaSelect("mediaUrl")} disabled={uploading}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm disabled:opacity-50">
+                                            {uploading ? "Uploading..." : `Upload ${formData.mediaType === "VIDEO" ? "Video" : "Image"}`}
                                         </button>
-                                        {formData.mediaUrl && <span className="text-green-600 text-sm">File selected</span>}
+                                        {formData.mediaUrl && <span className="text-green-600 text-sm">File uploaded</span>}
                                     </div>
-                                    {formData.mediaUrl && formData.mediaType === "image" && (
+                                    {formData.mediaUrl && formData.mediaType === "IMAGE" && (
                                         <div className="mt-3 relative w-40 h-52 bg-gray-100 rounded-lg overflow-hidden">
                                             <Image src={formData.mediaUrl} alt="Preview" fill className="object-cover" />
                                         </div>
@@ -199,7 +223,6 @@ export default function AdminGalleryPage() {
                     </div>
                 )}
 
-                {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {loading ? (
                         [...Array(6)].map((_, i) => (
@@ -217,9 +240,9 @@ export default function AdminGalleryPage() {
                         </div>
                     ) : (
                         items.sort((a, b) => a.order - b.order).map((item) => (
-                            <div key={item._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
+                            <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
                                 <div className="relative aspect-4/5 bg-gray-100">
-                                    {item.mediaType === "image" && item.mediaUrl ? (
+                                    {item.mediaType === "IMAGE" && item.mediaUrl ? (
                                         <Image src={item.mediaUrl} alt={item.alt || item.title} fill className="object-cover" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center bg-gray-900">
@@ -236,12 +259,12 @@ export default function AdminGalleryPage() {
                                     <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
                                     <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
                                     <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                                        <span className="capitalize">{item.mediaType}</span>
+                                        <span className="capitalize">{item.mediaType.toLowerCase()}</span>
                                         <span>Order: {item.order}</span>
                                     </div>
                                     <div className="flex gap-2">
                                         <button onClick={() => handleEdit(item)} className="flex-1 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm">Edit</button>
-                                        <button onClick={() => handleDelete(item._id)} className="flex-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition text-sm">Delete</button>
+                                        <button onClick={() => handleDelete(item.id)} className="flex-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition text-sm">Delete</button>
                                     </div>
                                 </div>
                             </div>

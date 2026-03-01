@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 
 // Type definitions
 interface Category {
-  _id: string;
+  id: string;
   name: string;
   isActive: boolean;
   image: string;
@@ -22,11 +22,11 @@ interface Category {
 }
 
 interface Subcategory {
-  _id: string;
+  id: string;
   name: string;
   isActive: boolean;
   image: string;
-  category: { _id: string; name: string };
+  category: { id: string; name: string };
 }
 
 interface CategoryPreviewProps {
@@ -42,7 +42,7 @@ interface SubcategoryBadgeProps {
 
 interface CardProps {
   card: {
-    _id?: string;
+    id?: string;
     name: string;
     image?: string;
     description?: string;
@@ -50,66 +50,10 @@ interface CardProps {
   index: number;
   layout?: boolean;
   onClick?: (card: CardProps["card"]) => void;
-  subcategories?: { _id?: string; name: string; image?: string }[];
+  subcategories?: { id?: string; name: string; image?: string }[];
   onSubcategoryClick?: (card: CardProps["card"], subcategory: NonNullable<CardProps["subcategories"]>[number]) => void;
 }
 
-// ===== STATIC DATA — edit these arrays to update the showcase =====
-const staticCategories: Category[] = [
-  {
-    _id: "cat1",
-    name: "Water Tanks",
-    isActive: true,
-    image: "/categories/water-tanks.png",
-    description: "Durable water storage tanks for every need",
-  },
-  {
-    _id: "cat2",
-    name: "Pipes & Fittings",
-    isActive: true,
-    image: "/categories/pipes-fittings.png",
-    description: "High-quality plumbing pipes and fittings",
-  },
-];
-
-const staticSubcategories: Subcategory[] = [
-  {
-    _id: "sub1",
-    name: "Overhead Tanks",
-    isActive: true,
-    image: "/subcategories/overhead-tanks.png",
-    category: { _id: "cat1", name: "Water Tanks" },
-  },
-  {
-    _id: "sub2",
-    name: "Underground Tanks",
-    isActive: true,
-    image: "/subcategories/underground-tanks.png",
-    category: { _id: "cat1", name: "Water Tanks" },
-  },
-  {
-    _id: "sub3",
-    name: "Loft Tanks",
-    isActive: true,
-    image: "/subcategories/loft-tanks.png",
-    category: { _id: "cat1", name: "Water Tanks" },
-  },
-  {
-    _id: "sub4",
-    name: "PVC Pipes",
-    isActive: true,
-    image: "/subcategories/pvc-pipes.png",
-    category: { _id: "cat2", name: "Pipes & Fittings" },
-  },
-  {
-    _id: "sub5",
-    name: "CPVC Pipes",
-    isActive: true,
-    image: "/subcategories/cpvc-pipes.png",
-    category: { _id: "cat2", name: "Pipes & Fittings" },
-  },
-];
-// ===== END STATIC DATA =====
 
 // Category Preview Component
 const CategoryPreview = React.memo(({ category, className }: CategoryPreviewProps) => {
@@ -260,7 +204,7 @@ export const Card = React.memo(({
 
   return (
     <motion.div
-      layoutId={layout ? `card-${card._id || card.name}` : undefined}
+      layoutId={layout ? `card-${card.id || card.name}` : undefined}
       whileHover={{ y: -8, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={handleOpen}
@@ -271,7 +215,7 @@ export const Card = React.memo(({
         <div className="flex flex-col gap-1 sm:gap-2">
           <div className="flex justify-between items-start gap-2">
             <motion.h3
-              layoutId={layout ? `title-${card._id || card.name}` : undefined}
+              layoutId={layout ? `title-${card.id || card.name}` : undefined}
               className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1"
             >
               {card.name}
@@ -293,7 +237,7 @@ export const Card = React.memo(({
             <div className="grid grid-cols-4 gap-2">
               {subcategories.slice(0, 4).map((sub, idx) => (
                 <SubcategoryBadge
-                  key={sub._id || idx}
+                  key={sub.id || idx}
                   subcategory={sub}
                   index={idx}
                   onClick={(e) => handleSubcategoryClick(e, sub)}
@@ -323,11 +267,46 @@ Card.displayName = 'Card';
 export default function CategoryShowcase() {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
 
-  const categories = staticCategories;
-  const subcategories = staticSubcategories;
+  const fetchCategories = useCallback(async () => {
+    try {
+      const res = await fetch("/api/categories");
+      if (!res.ok) throw new Error("Failed to fetch categories");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setCategories(data);
+      }
+    } catch {
+      // API failed
+    }
+  }, []);
+
+  const fetchSubcategories = useCallback(async () => {
+    try {
+      const res = await fetch("/api/subcategories");
+      if (!res.ok) throw new Error("Failed to fetch subcategories");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setSubcategories(data);
+      }
+    } catch {
+      // API failed
+    }
+  }, []);
+
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      await Promise.all([fetchCategories(), fetchSubcategories()]);
+      setIsLoading(false);
+    }
+    loadData();
+  }, [fetchCategories, fetchSubcategories]);
 
   const MAX_DISPLAYED = 16;
 
@@ -384,16 +363,16 @@ export default function CategoryShowcase() {
 
   const handleSubcategoryClick = useCallback((subcategory: Subcategory) => {
     const categoryInfo = categories.find(cat =>
-      cat._id === subcategory.category._id ||
+      cat.id === subcategory.category.id ||
       cat.name === subcategory.category.name
     );
 
     if (categoryInfo) {
       const categoryName = encodeURIComponent(categoryInfo.name);
-      const subcategoryId = encodeURIComponent(subcategory._id);
+      const subcategoryId = encodeURIComponent(subcategory.id);
       router.push(`/products?category=${categoryName}&subcategory=${subcategoryId}`);
     } else {
-      router.push(`/products?subcategory=${encodeURIComponent(subcategory._id)}`);
+      router.push(`/products?subcategory=${encodeURIComponent(subcategory.id)}`);
     }
   }, [router, categories]);
 
@@ -418,7 +397,7 @@ export default function CategoryShowcase() {
 
     return subcategories.filter(sub =>
       sub.isActive && (
-        sub.category._id === category._id ||
+        sub.category.id === category.id ||
         sub.category.name === category.name
       )
     );
@@ -435,7 +414,7 @@ export default function CategoryShowcase() {
   const renderedSubcategories = useMemo(() => {
     return displayedSubcategories.map((subcategory, index) => (
       <motion.div
-        key={`${selectedCategory}-${subcategory._id}`}
+        key={`${selectedCategory}-${subcategory.id}`}
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{
           opacity: 1,
@@ -503,7 +482,7 @@ export default function CategoryShowcase() {
                         const category = categories.find(cat => cat.name === filter);
                         if (!category) return false;
                         return sub.isActive && (
-                          sub.category._id === category._id ||
+                          sub.category.id === category.id ||
                           sub.category.name === category.name
                         );
                       }).length;
@@ -539,7 +518,7 @@ export default function CategoryShowcase() {
                           const category = categories.find(cat => cat.name === filter);
                           if (!category) return false;
                           return sub.isActive && (
-                            sub.category._id === category._id ||
+                            sub.category.id === category.id ||
                             sub.category.name === category.name
                           );
                         }).length;
@@ -603,7 +582,19 @@ export default function CategoryShowcase() {
             </motion.div>
 
             {/* Categories Grid */}
-            {filteredSubcategories.length > 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-white/50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-white/6">
+                    <div className="aspect-4/3 rounded-xl sm:rounded-2xl skeleton-loader" />
+                    <div className="mt-2 sm:mt-3 md:mt-4 space-y-2">
+                      <div className="h-5 w-3/4 rounded skeleton-loader" />
+                      <div className="h-4 w-1/2 rounded skeleton-loader" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredSubcategories.length > 0 ? (
               <>
                 <AnimatePresence mode="wait">
                   <motion.div

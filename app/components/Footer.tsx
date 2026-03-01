@@ -8,7 +8,7 @@ export default function Footer() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                     <div className="space-y-6">
-                        <h3 className="text-2xl font-light tracking-widest">Garud Aqua Solutions</h3>
+                        <h3 className="text-2xl font-light tracking-widest">Garud Aqua Solutionss</h3>
                         <p className="text-gray-400 font-light leading-relaxed">
                             A Bond of Trust & Quality — your reliable partner for water tanks, pipes & fittings.
                         </p>
@@ -68,7 +68,7 @@ export default function Footer() {
                 <div className="mt-16 pt-8 border-t border-gray-800">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-gray-500 font-light text-sm">
-                            © 2025 Garud Aqua Solutions. All rights reserved.
+                            © 2025 Garud Aqua Solutionss. All rights reserved.
                         </p>
                         <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
                             <Link href="/policies/privacy" className="text-gray-500 hover:text-[#0EA5E9] transition-colors font-light">Privacy Policy</Link>

@@ -1,13 +1,14 @@
 "use client";
 
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 // ===== Type Definitions =====
 interface Blog {
-    _id: string;
+    id: string;
     slug: string;
     title: string;
     excerpt: string;
@@ -18,209 +19,84 @@ interface Blog {
     readTime: number;
     publishedAt: string;
     author: string;
+    isPublished: boolean;
 }
-
-// ===== STATIC DATA =====
-const staticBlogs: Blog[] = [
-    {
-        _id: "b1",
-        slug: "how-to-choose-right-water-tank",
-        title: "How to Choose the Right Water Tank for Your Home",
-        excerpt: "Selecting the perfect water tank involves considering capacity, material, placement, and your family's daily water needs.",
-        content: `<h2>Understanding Your Water Needs</h2>
-<p>The first step in choosing a water tank is calculating your household's daily water consumption. A family of four typically uses 500-800 litres per day, including cooking, bathing, cleaning, and other household activities.</p>
-
-<h2>Tank Capacity Guide</h2>
-<p>For a family of 2-3 members, a <strong>500L to 750L</strong> tank is usually sufficient. Families of 4-6 should consider <strong>1000L to 2000L</strong> tanks, while larger households or those with gardens may need <strong>2000L or more</strong>.</p>
-
-<h2>Material Matters</h2>
-<p>Modern water tanks are made from <strong>LLDPE (Linear Low-Density Polyethylene)</strong>, which is food-grade, UV-stabilised, and resistant to algae growth. Look for ISI-certified tanks that meet Bureau of Indian Standards quality requirements.</p>
-
-<h2>Overhead vs Underground</h2>
-<p><strong>Overhead tanks</strong> use gravity for water pressure and are easier to maintain. <strong>Underground tanks</strong> save space and keep water naturally cool but require a pump for distribution.</p>
-
-<h2>Key Features to Look For</h2>
-<ul>
-<li>Multi-layer construction for better insulation</li>
-<li>UV protection to prevent degradation</li>
-<li>Food-grade certification for safe drinking water</li>
-<li>Minimum 5-year warranty from a trusted manufacturer</li>
-</ul>`,
-        featuredImage: "/blogs/choose-water-tank.jpg",
-        category: "water-tank-guide",
-        tags: ["Water Tanks", "Buying Guide", "Home"],
-        readTime: 6,
-        publishedAt: "2025-03-15",
-        author: "Garud Aqua Team",
-    },
-    {
-        _id: "b2",
-        slug: "pvc-vs-cpvc-pipes-comparison",
-        title: "PVC vs CPVC Pipes: Which One Should You Use?",
-        excerpt: "Understanding the differences between PVC and CPVC pipes is crucial for making the right plumbing decisions.",
-        content: `<h2>What is PVC?</h2>
-<p><strong>PVC (Polyvinyl Chloride)</strong> pipes are the most commonly used plastic pipes in plumbing. They are affordable, lightweight, and ideal for cold water supply and drainage applications.</p>
-
-<h2>What is CPVC?</h2>
-<p><strong>CPVC (Chlorinated Polyvinyl Chloride)</strong> is a modified version of PVC that can handle higher temperatures — up to <strong>93°C (200°F)</strong>. This makes CPVC the preferred choice for hot water supply lines.</p>
-
-<h2>Key Differences</h2>
-<p><strong>Temperature Tolerance:</strong> PVC handles up to 60°C, while CPVC can withstand up to 93°C. For hot water lines from geysers or solar heaters, CPVC is essential.</p>
-<p><strong>Cost:</strong> PVC pipes are 20-30% cheaper than CPVC. For cold water lines and drainage, PVC offers excellent value.</p>
-<p><strong>Applications:</strong> Use PVC for drainage, rainwater harvesting, and cold water supply. Use CPVC for hot and cold water distribution inside the house.</p>
-
-<h2>Our Recommendation</h2>
-<p>For a complete home plumbing system, we recommend using <strong>CPVC for internal water supply</strong> (both hot and cold) and <strong>PVC for external drainage and underground supply lines</strong>.</p>`,
-        featuredImage: "/blogs/pvc-vs-cpvc.jpg",
-        category: "plumbing-tips",
-        tags: ["PVC Pipes", "CPVC Pipes", "Comparison"],
-        readTime: 5,
-        publishedAt: "2025-03-01",
-        author: "Garud Aqua Team",
-    },
-    {
-        _id: "b3",
-        slug: "water-tank-maintenance-tips",
-        title: "5 Essential Tips to Maintain Your Water Tank",
-        excerpt: "Regular maintenance ensures clean water and extends the lifespan of your tank.",
-        content: `<h2>1. Clean Your Tank Every 6 Months</h2>
-<p>Drain the tank completely and scrub the interior walls with a mild cleaning solution. Rinse thoroughly before refilling. This prevents sediment buildup and bacterial growth.</p>
-
-<h2>2. Inspect the Lid and Seals</h2>
-<p>Ensure the tank lid is always properly sealed. A loose lid allows dust, insects, and debris to contaminate the water. Replace damaged seals immediately.</p>
-
-<h2>3. Check for Leaks Regularly</h2>
-<p>Inspect pipe connections, the tank body, and the overflow pipe for any signs of leakage. Even minor leaks can lead to significant water loss and structural damage over time.</p>
-
-<h2>4. Keep the Surrounding Area Clean</h2>
-<p>Remove any vegetation or debris near your tank. Overhanging branches can drop leaves and organic matter that promotes algae growth.</p>
-
-<h2>5. Monitor Water Quality</h2>
-<p>If you notice any change in water colour, smell, or taste, clean the tank immediately. Consider installing a basic filtration system at the tank outlet for an extra layer of protection.</p>`,
-        featuredImage: "/blogs/tank-maintenance.jpg",
-        category: "maintenance",
-        tags: ["Maintenance", "Water Tanks", "Cleaning"],
-        readTime: 4,
-        publishedAt: "2025-02-20",
-        author: "Garud Aqua Team",
-    },
-    {
-        _id: "b4",
-        slug: "underground-vs-overhead-tanks",
-        title: "Underground vs Overhead Water Tanks: Pros & Cons",
-        excerpt: "Both underground and overhead tanks have unique advantages. Learn which type suits your needs.",
-        content: `<h2>Overhead Water Tanks</h2>
-<h3>Pros</h3>
-<ul>
-<li>Uses gravity for water distribution — no pump needed for basic flow</li>
-<li>Easy to inspect and maintain</li>
-<li>Lower installation cost</li>
-<li>Simple to detect leaks</li>
-</ul>
-<h3>Cons</h3>
-<ul>
-<li>Requires strong structural support on the roof</li>
-<li>Water temperature rises in summer</li>
-<li>Visible and may affect building aesthetics</li>
-</ul>
-
-<h2>Underground Water Tanks</h2>
-<h3>Pros</h3>
-<ul>
-<li>Saves rooftop space</li>
-<li>Water stays naturally cool</li>
-<li>Hidden from view — no aesthetic impact</li>
-<li>Can store larger volumes (3000L to 10000L+)</li>
-</ul>
-<h3>Cons</h3>
-<ul>
-<li>Requires a pump for water distribution</li>
-<li>Harder to inspect and clean</li>
-<li>Higher installation cost due to excavation</li>
-<li>Risk of contamination from groundwater seepage if not properly sealed</li>
-</ul>
-
-<h2>Which Should You Choose?</h2>
-<p>For most residential buildings, a combination works best: an <strong>underground tank</strong> as the main storage connected to an <strong>overhead tank</strong> via a pump for daily supply.</p>`,
-        featuredImage: "/blogs/underground-vs-overhead.jpg",
-        category: "water-tank-guide",
-        tags: ["Underground Tanks", "Overhead Tanks", "Comparison"],
-        readTime: 7,
-        publishedAt: "2025-02-10",
-        author: "Garud Aqua Team",
-    },
-    {
-        _id: "b5",
-        slug: "complete-guide-cpvc-plumbing",
-        title: "A Complete Guide to Home Plumbing with CPVC Pipes",
-        excerpt: "CPVC pipes are the modern choice for hot and cold water supply. Learn installation best practices.",
-        content: `<h2>Why Choose CPVC for Home Plumbing?</h2>
-<p>CPVC pipes offer several advantages over traditional metal piping: they don't corrode, don't support bacterial growth, provide better thermal insulation, and are significantly easier and faster to install.</p>
-
-<h2>Sizing Guide</h2>
-<p><strong>1/2 inch (15mm):</strong> Individual tap connections — basins, kitchen sinks<br/>
-<strong>3/4 inch (20mm):</strong> Branch lines and bathroom connections<br/>
-<strong>1 inch (25mm):</strong> Main supply lines from the tank to the building</p>
-
-<h2>Installation Best Practices</h2>
-<ul>
-<li>Always use CPVC-specific solvent cement — never use PVC adhesive on CPVC</li>
-<li>Allow joints to cure for at least 24 hours before running water</li>
-<li>Support pipes with clamps every 1 metre to prevent sagging</li>
-<li>Leave expansion gaps near hot water sources</li>
-</ul>
-
-<h2>Common Mistakes to Avoid</h2>
-<ul>
-<li>Mixing PVC and CPVC fittings — they are not interchangeable</li>
-<li>Using pipes near direct flames or extremely high heat sources</li>
-<li>Over-tightening threaded connections, which can crack the pipe</li>
-</ul>`,
-        featuredImage: "/blogs/cpvc-plumbing.jpg",
-        category: "plumbing-tips",
-        tags: ["CPVC Pipes", "Plumbing", "Installation"],
-        readTime: 8,
-        publishedAt: "2025-01-28",
-        author: "Garud Aqua Team",
-    },
-    {
-        _id: "b6",
-        slug: "water-tank-quality-family-health",
-        title: "Why Water Tank Quality Matters for Your Family's Health",
-        excerpt: "The material and build quality of your water tank directly impacts the water you consume.",
-        content: `<h2>The Hidden Risks of Cheap Tanks</h2>
-<p>Low-quality water tanks made from recycled or non-food-grade plastics can leach harmful chemicals into your water supply. These chemicals may not be visible or detectable by taste but can have long-term health effects.</p>
-
-<h2>What Makes a Tank Food-Safe?</h2>
-<p>Food-grade tanks are made from <strong>virgin LLDPE or HDPE</strong> resin that meets safety standards for storing consumable water. They are free from heavy metals, BPA, and other toxic compounds.</p>
-
-<h2>Look for ISI Certification</h2>
-<p>The <strong>ISI mark (IS 12701)</strong> certifies that a water tank has been tested for material safety, structural integrity, and UV resistance. Always choose ISI-certified tanks from reputable manufacturers.</p>
-
-<h2>Multi-Layer Protection</h2>
-<p>Premium tanks feature <strong>triple-layer construction</strong>: an outer layer for UV protection, a middle layer for insulation, and an inner food-grade layer that keeps water clean and safe.</p>
-
-<h2>The Garud Aqua Promise</h2>
-<p>All Garud Aqua water tanks are made from 100% virgin food-grade material, ISI-certified, and come with up to 7 years warranty. Because your family's health deserves nothing less.</p>`,
-        featuredImage: "/blogs/tank-quality-health.jpg",
-        category: "industry-news",
-        tags: ["Health", "Quality", "ISI Certification"],
-        readTime: 5,
-        publishedAt: "2025-01-15",
-        author: "Garud Aqua Team",
-    },
-];
-// ===== END STATIC DATA =====
 
 export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);
 
-    const blog = staticBlogs.find((b) => b.slug === slug);
-    const relatedBlogs = blog
-        ? staticBlogs.filter((b) => b.category === blog.category && b._id !== blog._id).slice(0, 3)
-        : [];
+    const [blog, setBlog] = useState<Blog | null>(null);
+    const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
 
-    if (!blog) {
+    useEffect(() => {
+        async function fetchBlog() {
+            setLoading(true);
+            setNotFound(false);
+            try {
+                const res = await fetch(`/api/blogs/${slug}`);
+                if (res.status === 404) {
+                    setNotFound(true);
+                    return;
+                }
+                if (!res.ok) throw new Error("Failed to fetch blog");
+
+                const data = await res.json();
+                setBlog(data.blog);
+                setRelatedBlogs(data.related || []);
+            } catch {
+                toast.error("Failed to load article.");
+                setNotFound(true);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchBlog();
+    }, [slug]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A]">
+                {/* Back Button */}
+                <div className="border-b border-gray-100 dark:border-white/6 sticky top-0 z-50 backdrop-blur-sm bg-white/90 dark:bg-black/90">
+                    <div className="container mx-auto px-4 py-4">
+                        <Link href="/blogs" className="inline-flex items-center text-[#0369A1] hover:text-[#0EA5E9] transition-colors font-light">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Back to Blog
+                        </Link>
+                    </div>
+                </div>
+
+                <article className="container mx-auto px-4 py-12 max-w-5xl">
+                    <div className="bg-white dark:bg-[#0A0A0A] rounded-3xl shadow-xl dark:shadow-none dark:border dark:border-white/6 overflow-hidden animate-pulse">
+                        <div className="h-64 sm:h-80 md:h-125 bg-gray-200 dark:bg-white/10" />
+                        <div className="p-8 md:p-12 space-y-6">
+                            <div className="h-8 bg-gray-200 dark:bg-white/10 rounded-full w-32" />
+                            <div className="h-12 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
+                            <div className="flex gap-6">
+                                <div className="h-5 bg-gray-200 dark:bg-white/10 rounded w-28" />
+                                <div className="h-5 bg-gray-200 dark:bg-white/10 rounded w-28" />
+                                <div className="h-5 bg-gray-200 dark:bg-white/10 rounded w-24" />
+                            </div>
+                            <div className="h-24 bg-gray-200 dark:bg-white/10 rounded-2xl" />
+                            <div className="space-y-3">
+                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-full" />
+                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-full" />
+                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-5/6" />
+                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-full" />
+                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        );
+    }
+
+    if (notFound || !blog) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-b from-gray-50 to-white dark:from-black dark:to-[#0A0A0A]">
                 <svg className="w-24 h-24 text-gray-300 dark:text-gray-600 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -362,7 +238,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {relatedBlogs.map((relatedBlog) => (
                                 <Link
-                                    key={relatedBlog._id}
+                                    key={relatedBlog.id}
                                     href={`/blogs/${relatedBlog.slug}`}
                                     className="group bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1"
                                 >

@@ -6,21 +6,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
-const STORAGE_KEY = "garudaqua_enquiries";
-
-interface Enquiry {
-    _id: string;
-    name: string;
-    email: string;
-    phone: string;
-    company: string;
-    product: string;
-    quantity: string;
-    message: string;
-    createdAt: string;
-    status: "new" | "contacted" | "closed";
-}
-
 export default function EnquirePage() {
     return (
         <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center text-gray-500">Loading...</div>}>
@@ -43,6 +28,7 @@ function EnquireForm() {
         message: "",
     });
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         if (productFromUrl) {
@@ -50,30 +36,32 @@ function EnquireForm() {
         }
     }, [productFromUrl]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.name.trim() || !formData.phone.trim()) {
             toast.error("Name and phone number are required");
             return;
         }
 
-        const enquiry: Enquiry = {
-            _id: `enq-${Date.now()}`,
-            ...formData,
-            createdAt: new Date().toISOString(),
-            status: "new",
-        };
-
+        setSubmitting(true);
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            const existing: Enquiry[] = stored ? JSON.parse(stored) : [];
-            localStorage.setItem(STORAGE_KEY, JSON.stringify([enquiry, ...existing]));
-        } catch {
-            // Ignore storage errors
-        }
+            const res = await fetch("/api/enquiries", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
 
-        toast.success("Enquiry submitted successfully!");
-        setSubmitted(true);
+            if (!res.ok) {
+                throw new Error("Failed to submit enquiry");
+            }
+
+            toast.success("Enquiry submitted successfully!");
+            setSubmitted(true);
+        } catch {
+            toast.error("Failed to submit enquiry. Please try again.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     if (submitted) {
@@ -226,11 +214,12 @@ function EnquireForm() {
                         {/* Submit */}
                         <motion.button
                             type="submit"
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
-                            className="w-full py-3.5 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-medium text-lg shadow-lg hover:shadow-xl transition-all"
+                            disabled={submitting}
+                            whileHover={{ scale: submitting ? 1 : 1.01 }}
+                            whileTap={{ scale: submitting ? 1 : 0.99 }}
+                            className="w-full py-3.5 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-medium text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            Submit Enquiry
+                            {submitting ? "Submitting..." : "Submit Enquiry"}
                         </motion.button>
 
                         <p className="text-xs text-gray-500 dark:text-gray-500 text-center">
