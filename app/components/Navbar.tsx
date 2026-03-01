@@ -2,12 +2,14 @@
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { useNavbar } from '../context/NavbarContext';
+import { useTheme } from '../context/ThemeContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 
 export default function Navbar() {
     const { isNavbarHidden } = useNavbar();
+    const { isDark } = useTheme();
     const [visible, setVisible] = useState(false);
     const ref = useRef<HTMLElement>(null);
     const { scrollY } = useScroll();
@@ -71,7 +73,7 @@ export default function Navbar() {
                                     className="flex items-center"
                                 >
                                     <img
-                                        src="/aqua-logo.svg"
+                                        src={isDark ? "/aqua-logo-dark.svg" : "/aqua-logo.svg"}
                                         alt="Garud Aqua"
                                         className="h-16 w-auto"
                                     />
@@ -146,7 +148,7 @@ export default function Navbar() {
                     {/* Mobile Logo */}
                     <Link href="/" className="shrink-0">
                         <img
-                            src="/aqua-logo-icon.svg"
+                            src={isDark ? "/aqua-logo-icon-dark.svg" : "/aqua-logo-icon.svg"}
                             alt="Garud Aqua"
                             className="h-11 w-11"
                         />

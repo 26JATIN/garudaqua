@@ -55,7 +55,7 @@ export async function sendEnquiryNotificationToAdmin(enquiry: {
   message: string;
 }) {
   await transporter.sendMail({
-    from: `"Garud Aqua Website" <${process.env.SMTP_USER}>`,
+    from: `"GarudAqua" <${process.env.SMTP_USER}>`,
     to: process.env.ADMIN_EMAIL,
     subject: `New Enquiry from ${enquiry.name}${enquiry.product ? ` — ${enquiry.product}` : ""}`,
     html: `
