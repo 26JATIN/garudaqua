@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get("category");
+    const categoryId = searchParams.get("category");
     const subcategory = searchParams.get("subcategory");
     const search = searchParams.get("search");
     const page = parseInt(searchParams.get("page") || "1");
@@ -13,8 +13,8 @@ export async function GET(request: Request) {
 
     const where: Record<string, unknown> = { isActive: true };
 
-    if (category) {
-      where.category = { name: category };
+    if (categoryId) {
+      where.categoryId = categoryId;
     }
     if (subcategory) {
       where.subcategoryId = subcategory;

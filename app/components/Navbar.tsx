@@ -1,19 +1,14 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useNavbar } from '../context/NavbarContext';
-import { useTheme } from '../context/ThemeContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 
 export default function Navbar() {
     const { isNavbarHidden } = useNavbar();
-    const { isDark } = useTheme();
     const [visible, setVisible] = useState(false);
-    const [bottomOffset, setBottomOffset] = useState(0);
-
     const ref = useRef<HTMLElement>(null);
     const { scrollY } = useScroll();
 
@@ -25,27 +20,6 @@ export default function Navbar() {
             setVisible(false);
         }
     });
-
-    // Fix iOS Chrome: bottom bar doesn't reposition when browser chrome hides/shows
-    useEffect(() => {
-        if (typeof window === 'undefined' || !window.visualViewport) return;
-
-        const viewport = window.visualViewport;
-
-        const handleViewportResize = () => {
-            const offset = window.innerHeight - viewport.height;
-            setBottomOffset(Math.max(0, offset));
-        };
-
-        viewport.addEventListener('resize', handleViewportResize);
-        viewport.addEventListener('scroll', handleViewportResize);
-        handleViewportResize();
-
-        return () => {
-            viewport.removeEventListener('resize', handleViewportResize);
-            viewport.removeEventListener('scroll', handleViewportResize);
-        };
-    }, []);
 
     return (
         <>
@@ -96,15 +70,11 @@ export default function Navbar() {
                                     href="/"
                                     className="flex items-center"
                                 >
-                                    <span className="relative h-12 w-180px overflow-hidden block">
-                                        <Image
-                                            src="/logo/desktop.png"
-                                            alt="Garud"
-                                            fill
-                                            className="absolute inset-0 object-cover transform scale-110"
-                                            priority
-                                        />
-                                    </span>
+                                    <img
+                                        src="/aqua-logo.svg"
+                                        alt="Garud Aqua"
+                                        className="h-16 w-auto"
+                                    />
                                 </Link>
                             </motion.div>
 
@@ -175,15 +145,11 @@ export default function Navbar() {
                 <div className="px-4 py-3 flex items-center gap-3">
                     {/* Mobile Logo */}
                     <Link href="/" className="shrink-0">
-                        <span className="relative h-10 w-10 overflow-hidden block rounded">
-                            <Image
-                                src="/logo/mobile.png"
-                                alt="Garud"
-                                fill
-                                className="absolute inset-0 object-cover transform scale-140"
-                                priority
-                            />
-                        </span>
+                        <img
+                            src="/aqua-logo-icon.svg"
+                            alt="Garud Aqua"
+                            className="h-11 w-11"
+                        />
                     </Link>
                     {/* Search Bar */}
                     <div className="flex-1">
@@ -196,16 +162,13 @@ export default function Navbar() {
 
             {/* Mobile Bottom Navigation - Enhanced Apple Liquid Glass Effect */}
             <motion.div
-                className="lg:hidden fixed left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border)"
+                className="lg:hidden fixed bottom-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border)"
                 style={{
-                    bottom: bottomOffset,
                     backgroundColor: "var(--navbar-bg)",
                     WebkitBackdropFilter: "blur(24px) saturate(200%)",
                     backdropFilter: "blur(24px) saturate(200%)",
                     boxShadow: "var(--navbar-shadow)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)",
-                    transform: "translateZ(0)",
-                    WebkitTransform: "translateZ(0)",
                 }}
                 initial={{ y: 100 }}
                 animate={{
@@ -219,61 +182,40 @@ export default function Navbar() {
                     duration: 0.4
                 }}
             >
-                {/* Scroll Gap 'Apron' - Extends background below the navbar */}
-                <div
-                    className="absolute top-full left-0 right-0 h-[50vh] -mt-px z-[-1]"
-                    style={{
-                        backgroundColor: "var(--navbar-bg)",
-                        WebkitBackdropFilter: "blur(24px) saturate(200%)",
-                        backdropFilter: "blur(24px) saturate(200%)",
-                    }}
-                />
-                <div className="flex items-center justify-around py-2.5">
+                <div className="flex items-center justify-around py-1.5">
                     {/* Home */}
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
-                        <Link href="/" className="flex flex-col items-center p-2 space-y-1.5">
-                            <motion.div
-                                className="p-2.5 rounded-2xl bg-(--nav-hover-bg)"
-                                whileHover={{ backgroundColor: "rgba(14, 165, 233, 0.15)", scale: 1.08 }}
-                                transition={{ duration: 0.3 }}
-                            >
+                    <motion.div whileTap={{ scale: 0.92 }}>
+                        <Link href="/" className="flex flex-col items-center px-3 py-1 space-y-0.5">
+                            <div className="p-1.5 rounded-xl">
                                 <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
-                            </motion.div>
-                            <span className="text-xs text-(--nav-text-muted) font-medium">Home</span>
+                            </div>
+                            <span className="text-[10px] text-(--nav-text-muted) font-medium">Home</span>
                         </Link>
                     </motion.div>
 
                     {/* Browse */}
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
-                        <Link href="/products" className="flex flex-col items-center p-2 space-y-1.5">
-                            <motion.div
-                                className="p-2.5 rounded-2xl bg-(--nav-hover-bg)"
-                                whileHover={{ backgroundColor: "rgba(14, 165, 233, 0.15)", scale: 1.08 }}
-                                transition={{ duration: 0.3 }}
-                            >
+                    <motion.div whileTap={{ scale: 0.92 }}>
+                        <Link href="/products" className="flex flex-col items-center px-3 py-1 space-y-0.5">
+                            <div className="p-1.5 rounded-xl">
                                 <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
-                            </motion.div>
-                            <span className="text-xs text-(--nav-text-muted) font-medium">Browse</span>
+                            </div>
+                            <span className="text-[10px] text-(--nav-text-muted) font-medium">Browse</span>
                         </Link>
                     </motion.div>
 
                     {/* Blog */}
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
-                        <Link href="/blogs" className="flex flex-col items-center p-2 space-y-1.5">
-                            <motion.div
-                                className="p-2.5 rounded-2xl bg-(--nav-hover-bg)"
-                                whileHover={{ backgroundColor: "rgba(14, 165, 233, 0.15)", scale: 1.08 }}
-                                transition={{ duration: 0.3 }}
-                            >
+                    <motion.div whileTap={{ scale: 0.92 }}>
+                        <Link href="/blogs" className="flex flex-col items-center px-3 py-1 space-y-0.5">
+                            <div className="p-1.5 rounded-xl">
                                 <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                            </motion.div>
-                            <span className="text-xs text-(--nav-text-muted) font-medium">Blog</span>
+                            </div>
+                            <span className="text-[10px] text-(--nav-text-muted) font-medium">Blog</span>
                         </Link>
                     </motion.div>
                 </div>

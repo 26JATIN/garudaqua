@@ -368,9 +368,8 @@ export default function CategoryShowcase() {
     );
 
     if (categoryInfo) {
-      const categoryName = encodeURIComponent(categoryInfo.name);
       const subcategoryId = encodeURIComponent(subcategory.id);
-      router.push(`/products?category=${categoryName}&subcategory=${subcategoryId}`);
+      router.push(`/products?category=${categoryInfo.id}&subcategory=${subcategoryId}`);
     } else {
       router.push(`/products?subcategory=${encodeURIComponent(subcategory.id)}`);
     }
@@ -620,7 +619,8 @@ export default function CategoryShowcase() {
                     <button
                       onClick={() => {
                         if (selectedCategory !== 'ALL') {
-                          router.push(`/products?category=${encodeURIComponent(selectedCategory)}`);
+                          const cat = categories.find(c => c.name === selectedCategory);
+                          router.push(`/products?category=${cat?.id || ''}`);
                         } else {
                           router.push('/products');
                         }

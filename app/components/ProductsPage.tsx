@@ -48,7 +48,7 @@ const PRODUCTS_PER_PAGE = 12;
 
 export default function ProductsPage() {
     const searchParams = useSearchParams();
-    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [selectedCategory, setSelectedCategory] = useState("all");
     const [selectedSubcategory, setSelectedSubcategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
     const [sortBy, setSortBy] = useState("featured");
@@ -130,7 +130,7 @@ export default function ProductsPage() {
             setLoadingProducts(true);
             try {
                 const params = new URLSearchParams();
-                if (selectedCategory !== "All") params.set("category", selectedCategory);
+                if (selectedCategory !== "all") params.set("category", selectedCategory);
                 if (selectedSubcategory !== "All") params.set("subcategory", selectedSubcategory);
                 if (searchTerm.trim()) params.set("search", searchTerm.trim());
                 params.set("page", String(currentPage));
@@ -198,9 +198,9 @@ export default function ProductsPage() {
 
     // Filtered subcategories based on selected category
     const visibleSubcategories = useMemo(() => {
-        if (selectedCategory === "All") return subcategories;
+        if (selectedCategory === "all") return subcategories;
         return subcategories.filter(
-            (sub) => sub.category.name === selectedCategory
+            (sub) => sub.category.id === selectedCategory
         );
     }, [selectedCategory, subcategories]);
 
@@ -212,7 +212,7 @@ export default function ProductsPage() {
     // Sync URL
     useEffect(() => {
         const params = new URLSearchParams();
-        if (selectedCategory !== "All") params.set("category", selectedCategory);
+        if (selectedCategory !== "all") params.set("category", selectedCategory);
         if (selectedSubcategory !== "All") params.set("subcategory", selectedSubcategory);
         if (searchTerm) params.set("search", searchTerm);
         if (sortBy !== "featured") params.set("sort", sortBy);
@@ -224,8 +224,15 @@ export default function ProductsPage() {
         }
     }, [selectedCategory, selectedSubcategory, searchTerm, sortBy]);
 
-    const handleCategoryClick = useCallback((categoryName: string) => {
-        setSelectedCategory(categoryName);
+    // Helper to get category name from ID
+    const getCategoryDisplayName = useCallback((catId: string) => {
+        if (catId === "all") return "All";
+        const cat = categories.find((c) => c.id === catId);
+        return cat?.name || "";
+    }, [categories]);
+
+    const handleCategoryClick = useCallback((categoryId: string) => {
+        setSelectedCategory(categoryId);
         setSelectedSubcategory("All");
     }, []);
 
@@ -339,16 +346,16 @@ export default function ProductsPage() {
                             <div ref={categoryScrollRef} className="flex gap-3 md:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
                                 {categories.map((category) => (
                                     <motion.button
-                                        key={category.name}
-                                        data-category-selected={selectedCategory === category.name ? "true" : undefined}
+                                        key={category.id}
+                                        data-category-selected={selectedCategory === category.id ? "true" : undefined}
                                         whileHover={{ scale: 1.05, y: -2 }}
                                         whileTap={{ scale: 0.95 }}
-                                        onClick={() => handleCategoryClick(category.name)}
+                                        onClick={() => handleCategoryClick(category.id)}
                                         className="flex flex-col items-center gap-1.5 md:gap-2 min-w-16 md:min-w-19 lg:min-w-20 group"
                                     >
                                         <div
                                             className={`relative rounded-full p-0.75 transition-all duration-300 ${
-                                                selectedCategory === category.name
+                                                selectedCategory === category.id
                                                     ? "bg-linear-to-tr from-[#0EA5E9] via-[#38BDF8] to-[#0369A1]"
                                                     : "bg-linear-to-tr from-gray-200 to-gray-300 group-hover:from-[#0EA5E9]/50 group-hover:to-[#0369A1]/50"
                                             }`}
@@ -365,7 +372,7 @@ export default function ProductsPage() {
                                                 </div>
                                             </div>
 
-                                            {selectedCategory === category.name && (
+                                            {selectedCategory === category.id && (
                                                 <motion.div
                                                     layoutId="activeRing"
                                                     className="absolute -inset-0.5 rounded-full"
@@ -381,7 +388,7 @@ export default function ProductsPage() {
 
                                         <span
                                             className={`text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center ${
-                                                selectedCategory === category.name
+                                                selectedCategory === category.id
                                                     ? "text-[#0EA5E9] font-medium"
                                                     : "text-[#2C2C2C] dark:text-gray-100 group-hover:text-[#0EA5E9]"
                                             }`}
@@ -421,9 +428,9 @@ export default function ProductsPage() {
                                 </svg>
                                 <h3 className="text-base md:text-lg font-medium text-[#2C2C2C] dark:text-gray-100">
                                     Browse Types
-                                    {selectedCategory !== "All" && (
+                                    {selectedCategory !== "all" && (
                                         <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
-                                            in {selectedCategory}
+                                            in {getCategoryDisplayName(selectedCategory)}
                                         </span>
                                     )}
                                 </h3>
@@ -572,8 +579,8 @@ export default function ProductsPage() {
                         </svg>
                         <span className="text-xs md:text-sm font-medium text-[#2C2C2C] dark:text-gray-200">
                             {totalProducts} {totalProducts === 1 ? "Product" : "Products"}
-                            {selectedCategory !== "All" && (
-                                <span className="hidden sm:inline"> in {selectedCategory}</span>
+                            {selectedCategory !== "all" && (
+                                <span className="hidden sm:inline"> in {getCategoryDisplayName(selectedCategory)}</span>
                             )}
                             {totalPages > 1 && (
                                 <span className="text-gray-500 ml-1">
@@ -638,12 +645,12 @@ export default function ProductsPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                         </svg>
                         <p className="text-xl text-[#2C2C2C] dark:text-gray-100 font-light">
-                            {searchTerm || selectedCategory !== "All" ? "No products found" : "No products available"}
+                            {searchTerm || selectedCategory !== "all" ? "No products found" : "No products available"}
                         </p>
                         <p className="text-gray-500 dark:text-gray-400 mt-2">
                             {searchTerm
                                 ? "Try adjusting your search terms"
-                                : selectedCategory !== "All"
+                                : selectedCategory !== "all"
                                   ? "Try selecting a different category"
                                   : "Check back soon for new items"}
                         </p>
@@ -755,7 +762,7 @@ export default function ProductsPage() {
 // ===== Grid Product Card =====
 function ProductCard({ product, index }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
-    const productHref = `/products/${product.slug || product.id}`;
+    const productHref = `/products/${product.id}`;
 
     return (
         <motion.div
@@ -806,7 +813,7 @@ function ProductCard({ product, index }: ProductCardProps) {
 // ===== List Product Item =====
 function ProductListItem({ product, index }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
-    const productHref = `/products/${product.slug || product.id}`;
+    const productHref = `/products/${product.id}`;
 
     return (
         <motion.div

@@ -4,7 +4,7 @@ import ProductDetail from "./ProductDetail";
 
 function ProductDetailContent({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
-    return <ProductDetail slug={resolvedParams.id} />;
+    return <ProductDetail productId={resolvedParams.id} />;
 }
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {

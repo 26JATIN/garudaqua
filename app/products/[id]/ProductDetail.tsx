@@ -215,7 +215,7 @@ function ProductDetailSkeleton() {
 }
 
 // ===== Main Component =====
-export default function ProductDetail({ slug }: { slug: string }) {
+export default function ProductDetail({ productId }: { productId: string }) {
     const router = useRouter();
     const [selectedImage, setSelectedImage] = useState(0);
     const [product, setProduct] = useState<Product | null>(null);
@@ -231,7 +231,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
             setSelectedImage(0);
 
             try {
-                const res = await fetch(`/api/products/${slug}`);
+                const res = await fetch(`/api/products/${productId}`);
                 if (!res.ok) {
                     setNotFound(true);
                     return;
@@ -255,7 +255,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
         }
 
         fetchProduct();
-    }, [slug]);
+    }, [productId]);
 
     const handleShare = async () => {
         const url = window.location.href;
@@ -327,6 +327,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
     }
 
     const categoryName = getCategoryName(product.category);
+    const categoryId = typeof product.category === "object" ? product.category.id : "";
     const displayImages = product.images && product.images.length > 0 ? product.images : product.image ? [product.image] : [];
 
     return (
@@ -481,7 +482,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
 
                         {/* Available Options */}
                         {product.hasVariants && product.variantOptions && product.variantOptions.length > 0 && (
-                            <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-5 dark:border dark:border-white/6">
+                            <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-5 border border-gray-200 dark:border-white/6">
                                 <h3 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100">Available Options</h3>
                                 {product.variantOptions.map((option) => {
                                     const availableValues = option.values.filter((v) => v.isAvailable);
@@ -526,7 +527,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
 
                         {/* Specifications */}
                         {product.specs && product.specs.length > 0 && (
-                            <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-3 dark:border dark:border-white/6">
+                            <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-3 border border-gray-200 dark:border-white/6">
                                 <h3 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100 mb-4">Specifications</h3>
                                 {product.specs.map((spec, i) => (
                                     <div key={i} className="flex justify-between items-center">
@@ -552,40 +553,40 @@ export default function ProductDetail({ slug }: { slug: string }) {
                         </Link>
 
                         {/* Features */}
-                        <div className={`grid gap-4 pt-6 ${product.guarantee ? "grid-cols-3" : "grid-cols-2"}`}>
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-                                    <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className={`grid grid-cols-2 gap-3 pt-6 ${product.guarantee ? "sm:grid-cols-3" : ""}`}>
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-10 h-10 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
+                                    <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-[#2C2C2C] dark:text-gray-200">ISI Certified</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-light">Quality Assured</p>
+                                    <p className="text-xs sm:text-sm font-medium text-[#2C2C2C] dark:text-gray-200">ISI Certified</p>
+                                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-light">Quality Assured</p>
                                 </div>
                             </div>
                             {product.guarantee && (
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-                                        <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-10 h-10 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
+                                        <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                         </svg>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Guarantee</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-light">{product.guarantee}</p>
+                                        <p className="text-xs sm:text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Guarantee</p>
+                                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-light">{product.guarantee}</p>
                                     </div>
                                 </div>
                             )}
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-                                    <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-10 h-10 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
+                                    <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Trusted Brand</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-light">A Bond of Trust</p>
+                                    <p className="text-xs sm:text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Trusted Brand</p>
+                                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-light">A Bond of Trust</p>
                                 </div>
                             </div>
                         </div>
@@ -611,7 +612,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
                                 </p>
                             </div>
                             <Link
-                                href={`/products?category=${encodeURIComponent(categoryName)}`}
+                                href={`/products?category=${categoryId}`}
                                 className="hidden md:flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
                                 View All
@@ -622,7 +623,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                             {relatedProducts.map((relatedProduct, index) => (
-                                <Link key={relatedProduct.id} href={`/products/${relatedProduct.slug || relatedProduct.id}`}>
+                                <Link key={relatedProduct.id} href={`/products/${relatedProduct.id}`}>
                                     <motion.div
                                         initial={{ opacity: 0, y: 20 }}
                                         whileInView={{ opacity: 1, y: 0 }}
@@ -664,7 +665,7 @@ export default function ProductDetail({ slug }: { slug: string }) {
                         {/* Mobile View All Button */}
                         <div className="md:hidden mt-6 text-center">
                             <Link
-                                href={`/products?category=${encodeURIComponent(categoryName)}`}
+                                href={`/products?category=${categoryId}`}
                                 className="inline-flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
                                 View All Similar Products
