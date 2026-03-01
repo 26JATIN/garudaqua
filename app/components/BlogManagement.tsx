@@ -12,6 +12,7 @@ interface BlogPost {
     excerpt: string;
     content: string;
     category: string;
+    categoryId: string | null;
     tags: string[];
     featuredImage: string;
     featuredAlt: string;
@@ -21,24 +22,17 @@ interface BlogPost {
     publishedAt: string;
 }
 
-const CATEGORIES = [
-    "water-tank-guide",
-    "plumbing-tips",
-    "maintenance",
-    "industry-news",
-    "other",
-];
-
-const CATEGORY_LABELS: Record<string, string> = {
-    "water-tank-guide": "Water Tank Guide",
-    "plumbing-tips": "Plumbing Tips",
-    maintenance: "Maintenance",
-    "industry-news": "Industry News",
-    other: "Other",
-};
+interface BlogCategory {
+    id: string;
+    name: string;
+    slug: string;
+    order: number;
+    isActive: boolean;
+}
 
 export default function BlogManagement() {
     const [blogs, setBlogs] = useState<BlogPost[]>([]);
+    const [categories, setCategories] = useState<BlogCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
@@ -56,7 +50,7 @@ export default function BlogManagement() {
         slug: "",
         excerpt: "",
         content: "",
-        category: "other",
+        categoryId: "",
         tags: "",
         featuredImage: "",
         featuredAlt: "",
@@ -64,6 +58,17 @@ export default function BlogManagement() {
         readTime: 5,
         author: "Garud Aqua Team",
     });
+
+    const fetchCategories = useCallback(async () => {
+        try {
+            const res = await fetch("/api/admin/blog-categories");
+            if (!res.ok) throw new Error("Failed to fetch");
+            const data = await res.json();
+            setCategories(data);
+        } catch {
+            toast.error("Failed to load blog categories");
+        }
+    }, []);
 
     const fetchBlogs = useCallback(async () => {
         try {
@@ -79,8 +84,17 @@ export default function BlogManagement() {
     }, []);
 
     useEffect(() => {
+        fetchCategories();
         fetchBlogs();
-    }, [fetchBlogs]);
+    }, [fetchCategories, fetchBlogs]);
+
+    const getCategoryLabel = (blog: BlogPost) => {
+        if (blog.categoryId) {
+            const cat = categories.find((c) => c.id === blog.categoryId);
+            if (cat) return cat.name;
+        }
+        return blog.category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    };
 
     // ===== Editor helpers =====
     const syncEditorContent = useCallback(() => {
@@ -163,12 +177,14 @@ export default function BlogManagement() {
 
         setSubmitting(true);
         try {
+            const selectedCat = categories.find((c) => c.id === formData.categoryId);
             const body = {
                 title: formData.title,
                 slug,
                 excerpt: formData.excerpt,
                 content: formData.content,
-                category: formData.category,
+                category: selectedCat?.slug || "other",
+                categoryId: formData.categoryId || null,
                 tags,
                 featuredImage: formData.featuredImage,
                 featuredAlt: formData.featuredAlt,
@@ -212,7 +228,7 @@ export default function BlogManagement() {
             slug: blog.slug,
             excerpt: blog.excerpt,
             content: blog.content,
-            category: blog.category,
+            categoryId: blog.categoryId || "",
             tags: blog.tags?.join(", ") || "",
             featuredImage: blog.featuredImage || "",
             featuredAlt: blog.featuredAlt || "",
@@ -247,7 +263,7 @@ export default function BlogManagement() {
             slug: "",
             excerpt: "",
             content: "",
-            category: "other",
+            categoryId: "",
             tags: "",
             featuredImage: "",
             featuredAlt: "",
@@ -292,7 +308,7 @@ export default function BlogManagement() {
     const filteredBlogs = blogs.filter((b) => {
         if (statusFilter === "published" && !b.isPublished) return false;
         if (statusFilter === "draft" && b.isPublished) return false;
-        if (categoryFilter !== "all" && b.category !== categoryFilter) return false;
+        if (categoryFilter !== "all" && b.categoryId !== categoryFilter) return false;
         if (searchTerm && !b.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
         return true;
     });
@@ -394,12 +410,13 @@ export default function BlogManagement() {
                         <div>
                             <label className="block text-sm font-medium mb-2 text-gray-700">Category</label>
                             <select
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                value={formData.categoryId}
+                                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
                             >
-                                {CATEGORIES.map((c) => (
-                                    <option key={c} value={c}>{CATEGORY_LABELS[c] || c}</option>
+                                <option value="">Select Category</option>
+                                {categories.map((c) => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -538,8 +555,8 @@ export default function BlogManagement() {
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
                 >
                     <option value="all">All Categories</option>
-                    {CATEGORIES.map((c) => (
-                        <option key={c} value={c}>{CATEGORY_LABELS[c] || c}</option>
+                    {categories.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                 </select>
             </div>
@@ -570,7 +587,7 @@ export default function BlogManagement() {
                                 <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{blog.excerpt}</p>
                                 <div className="flex flex-wrap items-center gap-2 mt-2">
                                     <span className="text-xs px-2 py-0.5 bg-[#0EA5E9]/10 text-[#0EA5E9] rounded-full">
-                                        {CATEGORY_LABELS[blog.category] || blog.category}
+                                        {getCategoryLabel(blog)}
                                     </span>
                                     <span className="text-xs text-gray-400">{blog.readTime} min read</span>
                                     <span className="text-xs text-gray-400">{new Date(blog.publishedAt).toLocaleDateString()}</span>

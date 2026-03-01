@@ -35,6 +35,7 @@ export async function POST(request: Request) {
         excerpt: body.excerpt || "",
         content: body.content || "",
         category: body.category || "other",
+        categoryId: body.categoryId || null,
         tags: body.tags || [],
         featuredImage: body.featuredImage || "",
         featuredAlt: body.featuredAlt || "",

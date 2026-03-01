@@ -15,6 +15,7 @@ interface Blog {
     content: string;
     featuredImage?: string;
     category: string;
+    categoryId: string | null;
     tags: string[];
     readTime: number;
     publishedAt: string;
@@ -22,22 +23,27 @@ interface Blog {
     isPublished: boolean;
 }
 
-// ===== STATIC DATA =====
-const CATEGORIES = [
-    { value: "all", label: "All Articles" },
-    { value: "water-tank-guide", label: "Water Tank Guide" },
-    { value: "plumbing-tips", label: "Plumbing Tips" },
-    { value: "maintenance", label: "Maintenance" },
-    { value: "industry-news", label: "Industry News" },
-];
+interface BlogCategory {
+    id: string;
+    name: string;
+    slug: string;
+}
 
 export default function BlogsPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [category, setCategory] = useState("all");
     const [blogs, setBlogs] = useState<Blog[]>([]);
+    const [categories, setCategories] = useState<BlogCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+
+    useEffect(() => {
+        fetch("/api/blog-categories")
+            .then((res) => res.ok ? res.json() : [])
+            .then((data) => setCategories(Array.isArray(data) ? data : []))
+            .catch(() => setCategories([]));
+    }, []);
 
     const fetchBlogs = useCallback(async () => {
         setLoading(true);
@@ -69,6 +75,14 @@ export default function BlogsPage() {
     useEffect(() => {
         setPage(1);
     }, [category, searchTerm]);
+
+    const getCategoryName = (blog: Blog) => {
+        if (blog.categoryId) {
+            const cat = categories.find((c) => c.id === blog.categoryId);
+            if (cat) return cat.name;
+        }
+        return blog.category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    };
 
     return (
         <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A]">
@@ -124,17 +138,27 @@ export default function BlogsPage() {
                     className="mb-12"
                 >
                     <div className="flex flex-wrap gap-3 justify-center">
-                        {CATEGORIES.map((cat) => (
+                        <button
+                            onClick={() => setCategory("all")}
+                            className={`px-6 py-3 rounded-full font-light transition-all duration-300 ${
+                                category === "all"
+                                    ? "bg-[#0EA5E9] text-white shadow-lg scale-105"
+                                    : "bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 hover:shadow-md border border-gray-200 dark:border-white/6"
+                            }`}
+                        >
+                            All Articles
+                        </button>
+                        {categories.map((cat) => (
                             <button
-                                key={cat.value}
-                                onClick={() => setCategory(cat.value)}
+                                key={cat.id}
+                                onClick={() => setCategory(cat.slug)}
                                 className={`px-6 py-3 rounded-full font-light transition-all duration-300 ${
-                                    category === cat.value
+                                    category === cat.slug
                                         ? "bg-[#0EA5E9] text-white shadow-lg scale-105"
                                         : "bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 hover:shadow-md border border-gray-200 dark:border-white/6"
                                 }`}
                             >
-                                {cat.label}
+                                {cat.name}
                             </button>
                         ))}
                     </div>
@@ -200,7 +224,7 @@ export default function BlogsPage() {
                                         {/* Category Badge */}
                                         <div className="mb-3">
                                             <span className="inline-block px-4 py-1.5 bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs font-medium rounded-full">
-                                                {blog.category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                                                {getCategoryName(blog)}
                                             </span>
                                         </div>
 

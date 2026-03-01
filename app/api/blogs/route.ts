@@ -24,6 +24,7 @@ export async function GET(request: Request) {
     const [blogs, total] = await Promise.all([
       prisma.blogPost.findMany({
         where,
+        include: { blogCategory: { select: { name: true } } },
         orderBy: { publishedAt: "desc" },
         skip: (page - 1) * limit,
         take: limit,

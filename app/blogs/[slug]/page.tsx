@@ -15,6 +15,7 @@ interface Blog {
     content: string;
     featuredImage?: string;
     category: string;
+    categoryName?: string;
     tags: string[];
     readTime: number;
     publishedAt: string;
@@ -158,7 +159,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                         {/* Category Badge */}
                         <div className="mb-6">
                             <span className="inline-block px-5 py-2 bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium rounded-full">
-                                {blog.category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                                {blog.categoryName || blog.category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                             </span>
                         </div>
 

@@ -19,6 +19,8 @@ export default function AdminHeroSlidesPage() {
     const [showForm, setShowForm] = useState(false);
     const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null);
     const [uploading, setUploading] = useState<"desktop" | "mobile" | null>(null);
+    const [bulkUploading, setBulkUploading] = useState(false);
+    const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
     const [formData, setFormData] = useState({
         image: "",
         mobileImage: "",
@@ -130,6 +132,63 @@ export default function AdminHeroSlidesPage() {
         input.click();
     };
 
+    const handleBulkUpload = () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/jpeg,image/jpg,image/png,image/webp";
+        input.multiple = true;
+
+        input.onchange = async (e: Event) => {
+            const files = (e.target as HTMLInputElement).files;
+            if (!files || files.length === 0) return;
+
+            const fileArray = Array.from(files);
+            setBulkUploading(true);
+            setBulkProgress({ current: 0, total: fileArray.length });
+
+            const maxOrder = slides.length > 0 ? Math.max(...slides.map((s) => s.order)) : -1;
+            let successCount = 0;
+
+            for (let i = 0; i < fileArray.length; i++) {
+                setBulkProgress({ current: i + 1, total: fileArray.length });
+                try {
+                    // Upload image to Cloudinary
+                    const fd = new FormData();
+                    fd.append("file", fileArray[i]);
+                    fd.append("folder", "garudaqua/hero-slides");
+                    const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: fd });
+                    if (!uploadRes.ok) throw new Error("Upload failed");
+                    const { url } = await uploadRes.json();
+
+                    // Create hero slide
+                    const slideRes = await fetch("/api/admin/hero-slides", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            image: url,
+                            mobileImage: "",
+                            title: "",
+                            order: maxOrder + 1 + i,
+                            isActive: true,
+                        }),
+                    });
+                    if (!slideRes.ok) throw new Error("Failed to create slide");
+                    successCount++;
+                } catch {
+                    toast.error(`Failed to upload image ${i + 1}`);
+                }
+            }
+
+            setBulkUploading(false);
+            setBulkProgress({ current: 0, total: 0 });
+            if (successCount > 0) {
+                toast.success(`${successCount} slide${successCount > 1 ? "s" : ""} added`);
+                fetchSlides();
+            }
+        };
+        input.click();
+    };
+
     return (
         <AdminLayout>
             <div className="space-y-6">
@@ -138,12 +197,23 @@ export default function AdminHeroSlidesPage() {
                         <h1 className="text-2xl font-bold text-gray-900">Hero Slides</h1>
                         <p className="text-gray-600 mt-1">Manage homepage hero banner slides</p>
                     </div>
-                    <button
-                        onClick={() => setShowForm(!showForm)}
-                        className="px-5 py-2 bg-[#0EA5E9] text-white rounded-lg hover:bg-[#0369A1] transition text-sm font-medium"
-                    >
-                        {showForm ? "Cancel" : "+ Add Slide"}
-                    </button>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={handleBulkUpload}
+                            disabled={bulkUploading}
+                            className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium disabled:opacity-50"
+                        >
+                            {bulkUploading
+                                ? `Uploading ${bulkProgress.current}/${bulkProgress.total}...`
+                                : "Bulk Upload"}
+                        </button>
+                        <button
+                            onClick={() => setShowForm(!showForm)}
+                            className="px-5 py-2 bg-[#0EA5E9] text-white rounded-lg hover:bg-[#0369A1] transition text-sm font-medium"
+                        >
+                            {showForm ? "Cancel" : "+ Add Slide"}
+                        </button>
+                    </div>
                 </div>
 
                 {showForm && (
