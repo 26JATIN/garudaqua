@@ -83,6 +83,8 @@ const CategoryPreview = React.memo(({ category, className }: CategoryPreviewProp
             onLoad={handleLoad}
             onError={handleError}
             loading="lazy"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            quality={70}
           />
 
           {/* Hover overlay */}
@@ -138,6 +140,8 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
               className={`object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setIsLoaded(true)}
               loading="lazy"
+              sizes="80px"
+              quality={60}
             />
             {!isLoaded && (
               <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#111] dark:to-black shimmer" />

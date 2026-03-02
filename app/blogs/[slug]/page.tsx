@@ -149,6 +149,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                                 fill
                                 className="object-cover"
                                 priority
+                                sizes="(max-width: 1280px) 100vw, 1280px"
+                                quality={85}
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
                         </div>
@@ -250,6 +252,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                                                 alt={relatedBlog.title}
                                                 fill
                                                 className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                sizes="(max-width: 768px) 100vw, 33vw"
+                                                quality={70}
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         </div>

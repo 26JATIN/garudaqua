@@ -189,6 +189,7 @@ export default function ImageCarousel({
                                     width={64}
                                     height={64}
                                     className="w-full h-full object-cover"
+                                    quality={50}
                                 />
                                 {currentIndex === index && (
                                     <div className="absolute inset-0 bg-[#0EA5E9]/30 flex items-center justify-center">

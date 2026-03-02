@@ -208,6 +208,10 @@ export default function BlogsPage() {
                                                 alt={blog.title}
                                                 fill
                                                 className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                                quality={75}
+                                                priority={index === 0}
+                                                loading={index === 0 ? undefined : "lazy"}
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         </div>

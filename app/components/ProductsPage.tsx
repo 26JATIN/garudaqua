@@ -48,10 +48,10 @@ const PRODUCTS_PER_PAGE = 12;
 
 export default function ProductsPage() {
     const searchParams = useSearchParams();
-    const [selectedCategory, setSelectedCategory] = useState("all");
-    const [selectedSubcategory, setSelectedSubcategory] = useState("All");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [sortBy, setSortBy] = useState("featured");
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "all");
+    const [selectedSubcategory, setSelectedSubcategory] = useState(searchParams.get("subcategory") || "All");
+    const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+    const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
     const [viewMode, setViewMode] = useState("grid");
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -68,7 +68,6 @@ export default function ProductsPage() {
     const productsGridRef = useRef<HTMLDivElement>(null);
     const categoryScrollRef = useRef<HTMLDivElement>(null);
     const subcategoryScrollRef = useRef<HTMLDivElement>(null);
-    const initialParamsLoaded = useRef(false);
 
     // Fetch categories on mount
     useEffect(() => {
@@ -108,23 +107,21 @@ export default function ProductsPage() {
         fetchSubcategories();
     }, []);
 
-    // Read URL params on mount
+    // Sync state when URL params change (e.g. browser back/forward)
     useEffect(() => {
-        const searchFromUrl = searchParams.get("search");
-        const categoryFromUrl = searchParams.get("category");
-        const subcategoryFromUrl = searchParams.get("subcategory");
-        const sortFromUrl = searchParams.get("sort");
+        const categoryFromUrl = searchParams.get("category") || "all";
+        const subcategoryFromUrl = searchParams.get("subcategory") || "All";
+        const searchFromUrl = searchParams.get("search") || "";
+        const sortFromUrl = searchParams.get("sort") || "featured";
 
-        if (searchFromUrl) setSearchTerm(searchFromUrl);
-        if (categoryFromUrl) setSelectedCategory(categoryFromUrl);
-        if (subcategoryFromUrl) setSelectedSubcategory(subcategoryFromUrl);
-        if (sortFromUrl) setSortBy(sortFromUrl);
-        initialParamsLoaded.current = true;
+        setSelectedCategory(categoryFromUrl);
+        setSelectedSubcategory(subcategoryFromUrl);
+        setSearchTerm(searchFromUrl);
+        setSortBy(sortFromUrl);
     }, [searchParams]);
 
     // Fetch products when filters change
     useEffect(() => {
-        if (!initialParamsLoaded.current) return;
 
         async function fetchProducts() {
             setLoadingProducts(true);
@@ -780,6 +777,10 @@ function ProductCard({ product, index }: ProductCardProps) {
                                 alt={product.name}
                                 fill
                                 className="object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                quality={75}
+                                priority={index < 4}
+                                loading={index < 4 ? undefined : "lazy"}
                             />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center">
@@ -832,6 +833,8 @@ function ProductListItem({ product, index }: ProductCardProps) {
                                     alt={product.name}
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                    sizes="(max-width: 640px) 64px, 192px"
+                                    quality={70}
                                 />
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center">

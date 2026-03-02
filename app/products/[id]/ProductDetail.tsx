@@ -124,6 +124,8 @@ function MobileImageGallery({ images, productName }: { images: string[]; product
                                     fill
                                     className="object-cover"
                                     priority={index === 0}
+                                    sizes="100vw"
+                                    quality={80}
                                 />
                             </div>
                         </div>
@@ -385,6 +387,8 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                                 fill
                                                 className="object-cover"
                                                 priority
+                                                sizes="50vw"
+                                                quality={85}
                                             />
                                         </motion.div>
                                     </AnimatePresence>
@@ -419,6 +423,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                             width={200}
                                             height={200}
                                             className="object-cover w-full h-full"
+                                            quality={60}
                                         />
                                     </motion.button>
                                 ))}
@@ -640,6 +645,8 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                                         alt={relatedProduct.name}
                                                         fill
                                                         className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                        sizes="(max-width: 768px) 50vw, 25vw"
+                                                        quality={70}
                                                     />
                                                 ) : (
                                                     <div className="absolute inset-0 flex items-center justify-center">

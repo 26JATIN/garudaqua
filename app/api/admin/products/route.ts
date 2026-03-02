@@ -11,9 +11,12 @@ function slugify(text: string): string {
 export async function GET() {
   try {
     const products = await prisma.product.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: [
+        { category: { sortOrder: "asc" } },
+        { createdAt: "desc" },
+      ],
       include: {
-        category: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, sortOrder: true } },
         subcategory: { select: { id: true, name: true } },
       },
     });

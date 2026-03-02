@@ -26,12 +26,12 @@ export async function GET(request: Request) {
       ];
     }
 
-    const orderBy: Record<string, string> =
+    const orderBy =
       sort === "latest"
-        ? { createdAt: "desc" }
+        ? [{ createdAt: "desc" as const }]
         : sort === "name"
-          ? { name: "asc" }
-          : { createdAt: "desc" };
+          ? [{ name: "asc" as const }]
+          : [{ category: { sortOrder: "asc" as const } }, { createdAt: "desc" as const }];
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({

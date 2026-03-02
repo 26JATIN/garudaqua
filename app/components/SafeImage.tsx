@@ -13,6 +13,7 @@ interface SafeImageProps {
     loading?: "lazy" | "eager";
     fallbackSrc?: string;
     quality?: number;
+    sizes?: string;
 }
 
 export default function SafeImage({
@@ -26,6 +27,7 @@ export default function SafeImage({
     loading = "lazy",
     fallbackSrc = "/product-placeholder.svg",
     quality = 80,
+    sizes,
 }: SafeImageProps) {
     const [error, setError] = useState(false);
 
@@ -65,7 +67,7 @@ export default function SafeImage({
                 alt={alt}
                 fill
                 className={className}
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes={sizes || "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
                 priority={priority}
                 loading={priority ? undefined : loading}
                 quality={quality}

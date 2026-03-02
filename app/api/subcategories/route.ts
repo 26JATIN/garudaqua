@@ -11,7 +11,10 @@ export async function GET(request: Request) {
         isActive: true,
         ...(categoryId ? { categoryId } : {}),
       },
-      orderBy: { order: "asc" },
+      orderBy: [
+        { category: { sortOrder: "asc" } },
+        { order: "asc" },
+      ],
       include: {
         category: { select: { id: true, name: true } },
       },
