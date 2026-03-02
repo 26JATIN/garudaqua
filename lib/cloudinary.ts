@@ -31,4 +31,27 @@ export async function deleteFromCloudinary(
   });
 }
 
+/**
+ * Extract public ID from a Cloudinary URL.
+ * e.g. "https://res.cloudinary.com/xxx/image/upload/v123/garudaqua/abc.jpg" → "garudaqua/abc"
+ */
+export function extractPublicId(url: string): string | null {
+  if (!url || !url.includes("cloudinary.com")) return null;
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/);
+  return match ? match[1] : null;
+}
+
+/** Delete a Cloudinary asset by its full URL. Silently skips non-Cloudinary URLs. */
+export async function deleteCloudinaryByUrl(
+  url: string,
+  resourceType: "image" | "video" = "image"
+) {
+  const publicId = extractPublicId(url);
+  if (publicId) {
+    await deleteFromCloudinary(publicId, resourceType).catch((err) =>
+      console.error(`Failed to delete Cloudinary asset ${publicId}:`, err)
+    );
+  }
+}
+
 export default cloudinary;

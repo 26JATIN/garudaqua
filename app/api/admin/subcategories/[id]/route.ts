@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 
 export async function PUT(
   request: Request,
@@ -8,6 +9,9 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+
+    const existing = await prisma.subcategory.findUnique({ where: { id } });
+
     const subcategory = await prisma.subcategory.update({
       where: { id },
       data: {
@@ -22,6 +26,11 @@ export async function PUT(
         category: { select: { id: true, name: true } },
       },
     });
+
+    if (existing?.image && existing.image !== body.image) {
+      await deleteCloudinaryByUrl(existing.image);
+    }
+
     return NextResponse.json(subcategory);
   } catch (error) {
     console.error("Error updating subcategory:", error);
@@ -38,7 +47,12 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+
+    const subcategory = await prisma.subcategory.findUnique({ where: { id } });
     await prisma.subcategory.delete({ where: { id } });
+
+    if (subcategory?.image) await deleteCloudinaryByUrl(subcategory.image);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting subcategory:", error);

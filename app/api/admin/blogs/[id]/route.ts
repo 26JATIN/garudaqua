@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 
 export async function PUT(
   request: Request,
@@ -8,6 +9,9 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+
+    const existing = await prisma.blogPost.findUnique({ where: { id } });
+
     const blog = await prisma.blogPost.update({
       where: { id },
       data: {
@@ -28,6 +32,11 @@ export async function PUT(
           : undefined,
       },
     });
+
+    if (existing?.featuredImage && existing.featuredImage !== body.featuredImage) {
+      await deleteCloudinaryByUrl(existing.featuredImage);
+    }
+
     return NextResponse.json(blog);
   } catch (error) {
     console.error("Error updating blog:", error);
@@ -44,7 +53,12 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+
+    const blog = await prisma.blogPost.findUnique({ where: { id } });
     await prisma.blogPost.delete({ where: { id } });
+
+    if (blog?.featuredImage) await deleteCloudinaryByUrl(blog.featuredImage);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting blog:", error);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 
 export async function PUT(
   request: Request,
@@ -8,6 +9,9 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+
+    const existing = await prisma.heroSlide.findUnique({ where: { id } });
+
     const slide = await prisma.heroSlide.update({
       where: { id },
       data: {
@@ -18,6 +22,14 @@ export async function PUT(
         isActive: body.isActive,
       },
     });
+
+    if (existing?.image && existing.image !== body.image) {
+      await deleteCloudinaryByUrl(existing.image);
+    }
+    if (existing?.mobileImage && existing.mobileImage !== body.mobileImage) {
+      await deleteCloudinaryByUrl(existing.mobileImage);
+    }
+
     return NextResponse.json(slide);
   } catch (error) {
     console.error("Error updating hero slide:", error);
@@ -34,7 +46,13 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+
+    const slide = await prisma.heroSlide.findUnique({ where: { id } });
     await prisma.heroSlide.delete({ where: { id } });
+
+    if (slide?.image) await deleteCloudinaryByUrl(slide.image);
+    if (slide?.mobileImage) await deleteCloudinaryByUrl(slide.mobileImage);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting hero slide:", error);

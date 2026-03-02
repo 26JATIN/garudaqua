@@ -478,11 +478,12 @@ class App {
   }
   onWheel(e: any) {
     const deltaX = e.deltaX || 0;
-    const deltaY = e.deltaY || e.wheelDelta || e.detail || 0;
+    const deltaY = e.deltaY || 0;
 
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    // Respond to horizontal swipes (trackpad two-finger left/right)
+    if (Math.abs(deltaX) > 3 && Math.abs(deltaX) >= Math.abs(deltaY) * 0.5) {
       e.preventDefault();
-      this.scroll.target += (deltaX > 0 ? this.scrollSpeed : -this.scrollSpeed) * 0.2;
+      this.scroll.target += deltaX * this.scrollSpeed * 0.01;
       this.onCheckDebounce();
     }
   }
@@ -544,8 +545,8 @@ class App {
     this.resizeObserver = new ResizeObserver(() => { this.onResize(); });
     this.resizeObserver.observe(this.container);
 
-    this.container.addEventListener('mousewheel', this.boundOnWheel);
-    this.container.addEventListener('wheel', this.boundOnWheel);
+    this.container.addEventListener('mousewheel', this.boundOnWheel, { passive: false });
+    this.container.addEventListener('wheel', this.boundOnWheel, { passive: false });
     this.container.addEventListener('mousedown', this.boundOnTouchDown);
     this.container.addEventListener('touchstart', this.boundOnTouchDown, { passive: true });
     this.container.addEventListener('touchmove', this.boundOnTouchMove, { passive: false });

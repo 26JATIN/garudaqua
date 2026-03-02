@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 
 export async function PUT(
   request: Request,
@@ -8,6 +9,9 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+
+    const existing = await prisma.galleryItem.findUnique({ where: { id } });
+
     const item = await prisma.galleryItem.update({
       where: { id },
       data: {
@@ -22,6 +26,15 @@ export async function PUT(
         tags: body.tags,
       },
     });
+
+    if (existing?.mediaUrl && existing.mediaUrl !== body.mediaUrl) {
+      const resType = existing.mediaType === "VIDEO" ? "video" : "image";
+      await deleteCloudinaryByUrl(existing.mediaUrl, resType as "image" | "video");
+    }
+    if (existing?.thumbnailUrl && existing.thumbnailUrl !== body.thumbnailUrl) {
+      await deleteCloudinaryByUrl(existing.thumbnailUrl);
+    }
+
     return NextResponse.json(item);
   } catch (error) {
     console.error("Error updating gallery item:", error);
@@ -38,7 +51,16 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+
+    const item = await prisma.galleryItem.findUnique({ where: { id } });
     await prisma.galleryItem.delete({ where: { id } });
+
+    if (item?.mediaUrl) {
+      const resType = item.mediaType === "VIDEO" ? "video" : "image";
+      await deleteCloudinaryByUrl(item.mediaUrl, resType as "image" | "video");
+    }
+    if (item?.thumbnailUrl) await deleteCloudinaryByUrl(item.thumbnailUrl);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting gallery item:", error);
