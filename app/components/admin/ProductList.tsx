@@ -3,12 +3,6 @@ import { useState } from "react";
 import Image from "next/image";
 
 // ===== Types =====
-interface Variant {
-    sku: string;
-    optionCombination: Record<string, string>;
-    isActive: boolean;
-}
-
 interface Product {
     id: string;
     name: string;
@@ -32,7 +26,6 @@ interface Product {
             isAvailable: boolean;
         }>;
     }>;
-    variants: Variant[];
 }
 
 interface ProductListProps {
@@ -146,8 +139,8 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {product.hasVariants ? (
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    {product.variants?.length || 0} variants
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {product.variantOptions?.length || 0} options
                                                 </span>
                                             ) : (
                                                 <span className="text-sm text-gray-500">None</span>
@@ -199,40 +192,41 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                                             <td colSpan={5} className="px-6 py-4">
                                                 <div className="bg-white rounded-lg border p-4">
                                                     <h4 className="font-medium text-gray-900 mb-3">
-                                                        Variants ({product.variants?.length || 0})
+                                                        Options ({product.variantOptions?.length || 0})
                                                     </h4>
-                                                    {product.variants && product.variants.length > 0 ? (
+                                                    {product.variantOptions && product.variantOptions.length > 0 ? (
                                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                            {product.variants.map((variant, index) => (
+                                                            {product.variantOptions.map((option, index) => (
                                                                 <div key={index} className="border rounded-lg p-3 bg-gray-50">
-                                                                    <div className="flex justify-between items-start mb-2">
-                                                                        <div className="font-medium text-sm text-gray-900">
-                                                                            {variant.sku}
-                                                                        </div>
-                                                                        <div
-                                                                            className={`px-2 py-1 rounded-full text-xs ${
-                                                                                variant.isActive
-                                                                                    ? "bg-green-100 text-green-800"
-                                                                                    : "bg-red-100 text-red-800"
-                                                                            }`}
-                                                                        >
-                                                                            {variant.isActive ? "Active" : "Inactive"}
-                                                                        </div>
+                                                                    <div className="font-medium text-sm text-gray-900 mb-2">
+                                                                        {option.displayName || option.name}
                                                                     </div>
-                                                                    {variant.optionCombination &&
-                                                                        Object.entries(variant.optionCombination).map(
-                                                                            ([key, value]) => (
-                                                                                <div key={key} className="text-xs text-gray-600">
-                                                                                    <span className="font-medium">{key}:</span> {value}
-                                                                                </div>
-                                                                            )
-                                                                        )}
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {option.values.map((val, vi) => (
+                                                                            <span
+                                                                                key={vi}
+                                                                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs border ${
+                                                                                    val.isAvailable
+                                                                                        ? "bg-white border-gray-300 text-gray-700"
+                                                                                        : "bg-gray-100 border-gray-200 text-gray-400 line-through"
+                                                                                }`}
+                                                                            >
+                                                                                {option.type === "color" && val.colorCode && (
+                                                                                    <span
+                                                                                        className="w-3 h-3 rounded-full inline-block border border-gray-300"
+                                                                                        style={{ background: val.colorCode }}
+                                                                                    />
+                                                                                )}
+                                                                                {val.displayName || val.name}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     ) : (
                                                         <p className="text-center py-4 text-gray-500 text-sm">
-                                                            No variants configured
+                                                            No options configured
                                                         </p>
                                                     )}
                                                 </div>
@@ -287,7 +281,7 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                                             <span className="text-xs text-gray-500">{categoryDisplay}</span>
                                             {product.hasVariants && (
                                                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    {product.variants?.length || 0} variants
+                                                    {product.variantOptions?.length || 0} options
                                                 </span>
                                             )}
                                         </div>
@@ -329,40 +323,41 @@ export default function ProductList({ products = [], onEdit, onDelete }: Product
                                 {product.hasVariants && expandedProducts.has(product.id) && (
                                     <div className="mt-3 bg-gray-50 rounded-lg p-3">
                                         <h4 className="font-medium text-gray-900 mb-2 text-sm">
-                                            Variants ({product.variants?.length || 0})
+                                            Options ({product.variantOptions?.length || 0})
                                         </h4>
-                                        {product.variants && product.variants.length > 0 ? (
+                                        {product.variantOptions && product.variantOptions.length > 0 ? (
                                             <div className="space-y-2">
-                                                {product.variants.map((variant, index) => (
+                                                {product.variantOptions.map((option, index) => (
                                                     <div key={index} className="border rounded-lg p-2 bg-white">
-                                                        <div className="flex justify-between items-start mb-1">
-                                                            <div className="font-medium text-xs text-gray-900">
-                                                                {variant.sku}
-                                                            </div>
-                                                            <div
-                                                                className={`px-1.5 py-0.5 rounded-full text-xs ${
-                                                                    variant.isActive
-                                                                        ? "bg-green-100 text-green-800"
-                                                                        : "bg-red-100 text-red-800"
-                                                                }`}
-                                                            >
-                                                                {variant.isActive ? "Active" : "Inactive"}
-                                                            </div>
+                                                        <div className="font-medium text-xs text-gray-900 mb-1">
+                                                            {option.displayName || option.name}
                                                         </div>
-                                                        {variant.optionCombination &&
-                                                            Object.entries(variant.optionCombination).map(
-                                                                ([key, value]) => (
-                                                                    <div key={key} className="text-xs text-gray-600">
-                                                                        <span className="font-medium">{key}:</span> {value}
-                                                                    </div>
-                                                                )
-                                                            )}
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {option.values.map((val, vi) => (
+                                                                <span
+                                                                    key={vi}
+                                                                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs border ${
+                                                                        val.isAvailable
+                                                                            ? "bg-white border-gray-300 text-gray-700"
+                                                                            : "bg-gray-100 border-gray-200 text-gray-400 line-through"
+                                                                    }`}
+                                                                >
+                                                                    {option.type === "color" && val.colorCode && (
+                                                                        <span
+                                                                            className="w-2.5 h-2.5 rounded-full inline-block border border-gray-300"
+                                                                            style={{ background: val.colorCode }}
+                                                                        />
+                                                                    )}
+                                                                    {val.displayName || val.name}
+                                                                </span>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
                                             <p className="text-center py-4 text-gray-500 text-xs">
-                                                No variants configured
+                                                No options configured
                                             </p>
                                         )}
                                     </div>
