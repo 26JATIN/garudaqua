@@ -32,7 +32,7 @@ interface Product {
             isAvailable: boolean;
         }>;
     }>;
-    variants?: ProductVariant[];
+    variants: ProductVariant[];
 }
 
 interface ProductListProps {
