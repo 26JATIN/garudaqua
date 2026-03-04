@@ -96,7 +96,7 @@ export default function Hero() {
                                 fill
                                 className={`object-cover object-top ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
                                 priority={currentSlide === 0}
-                                quality={90}
+                                quality={100}
                                 sizes="100vw"
                             />
 
@@ -108,7 +108,7 @@ export default function Hero() {
                                     fill
                                     className="sm:hidden object-cover object-center"
                                     priority={currentSlide === 0}
-                                    quality={90}
+                                    quality={100}
                                     sizes="100vw"
                                 />
                             )}
