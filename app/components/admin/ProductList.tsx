@@ -26,6 +26,7 @@ interface Product {
             isAvailable: boolean;
         }>;
     }>;
+    variants?: unknown[];
 }
 
 interface ProductListProps {
