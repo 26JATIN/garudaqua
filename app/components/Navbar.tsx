@@ -2,14 +2,12 @@
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { useNavbar } from '../context/NavbarContext';
-import { useTheme } from '../context/ThemeContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 
 export default function Navbar() {
     const { isNavbarHidden } = useNavbar();
-    const { isDark } = useTheme();
     const [visible, setVisible] = useState(false);
     const ref = useRef<HTMLElement>(null);
     const { scrollY } = useScroll();
@@ -61,7 +59,7 @@ export default function Navbar() {
                         backdropFilter: "blur(24px) saturate(200%)"
                     }}
                 >
-                    <div className="max-w-7xl mx-auto px-6 py-4">
+                    <div className="max-w-7xl mx-auto px-6 py-1">
                         <div className="flex items-center justify-between">
                             {/* Logo */}
                             <motion.div
@@ -73,9 +71,9 @@ export default function Navbar() {
                                     className="flex items-center"
                                 >
                                     <img
-                                        src={isDark ? "/aqua-logo-dark.svg" : "/aqua-logo.svg"}
+                                        src="/DesktopLogo.png"
                                         alt="Garud Aqua"
-                                        className="h-16 w-auto"
+                                        className="h-20 w-auto"
                                     />
                                 </Link>
                             </motion.div>
@@ -144,13 +142,13 @@ export default function Navbar() {
                     duration: 0.4
                 }}
             >
-                <div className="px-4 py-3 flex items-center gap-3">
+                <div className="px-4 py-2 flex items-center gap-2">
                     {/* Mobile Logo */}
                     <Link href="/" className="shrink-0">
                         <img
-                            src={isDark ? "/aqua-logo-icon-dark.svg" : "/aqua-logo-icon.svg"}
+                            src="/MobileLogo.png"
                             alt="Garud Aqua"
-                            className="h-11 w-11"
+                            className="h-12 w-12 object-contain scale-200"
                         />
                     </Link>
                     {/* Search Bar */}
