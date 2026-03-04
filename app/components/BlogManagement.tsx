@@ -574,36 +574,42 @@ export default function BlogManagement() {
                     </div>
                 ) : (
                     filteredBlogs.map((blog) => (
-                        <div key={blog.id} className="flex items-start gap-4 p-4 hover:bg-gray-50 transition">
-                            {/* Thumbnail */}
-                            {blog.featuredImage && (
-                                <div className="w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                                    <Image src={blog.featuredImage} alt={blog.featuredAlt || blog.title} width={80} height={56} className="w-full h-full object-cover" />
-                                </div>
-                            )}
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                                <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">{blog.title}</h3>
-                                <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{blog.excerpt}</p>
-                                <div className="flex flex-wrap items-center gap-2 mt-2">
-                                    <span className="text-xs px-2 py-0.5 bg-[#0EA5E9]/10 text-[#0EA5E9] rounded-full">
-                                        {getCategoryLabel(blog)}
-                                    </span>
-                                    <span className="text-xs text-gray-400">{blog.readTime} min read</span>
-                                    <span className="text-xs text-gray-400">{new Date(blog.publishedAt).toLocaleDateString()}</span>
-                                    {blog.tags?.slice(0, 2).map((tag) => (
-                                        <span key={tag} className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{tag}</span>
-                                    ))}
+                        <div key={blog.id} className="flex flex-col sm:flex-row sm:items-start gap-3 p-4 hover:bg-gray-50 transition">
+                            {/* Top row on mobile: thumbnail + title + status */}
+                            <div className="flex items-start gap-3 min-w-0">
+                                {/* Thumbnail */}
+                                {blog.featuredImage && (
+                                    <div className="w-16 h-12 sm:w-20 sm:h-14 shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                                        <Image src={blog.featuredImage} alt={blog.featuredAlt || blog.title} width={80} height={56} className="w-full h-full object-cover" />
+                                    </div>
+                                )}
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">{blog.title}</h3>
+                                    <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{blog.excerpt}</p>
+                                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                                        <span className="text-xs px-2 py-0.5 bg-[#0EA5E9]/10 text-[#0EA5E9] rounded-full">
+                                            {getCategoryLabel(blog)}
+                                        </span>
+                                        <span className="text-xs text-gray-400">{blog.readTime} min read</span>
+                                        <span className="hidden sm:inline text-xs text-gray-400">{new Date(blog.publishedAt).toLocaleDateString()}</span>
+                                        {blog.tags?.slice(0, 2).map((tag) => (
+                                            <span key={tag} className="hidden sm:inline text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{tag}</span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                            {/* Status */}
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${blog.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}`}>
-                                {blog.isPublished ? "Published" : "Draft"}
-                            </span>
-                            {/* Actions */}
-                            <div className="flex gap-2 shrink-0">
-                                <button onClick={() => handleEdit(blog)} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium">Edit</button>
-                                <button onClick={() => handleDelete(blog.id)} className="text-red-600 hover:text-red-500 text-sm font-medium">Delete</button>
+                            {/* Bottom row on mobile: status + actions */}
+                            <div className="flex items-center justify-between sm:justify-end gap-3 sm:ml-auto sm:shrink-0">
+                                {/* Status */}
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${blog.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}`}>
+                                    {blog.isPublished ? "Published" : "Draft"}
+                                </span>
+                                {/* Actions */}
+                                <div className="flex gap-3 shrink-0">
+                                    <button onClick={() => handleEdit(blog)} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium">Edit</button>
+                                    <button onClick={() => handleDelete(blog.id)} className="text-red-600 hover:text-red-500 text-sm font-medium">Delete</button>
+                                </div>
                             </div>
                         </div>
                     ))

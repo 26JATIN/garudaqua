@@ -115,6 +115,19 @@ export default function Navbar() {
                                         Blog
                                     </Link>
                                 </motion.div>
+
+                                <motion.div
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                >
+                                    <Link
+                                        href="/about"
+                                        className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300"
+                                    >
+                                        About
+                                    </Link>
+                                </motion.div>
                             </div>
                         </div>
                     </div>
@@ -216,6 +229,18 @@ export default function Navbar() {
                                 </svg>
                             </div>
                             <span className="text-[10px] text-(--nav-text-muted) font-medium">Blog</span>
+                        </Link>
+                    </motion.div>
+
+                    {/* About */}
+                    <motion.div whileTap={{ scale: 0.92 }}>
+                        <Link href="/about" className="flex flex-col items-center px-3 py-1 space-y-0.5">
+                            <div className="p-1.5 rounded-xl">
+                                <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <span className="text-[10px] text-(--nav-text-muted) font-medium">About</span>
                         </Link>
                     </motion.div>
                 </div>

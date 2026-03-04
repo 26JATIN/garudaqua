@@ -173,12 +173,12 @@ export default function AdminEnquiriesPage() {
                         </h1>
                         <p className="text-gray-600 mt-1">Manage product enquiries from customers</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
                         {["all", "new", "contacted", "closed"].map((s) => (
                             <button
                                 key={s}
                                 onClick={() => setStatusFilter(s)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition shrink-0 ${
                                     statusFilter === s
                                         ? "bg-[#0EA5E9] text-white"
                                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -230,7 +230,7 @@ export default function AdminEnquiriesPage() {
                                             {statusToDisplay(enq.status)}
                                         </span>
 
-                                        <span className="text-xs text-gray-400 shrink-0">
+                                        <span className="text-xs text-gray-400 shrink-0 hidden sm:inline">
                                             {new Date(enq.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                                         </span>
 

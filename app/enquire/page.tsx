@@ -146,7 +146,7 @@ function EnquireForm() {
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     className="w-full px-4 py-3 border border-gray-300 dark:border-white/20 rounded-xl bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition"
-                                    placeholder="+91 98765 43210"
+                                    placeholder="+91 XXXXX XXXXX"
                                 />
                             </div>
                         </div>

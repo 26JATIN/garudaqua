@@ -197,7 +197,7 @@ export default function AdminHeroSlidesPage() {
                         <h1 className="text-2xl font-bold text-gray-900">Hero Slides</h1>
                         <p className="text-gray-600 mt-1">Manage homepage hero banner slides</p>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                         <button
                             onClick={handleBulkUpload}
                             disabled={bulkUploading}

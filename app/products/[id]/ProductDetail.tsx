@@ -613,7 +613,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                     Similar Products
                                 </h2>
                                 <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-light">
-                                    More from {product.subcategory?.name || categoryName}
+                                    More from {categoryName}
                                 </p>
                             </div>
                             <Link

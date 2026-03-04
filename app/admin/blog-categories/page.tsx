@@ -180,13 +180,14 @@ export default function AdminBlogCategoriesPage() {
                             <p className="text-gray-500">No blog categories yet. Add your first one!</p>
                         </div>
                     ) : (
-                        <table className="w-full">
+                        <div className="overflow-x-auto">
+                        <table className="w-full min-w-120">
                             <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
                                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Name</th>
-                                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Slug</th>
+                                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">Slug</th>
                                     <th className="text-center px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Posts</th>
-                                    <th className="text-center px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Order</th>
+                                    <th className="text-center px-6 py-3 text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">Order</th>
                                     <th className="text-center px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Status</th>
                                     <th className="text-right px-6 py-3 text-xs font-semibold text-gray-600 uppercase">Actions</th>
                                 </tr>
@@ -195,9 +196,9 @@ export default function AdminBlogCategoriesPage() {
                                 {categories.map((cat) => (
                                     <tr key={cat.id} className="hover:bg-gray-50 transition">
                                         <td className="px-6 py-4 font-medium text-gray-900">{cat.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 font-mono">{cat.slug}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-500 font-mono hidden sm:table-cell">{cat.slug}</td>
                                         <td className="px-6 py-4 text-center text-sm text-gray-600">{cat._count?.posts ?? 0}</td>
-                                        <td className="px-6 py-4 text-center text-sm text-gray-600">{cat.order}</td>
+                                        <td className="px-6 py-4 text-center text-sm text-gray-600 hidden sm:table-cell">{cat.order}</td>
                                         <td className="px-6 py-4 text-center">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${cat.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                                                 {cat.isActive ? "Active" : "Inactive"}
@@ -213,6 +214,7 @@ export default function AdminBlogCategoriesPage() {
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     )}
                 </div>
             </div>

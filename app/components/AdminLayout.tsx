@@ -334,7 +334,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                 )}
             </AnimatePresence>
 
-            <div className="flex pt-10">
+            <div className="flex pt-18">
                 {/* Desktop Sidebar */}
                 <aside className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 fixed left-0 top-18.25 bottom-0 z-30 overflow-y-auto overscroll-contain">
                     <nav className="p-4 space-y-2 pb-20">
