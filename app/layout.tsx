@@ -36,11 +36,11 @@ export const metadata = {
   },
   icons: {
     icon: [
-      { url: '/MobileLogo.png', type: 'image/png' },
+      { url: '/favicon.png', type: 'image/png' },
     ],
-    shortcut: '/MobileLogo.png',
+    shortcut: '/favicon.png',
     apple: [
-      { url: '/MobileLogo.png', type: 'image/png' },
+      { url: '/favicon.png', type: 'image/png' },
     ],
   },
 };
@@ -49,9 +49,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="shortcut icon" href="/favicon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
-        <link rel="apple-touch-icon" href="/MobileLogo.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script dangerouslySetInnerHTML={{
