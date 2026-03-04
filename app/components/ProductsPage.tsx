@@ -44,8 +44,6 @@ function getCategoryName(category: Product["category"]): string {
     return category?.name || "";
 }
 
-const PRODUCTS_PER_PAGE = 12;
-
 export default function ProductsPage() {
     const searchParams = useSearchParams();
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "all");
@@ -53,14 +51,12 @@ export default function ProductsPage() {
     const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
     const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
     const [viewMode, setViewMode] = useState("grid");
-    const [currentPage, setCurrentPage] = useState(1);
 
     // API data states
     const [categories, setCategories] = useState<Category[]>([{ id: "all", name: "All" }]);
     const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
     const [totalProducts, setTotalProducts] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loadingSubcategories, setLoadingSubcategories] = useState(true);
     const [loadingProducts, setLoadingProducts] = useState(true);
@@ -130,8 +126,7 @@ export default function ProductsPage() {
                 if (selectedCategory !== "all") params.set("category", selectedCategory);
                 if (selectedSubcategory !== "All") params.set("subcategory", selectedSubcategory);
                 if (searchTerm.trim()) params.set("search", searchTerm.trim());
-                params.set("page", String(currentPage));
-                params.set("limit", String(PRODUCTS_PER_PAGE));
+                params.set("limit", "200");
                 if (sortBy !== "featured") params.set("sort", sortBy);
 
                 const res = await fetch(`/api/products?${params.toString()}`);
@@ -141,7 +136,9 @@ export default function ProductsPage() {
                 if (data.products && Array.isArray(data.products)) {
                     setProducts(data.products);
                     setTotalProducts(data.total || data.products.length);
-                    setTotalPages(data.totalPages || Math.ceil((data.total || data.products.length) / PRODUCTS_PER_PAGE));
+                } else if (Array.isArray(data)) {
+                    setProducts(data);
+                    setTotalProducts(data.length);
                 }
             } catch {
                 toast.error("Failed to load products");
@@ -151,7 +148,7 @@ export default function ProductsPage() {
         }
 
         fetchProducts();
-    }, [selectedCategory, selectedSubcategory, searchTerm, sortBy, currentPage]);
+    }, [selectedCategory, selectedSubcategory, searchTerm, sortBy]);
 
     // Scroll a container left or right
     const scrollByAmount = useCallback((ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
@@ -200,11 +197,6 @@ export default function ProductsPage() {
             (sub) => sub.category.id === selectedCategory
         );
     }, [selectedCategory, subcategories]);
-
-    // Reset page when filters change (not page itself)
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [selectedCategory, selectedSubcategory, searchTerm, sortBy]);
 
     // Sync URL
     useEffect(() => {
@@ -579,11 +571,6 @@ export default function ProductsPage() {
                             {selectedCategory !== "all" && (
                                 <span className="hidden sm:inline"> in {getCategoryDisplayName(selectedCategory)}</span>
                             )}
-                            {totalPages > 1 && (
-                                <span className="text-gray-500 ml-1">
-                                    (Page {currentPage} of {totalPages})
-                                </span>
-                            )}
                         </span>
                     </div>
 
@@ -655,7 +642,7 @@ export default function ProductsPage() {
                 ) : (
                     <AnimatePresence mode="wait">
                         <motion.div
-                            key={`${selectedCategory}-${viewMode}-${currentPage}-${sortBy}`}
+                            key={`${selectedCategory}-${viewMode}-${sortBy}`}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
@@ -675,81 +662,6 @@ export default function ProductsPage() {
                             )}
                         </motion.div>
                     </AnimatePresence>
-                )}
-
-                {/* Pagination */}
-                {products.length > 0 && totalPages > 1 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.2 }}
-                        className="mt-8 md:mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100 dark:border-white/6"
-                    >
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                            Showing{" "}
-                            <span className="font-medium text-[#0EA5E9]">{(currentPage - 1) * PRODUCTS_PER_PAGE + 1}</span> to{" "}
-                            <span className="font-medium text-[#0EA5E9]">{Math.min(currentPage * PRODUCTS_PER_PAGE, totalProducts)}</span>{" "}
-                            of <span className="font-medium text-[#0EA5E9]">{totalProducts}</span> products
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => { setCurrentPage((prev) => Math.max(1, prev - 1)); scrollToProducts(); }}
-                                disabled={currentPage === 1}
-                                className={`px-3 md:px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                                    currentPage === 1
-                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        : "bg-[#0EA5E9] text-white hover:bg-[#0369A1] shadow-sm"
-                                }`}
-                            >
-                                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </motion.button>
-
-                            <div className="flex items-center gap-1 md:gap-2">
-                                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                    .filter((page) => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
-                                    .map((page, index, array) => (
-                                        <React.Fragment key={page}>
-                                            {index > 0 && array[index - 1] !== page - 1 && (
-                                                <span className="px-2 text-gray-400">...</span>
-                                            )}
-                                            <motion.button
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.9 }}
-                                                onClick={() => { setCurrentPage(page); scrollToProducts(); }}
-                                                className={`w-8 h-8 md:w-10 md:h-10 rounded-lg font-medium text-sm transition-all ${
-                                                    currentPage === page
-                                                        ? "bg-[#0EA5E9] text-white shadow-md"
-                                                        : "bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/20"
-                                                }`}
-                                            >
-                                                {page}
-                                            </motion.button>
-                                        </React.Fragment>
-                                    ))}
-                            </div>
-
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => { setCurrentPage((prev) => Math.min(totalPages, prev + 1)); scrollToProducts(); }}
-                                disabled={currentPage === totalPages}
-                                className={`px-3 md:px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                                    currentPage === totalPages
-                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        : "bg-[#0EA5E9] text-white hover:bg-[#0369A1] shadow-sm"
-                                }`}
-                            >
-                                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </motion.button>
-                        </div>
-                    </motion.div>
                 )}
             </div>
         </div>
