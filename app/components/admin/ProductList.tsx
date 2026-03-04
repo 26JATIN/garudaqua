@@ -3,6 +3,12 @@ import { useState } from "react";
 import Image from "next/image";
 
 // ===== Types =====
+interface ProductVariant {
+    sku: string;
+    optionCombination: Record<string, string>;
+    isActive: boolean;
+}
+
 interface Product {
     id: string;
     name: string;
@@ -26,7 +32,7 @@ interface Product {
             isAvailable: boolean;
         }>;
     }>;
-    variants?: unknown[];
+    variants?: ProductVariant[];
 }
 
 interface ProductListProps {
