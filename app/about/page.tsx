@@ -30,7 +30,7 @@ export default function AboutPage() {
                         >
                             Garud Aqua
                             <br />
-                            solutions
+                            Solutions
                         </motion.h1>
 
                         <motion.div
