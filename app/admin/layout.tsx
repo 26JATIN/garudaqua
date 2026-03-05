@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ManifestOverride from "../components/ManifestOverride";
 
 export const metadata: Metadata = {
   title: {
@@ -11,23 +12,6 @@ export const metadata: Metadata = {
     follow: false,
     googleBot: { index: false, follow: false },
   },
-  manifest: "/admin-manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "GA Admin",
-  },
-  icons: {
-    icon: [
-      { url: "/icons/admin-icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/admin-icon-512x512.png", sizes: "512x512", type: "image/png" },
-    ],
-    shortcut: "/icons/admin-icon-192x192.png",
-    apple: [
-      { url: "/icons/admin-icon-152x152.png", sizes: "152x152", type: "image/png" },
-      { url: "/icons/admin-icon-192x192.png", sizes: "192x192", type: "image/png" },
-    ],
-  },
 };
 
 export default function AdminRootLayout({
@@ -37,15 +21,11 @@ export default function AdminRootLayout({
 }) {
   return (
     <>
-      {/* Override manifest and icons for admin PWA */}
-      <head>
-        <link rel="manifest" href="/admin-manifest.json" />
-        <link rel="apple-touch-icon" href="/icons/admin-icon-192x192.png" sizes="192x192" />
-        <link rel="apple-touch-icon" href="/icons/admin-icon-152x152.png" sizes="152x152" />
-        <meta name="theme-color" content="#0f172a" />
-        <meta name="application-name" content="GA Admin" />
-        <meta name="apple-mobile-web-app-title" content="GA Admin" />
-      </head>
+      <ManifestOverride
+        manifestHref="/admin-manifest.json"
+        themeColor="#0f172a"
+        appName="GA Admin"
+      />
       {children}
     </>
   );
