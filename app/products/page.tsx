@@ -1,5 +1,19 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import ProductsPage from "../components/ProductsPage";
+
+export const metadata: Metadata = {
+  title: "Products — Water Tanks, Pipes & Fittings",
+  description:
+    "Browse Garud Aqua Solutions' full range of HDPE water tanks, PVC & CPVC pipes, pipe fittings, agricultural sprayers and water management products available in Rajasthan.",
+  alternates: { canonical: "https://garudaqua.in/products" },
+  openGraph: {
+    url: "https://garudaqua.in/products",
+    title: "Products — Water Tanks, Pipes & Fittings | Garud Aqua Solutions",
+    description:
+      "Browse our full range of HDPE water tanks, PVC pipes, pipe fittings & agricultural water products.",
+  },
+};
 
 // Force dynamic rendering to avoid SSG issues with useSearchParams
 export const dynamic = 'force-dynamic';

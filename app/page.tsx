@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Hero from './components/hero';
 import CategoryShowcase from './components/CategoryShowcase';
 import Footer from './components/Footer';
@@ -6,6 +7,19 @@ import Newsletter from './components/Newsletter';
 import VideoShowcaseSection from './components/HeroVideoShowcase';
 import ImageGallery from './components/ImageGallery';
 import Testimonials from './components/Testimonials';
+
+export const metadata: Metadata = {
+  title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings | Sriganganagar",
+  description:
+    "Garud Aqua Solutions is Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes, pipe fittings & agricultural water management products. A Bond of Trust & Quality.",
+  alternates: { canonical: "https://garudaqua.in" },
+  openGraph: {
+    url: "https://garudaqua.in",
+    title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
+    description:
+      "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products.",
+  },
+};
 export default function Home() {
   return (
     <main className="min-h-screen relative overflow-x-hidden">
