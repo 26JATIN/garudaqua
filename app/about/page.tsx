@@ -8,7 +8,7 @@ import { Timeline } from "@/components/ui/timeline";
 export default function AboutPage() {
     return (
         <main className="min-h-screen bg-[#0A0A0A]">
-            <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-18 pb-20">
+            <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-4 sm:pt-18 pb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
                     {/* Left — headline */}

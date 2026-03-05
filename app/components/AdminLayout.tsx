@@ -297,7 +297,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
 
                                 {isProfileOpen && (
                                     <>
-                                        <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setIsProfileOpen(false)} />
+                                        <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />
                                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 border border-gray-100 z-50">
                                             <div className="px-4 py-2 border-b border-gray-100">
                                                 <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>

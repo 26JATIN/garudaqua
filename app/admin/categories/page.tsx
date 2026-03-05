@@ -417,8 +417,8 @@ export default function CategoriesAdmin() {
                                 <div className="p-8 text-center text-gray-500">No categories found</div>
                             ) : (
                                 filteredCats.sort((a, b) => a.sortOrder - b.sortOrder).map((cat) => (
-                                    <div key={cat.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition">
-                                        <div className="w-14 h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                    <div key={cat.id} className="flex items-center gap-3 p-4 hover:bg-gray-50 transition">
+                                        <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                                             {cat.image ? (
                                                 <Image src={cat.image} alt={cat.name} width={56} height={56} className="object-cover w-full h-full" />
                                             ) : (
@@ -428,18 +428,18 @@ export default function CategoriesAdmin() {
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="text-sm font-semibold text-gray-900">{cat.name}</h3>
+                                            <h3 className="text-sm font-semibold text-gray-900 truncate">{cat.name}</h3>
                                             <p className="text-xs text-gray-500 line-clamp-1">{cat.description}</p>
-                                            <div className="flex items-center gap-2 mt-1">
+                                            <div className="flex items-center gap-2 mt-1 flex-wrap">
                                                 <span className="text-xs text-gray-400">Order: {cat.sortOrder}</span>
                                                 <span className="text-xs text-gray-400">|</span>
                                                 <span className="text-xs text-gray-400">{cat._count?.subcategories ?? 0} subcategories</span>
+                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cat.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                                    {cat.isActive ? "Active" : "Inactive"}
+                                                </span>
                                             </div>
                                         </div>
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${cat.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                            {cat.isActive ? "Active" : "Inactive"}
-                                        </span>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 shrink-0">
                                             <button onClick={() => startEditCat(cat)} disabled={saving} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium disabled:opacity-50">Edit</button>
                                             <button onClick={() => handleDeleteCat(cat.id)} disabled={saving} className="text-red-600 hover:text-red-500 text-sm font-medium disabled:opacity-50">Delete</button>
                                         </div>
@@ -458,8 +458,8 @@ export default function CategoriesAdmin() {
                                 <div className="p-8 text-center text-gray-500">No subcategories found</div>
                             ) : (
                                 filteredSubs.sort((a, b) => a.order - b.order).map((sub) => (
-                                    <div key={sub.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition">
-                                        <div className="w-14 h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                    <div key={sub.id} className="flex items-center gap-3 p-4 hover:bg-gray-50 transition">
+                                        <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                                             {sub.image ? (
                                                 <Image src={sub.image} alt={sub.name} width={56} height={56} className="object-cover w-full h-full" />
                                             ) : (
@@ -469,14 +469,16 @@ export default function CategoriesAdmin() {
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="text-sm font-semibold text-gray-900">{sub.name}</h3>
+                                            <h3 className="text-sm font-semibold text-gray-900 truncate">{sub.name}</h3>
                                             <p className="text-xs text-gray-500 line-clamp-1">{sub.description}</p>
-                                            <span className="text-xs text-[#0EA5E9] mt-1 inline-block">{sub.category?.name || getCatName(sub.categoryId)}</span>
+                                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                <span className="text-xs text-[#0EA5E9]">{sub.category?.name || getCatName(sub.categoryId)}</span>
+                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sub.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                                    {sub.isActive ? "Active" : "Inactive"}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${sub.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                            {sub.isActive ? "Active" : "Inactive"}
-                                        </span>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 shrink-0">
                                             <button onClick={() => startEditSub(sub)} disabled={saving} className="text-[#0EA5E9] hover:text-[#0369A1] text-sm font-medium disabled:opacity-50">Edit</button>
                                             <button onClick={() => handleDeleteSub(sub.id)} disabled={saving} className="text-red-600 hover:text-red-500 text-sm font-medium disabled:opacity-50">Delete</button>
                                         </div>
