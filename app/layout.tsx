@@ -8,7 +8,6 @@ import Providers from "./components/Providers";
 import { Toaster } from "sonner";
 import ThemeToaster from "./components/ThemeToaster";
 import PWARegister from "./components/PWARegister";
-import LenisProvider from "./components/LenisProvider";
 import type { Metadata } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -206,7 +205,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.className} bg-white dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
         <PWARegister />
-        <LenisProvider />
         <Providers>
           <ThemeToaster />
           <ThemeProvider>

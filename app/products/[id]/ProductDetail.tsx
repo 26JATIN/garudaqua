@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 // ===== Type Definitions =====
 interface VariantOptionValue {
@@ -213,6 +214,80 @@ function ProductDetailSkeleton() {
                 </div>
             </div>
         </div>
+    );
+}
+
+// ===== Related Product Card with hover spotlight =====
+function RelatedProductCard({ product: relatedProduct, index, categoryId }: { product: Product; index: number; categoryId: string }) {
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
+        <Link href={`/products/${relatedProduct.id}`}>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className="relative group cursor-pointer p-2 rounded-2xl md:rounded-3xl"
+            >
+                {/* Hover spotlight background */}
+                <AnimatePresence>
+                    {isHovered && (
+                        <motion.span
+                            className="absolute inset-0 h-full w-full bg-neutral-100 dark:bg-slate-800/70 block rounded-2xl md:rounded-3xl"
+                            layoutId={`relatedHoverBg-${relatedProduct.id}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1, transition: { duration: 0.15 } }}
+                            exit={{ opacity: 0, transition: { duration: 0.15, delay: 0.1 } }}
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* Card content */}
+                <div className={cn(
+                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-shadow duration-300",
+                    isHovered && "shadow-xl"
+                )}>
+                    <div className="aspect-square relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                        {relatedProduct.image ? (
+                            <Image
+                                src={relatedProduct.image}
+                                alt={relatedProduct.name}
+                                fill
+                                className={cn(
+                                    "object-cover transition-transform duration-700",
+                                    isHovered && "scale-110"
+                                )}
+                                sizes="(max-width: 768px) 50vw, 25vw"
+                                quality={70}
+                            />
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <svg className="w-12 h-12 text-[#0EA5E9] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                        )}
+                        <div className={cn(
+                            "absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300 flex items-end justify-center pb-4",
+                            isHovered ? "opacity-100" : "opacity-0"
+                        )}>
+                            <span className="text-white text-sm font-medium">View Details</span>
+                        </div>
+                    </div>
+                    <div className="p-3 md:p-4">
+                        <h3 className={cn(
+                            "text-sm md:text-base font-light text-[#2C2C2C] dark:text-gray-200 mb-1 md:mb-2 line-clamp-2 transition-colors leading-tight",
+                            isHovered && "text-[#0EA5E9]"
+                        )}>
+                            {relatedProduct.name}
+                        </h3>
+                    </div>
+                </div>
+            </motion.div>
+        </Link>
     );
 }
 
@@ -628,45 +703,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                             {relatedProducts.map((relatedProduct, index) => (
-                                <Link key={relatedProduct.id} href={`/products/${relatedProduct.id}`}>
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                                        whileHover={{ y: -8 }}
-                                        className="group cursor-pointer"
-                                    >
-                                        <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl md:rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 dark:border-white/6">
-                                            <div className="aspect-square relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-                                                {relatedProduct.image ? (
-                                                    <Image
-                                                        src={relatedProduct.image}
-                                                        alt={relatedProduct.name}
-                                                        fill
-                                                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                                        sizes="(max-width: 768px) 50vw, 25vw"
-                                                        quality={70}
-                                                    />
-                                                ) : (
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <svg className="w-12 h-12 text-[#0EA5E9] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                        </svg>
-                                                    </div>
-                                                )}
-                                                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
-                                                    <span className="text-white text-sm font-medium">View Details</span>
-                                                </div>
-                                            </div>
-                                            <div className="p-3 md:p-4">
-                                                <h3 className="text-sm md:text-base font-light text-[#2C2C2C] dark:text-gray-200 mb-1 md:mb-2 line-clamp-2 group-hover:text-[#0EA5E9] transition-colors leading-tight">
-                                                    {relatedProduct.name}
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                </Link>
+                                <RelatedProductCard key={relatedProduct.id} product={relatedProduct} index={index} categoryId={categoryId} />
                             ))}
                         </div>
                         {/* Mobile View All Button */}

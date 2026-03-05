@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Droplets } from "lucide-react";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -178,6 +179,8 @@ export const Card = React.memo(({
   subcategories = [],
   onSubcategoryClick
 }: CardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   // Memoize the card preview to prevent unnecessary re-renders
   const cardPreview = useMemo(() => (
     <div
@@ -209,58 +212,79 @@ export const Card = React.memo(({
   return (
     <motion.div
       layoutId={layout ? `card-${card.id || card.name}` : undefined}
-      whileHover={{ y: -8, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={handleOpen}
-      className="cursor-pointer card-hover border border-gray-200 dark:border-white/6 rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-white/50 dark:bg-[#0A0A0A] shadow-sm hover:shadow-lg"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={cn(
+        "relative cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm transition-shadow duration-300",
+        isHovered && "shadow-lg"
+      )}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}>
-      {cardPreview}
-      <div className="space-y-2 sm:space-y-3 md:space-y-4 mt-2 sm:mt-3 md:mt-4">
-        <div className="flex flex-col gap-1 sm:gap-2">
-          <div className="flex justify-between items-start gap-2">
-            <motion.h3
-              layoutId={layout ? `title-${card.id || card.name}` : undefined}
-              className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1"
-            >
-              {card.name}
-            </motion.h3>
-          </div>
-          {card.description && (
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-              {card.description}
-            </p>
-          )}
-        </div>
 
-        {/* Subcategories */}
-        {subcategories && subcategories.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {subcategories.length} {subcategories.length === 1 ? 'Type' : 'Types'}
-            </h4>
-            <div className="grid grid-cols-4 gap-2">
-              {subcategories.slice(0, 4).map((sub, idx) => (
-                <SubcategoryBadge
-                  key={sub.id || idx}
-                  subcategory={sub}
-                  index={idx}
-                  onClick={(e) => handleSubcategoryClick(e, sub)}
-                />
-              ))}
-            </div>
-            {subcategories.length > 4 && onClick && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick(card);
-                }}
-                className="text-xs text-[#0EA5E9] hover:text-[#0284C7] transition-colors font-medium"
+      {/* Hover spotlight background */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.span
+            className="absolute inset-0 h-full w-full bg-neutral-100 dark:bg-slate-800/70 block rounded-2xl sm:rounded-3xl"
+            layoutId={`hoverBg-${card.id || card.name}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.15 } }}
+            exit={{ opacity: 0, transition: { duration: 0.15, delay: 0.1 } }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Card content — above the spotlight */}
+      <div className="relative z-10">
+        {cardPreview}
+        <div className="space-y-2 sm:space-y-3 md:space-y-4 mt-2 sm:mt-3 md:mt-4">
+          <div className="flex flex-col gap-1 sm:gap-2">
+            <div className="flex justify-between items-start gap-2">
+              <motion.h3
+                layoutId={layout ? `title-${card.id || card.name}` : undefined}
+                className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1"
               >
-                +{subcategories.length - 4} more types →
-              </button>
+                {card.name}
+              </motion.h3>
+            </div>
+            {card.description && (
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                {card.description}
+              </p>
             )}
           </div>
-        )}
+
+          {/* Subcategories */}
+          {subcategories && subcategories.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                {subcategories.length} {subcategories.length === 1 ? 'Type' : 'Types'}
+              </h4>
+              <div className="grid grid-cols-4 gap-2">
+                {subcategories.slice(0, 4).map((sub, idx) => (
+                  <SubcategoryBadge
+                    key={sub.id || idx}
+                    subcategory={sub}
+                    index={idx}
+                    onClick={(e) => handleSubcategoryClick(e, sub)}
+                  />
+                ))}
+              </div>
+              {subcategories.length > 4 && onClick && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick(card);
+                  }}
+                  className="text-xs text-[#0EA5E9] hover:text-[#0284C7] transition-colors font-medium"
+                >
+                  +{subcategories.length - 4} more types →
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </motion.div>
   );
