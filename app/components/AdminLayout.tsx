@@ -105,6 +105,10 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
             html.classList.remove("dark");
         }
 
+        // Remove body padding-top added by main site navbar CSS
+        const prevBodyPaddingTop = document.body.style.paddingTop;
+        document.body.style.paddingTop = "0px";
+
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === "attributes" && mutation.attributeName === "class") {
@@ -118,6 +122,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
 
         return () => {
             observer.disconnect();
+            document.body.style.paddingTop = prevBodyPaddingTop;
             if (wasDarkRef.current) {
                 html.classList.add("dark");
             }
