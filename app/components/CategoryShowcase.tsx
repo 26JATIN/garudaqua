@@ -548,6 +548,20 @@ export default function CategoryShowcase() {
                   </div>
                 </div>
               </div>
+              {/* View All Products CTA */}
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
+                <button
+                  onClick={() => router.push('/products')}
+                  className="w-full group flex items-center justify-between px-4 py-3 rounded-xl bg-[#0EA5E9]/8 dark:bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 hover:bg-[#0EA5E9] hover:border-[#0EA5E9] transition-all duration-300"
+                >
+                  <span className="text-sm font-semibold text-[#0369A1] dark:text-[#0EA5E9] group-hover:text-white transition-colors duration-300">
+                    View All Products
+                  </span>
+                  <svg className="w-4 h-4 text-[#0EA5E9] group-hover:text-white group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
