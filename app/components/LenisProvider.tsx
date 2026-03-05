@@ -20,15 +20,19 @@ export default function LenisProvider() {
     if (isAdmin || isTouchDevice) return;
 
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 0.9,
+      easing: (t) => 1 - Math.pow(1 - t, 3), // cubic ease-out — feels natural, never "stuck"
       orientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 0, // disable touch — native handles it
+      wheelMultiplier: 1.2,
+      touchMultiplier: 0, // native touch on mobile
+      infinite: false,
     });
 
     lenisRef.current = lenis;
+
+    // Scroll to top on page change so Lenis state is clean
+    lenis.scrollTo(0, { immediate: true });
 
     function raf(time: number) {
       lenis.raf(time);
@@ -36,7 +40,14 @@ export default function LenisProvider() {
     }
     rafRef.current = requestAnimationFrame(raf);
 
+    // When dynamic content loads and changes page height, tell Lenis to recalculate
+    const resizeObserver = new ResizeObserver(() => {
+      lenis.resize();
+    });
+    resizeObserver.observe(document.body);
+
     return () => {
+      resizeObserver.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       lenis.destroy();
       lenisRef.current = null;
