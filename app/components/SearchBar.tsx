@@ -26,6 +26,8 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const router = useRouter();
     const searchRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const listRef = useRef<HTMLDivElement>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
 
     const fetchSuggestions = useCallback(async (query: string) => {
@@ -136,6 +138,42 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
         return () => { abortControllerRef.current?.abort(); };
     }, []);
 
+    // Prevent page scroll when scrolling inside dropdown; dismiss keyboard on scroll start
+    useEffect(() => {
+        const list = listRef.current;
+        if (!list) return;
+
+        let touchStartY = 0;
+
+        const onTouchStart = (e: TouchEvent) => {
+            touchStartY = e.touches[0].clientY;
+        };
+
+        const onTouchMove = (e: TouchEvent) => {
+            const deltaY = e.touches[0].clientY - touchStartY;
+            const { scrollTop, scrollHeight, clientHeight } = list;
+            const atTop = scrollTop === 0 && deltaY > 0;
+            const atBottom = scrollTop + clientHeight >= scrollHeight && deltaY < 0;
+
+            // Dismiss keyboard when user starts scrolling the list
+            if (Math.abs(deltaY) > 5 && inputRef.current) {
+                inputRef.current.blur();
+            }
+
+            // Block the page from scrolling only when list itself can scroll
+            if (!atTop && !atBottom) {
+                e.stopPropagation();
+            }
+        };
+
+        list.addEventListener('touchstart', onTouchStart, { passive: true });
+        list.addEventListener('touchmove', onTouchMove, { passive: true });
+        return () => {
+            list.removeEventListener('touchstart', onTouchStart);
+            list.removeEventListener('touchmove', onTouchMove);
+        };
+    }, [isOpen]);
+
     const handleSearch = (query = searchQuery) => {
         const trimmedQuery = query.trim();
         if (trimmedQuery) {
@@ -231,6 +269,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                 className="relative"
             >
                 <input
+                    ref={inputRef}
                     type="text"
                     placeholder={placeholder}
                     value={searchQuery}
@@ -318,7 +357,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                             </div>
                         ) : (
                             <>
-                                <div className="max-h-80 overflow-y-auto">
+                                <div ref={listRef} className="max-h-80 overflow-y-auto overscroll-contain">
                                     {suggestions.map((suggestion, index) => (
                                         <button
                                             key={`${suggestion.type}-${suggestion.id}`}
@@ -330,7 +369,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                                             }`}
                                         >
                                             {/* Thumbnail */}
-                                            <div className="flex-shrink-0 w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                                            <div className="shrink-0 w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
                                                 {suggestion.image ? (
                                                     <img
                                                         src={suggestion.image}
@@ -361,7 +400,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                                             </div>
 
                                             {/* Arrow icon */}
-                                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center">
+                                            <div className="shrink-0 w-6 h-6 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center">
                                                 <svg className="w-3 h-3 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                                 </svg>
@@ -371,7 +410,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                                 </div>
 
                                 {/* Footer */}
-                                <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-2.5 bg-gray-50/50 dark:bg-white/[0.02]">
+                                <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-2.5 bg-gray-50/50 dark:bg-white/2">
                                     <button
                                         onClick={() => handleSearch()}
                                         className="flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors"
