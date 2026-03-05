@@ -112,7 +112,7 @@ export default function AboutPage() {
                         {/* Middle row — two stat cards */}
                         <div className="grid grid-cols-2 gap-3">
                             <WobbleCard containerClassName="bg-[#1b5e20]">
-                                <p className="text-white font-bold text-4xl mb-1">15+</p>
+                                <p className="text-white font-bold text-4xl mb-1">55+</p>
                                 <p className="text-white/70 text-sm">Years of experience</p>
                             </WobbleCard>
 
