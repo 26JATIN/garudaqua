@@ -19,19 +19,19 @@ export const useTheme = () => {
 };
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [theme, setTheme] = useState('light');
+    const [theme, setTheme] = useState('dark');
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
-        // Read from localStorage — default to light if no preference stored
+        // Read from localStorage — default to dark if no preference stored
         const stored = localStorage.getItem('theme');
-        if (stored === 'dark') {
-            setTheme('dark');
-            applyTheme('dark');
-        } else {
+        if (stored === 'light') {
             setTheme('light');
             applyTheme('light');
+        } else {
+            setTheme('dark');
+            applyTheme('dark');
         }
     }, []);
 

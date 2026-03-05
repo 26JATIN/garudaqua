@@ -130,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" sizes="192x192" />
         <link rel="apple-touch-icon" href="/icons/icon-152x152.png" sizes="152x152" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
+        <meta name="theme-color" content="#000000" id="theme-color-meta" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script
@@ -190,13 +190,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             try {
               var theme = localStorage.getItem('theme');
               var meta = document.getElementById('theme-color-meta');
-              if (theme === 'dark') {
+              if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                if (meta) meta.content = '#ffffff';
+              } else {
                 document.documentElement.classList.add('dark');
                 if (meta) meta.content = '#000000';
-              } else {
-                if (meta) meta.content = '#ffffff';
               }
-            } catch(e) {}
+            } catch(e) {
+              document.documentElement.classList.add('dark');
+            }
           })();
         `}} />
       </head>
