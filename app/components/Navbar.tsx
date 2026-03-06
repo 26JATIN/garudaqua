@@ -33,31 +33,18 @@ export default function Navbar() {
                     opacity: isNavbarHidden ? 0 : 1
                 }}
                 transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 25
+                    duration: 0.3,
+                    ease: [0.25, 0.1, 0.25, 1]
                 }}
             >
-                <motion.div
-                    animate={{
-                        backgroundColor: visible
-                            ? "var(--navbar-bg-scroll)"
-                            : "var(--navbar-bg)",
-                        borderBottomColor: visible
-                            ? "var(--navbar-border-scroll)"
-                            : "var(--navbar-border)",
-                        boxShadow: visible
-                            ? "var(--navbar-shadow-scroll)"
-                            : "var(--navbar-shadow)"
-                    }}
-                    transition={{
-                        duration: 0.5,
-                        ease: [0.25, 0.1, 0.25, 1]
-                    }}
-                    className="backdrop-blur-xl backdrop-saturate-200 border-b"
+                <div
+                    className="backdrop-blur-xl backdrop-saturate-200 border-b transition-[background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
                     style={{
                         WebkitBackdropFilter: "blur(24px) saturate(200%)",
-                        backdropFilter: "blur(24px) saturate(200%)"
+                        backdropFilter: "blur(24px) saturate(200%)",
+                        backgroundColor: visible ? "var(--navbar-bg-scroll)" : "var(--navbar-bg)",
+                        borderBottomColor: visible ? "var(--navbar-border-scroll)" : "var(--navbar-border)",
+                        boxShadow: visible ? "var(--navbar-shadow-scroll)" : "var(--navbar-shadow)"
                     }}
                 >
                     <div className="max-w-7xl mx-auto px-6 py-1">
@@ -136,7 +123,7 @@ export default function Navbar() {
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </div>
             </motion.nav>
 
             {/* Mobile Top Search Bar - Enhanced Apple Liquid Glass Effect */}
@@ -154,10 +141,8 @@ export default function Navbar() {
                     opacity: isNavbarHidden ? 0 : 1
                 }}
                 transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 25,
-                    duration: 0.4
+                    duration: 0.3,
+                    ease: [0.25, 0.1, 0.25, 1]
                 }}
             >
                 <div className="px-4 py-2 flex items-center gap-2">
@@ -198,10 +183,8 @@ export default function Navbar() {
                     opacity: isNavbarHidden ? 0 : 1
                 }}
                 transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 25,
-                    duration: 0.4
+                    duration: 0.3,
+                    ease: [0.25, 0.1, 0.25, 1]
                 }}
             >
                 <div className="flex items-center justify-around py-1.5">
