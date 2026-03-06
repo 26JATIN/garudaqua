@@ -223,11 +223,7 @@ function RelatedProductCard({ product: relatedProduct, index, categoryId }: { pr
 
     return (
         <Link href={`/products/${relatedProduct.id}`}>
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+            <div
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 className="relative group cursor-pointer p-2 rounded-2xl md:rounded-3xl"
@@ -286,22 +282,31 @@ function RelatedProductCard({ product: relatedProduct, index, categoryId }: { pr
                         </h3>
                     </div>
                 </div>
-            </motion.div>
+            </div>
         </Link>
     );
 }
 
 // ===== Main Component =====
-export default function ProductDetail({ productId }: { productId: string }) {
+interface ProductDetailProps {
+    productId: string;
+    initialProduct?: Product | null;
+    initialRelated?: Product[];
+}
+
+export default function ProductDetail({ productId, initialProduct, initialRelated }: ProductDetailProps) {
     const router = useRouter();
+    const hasInitialData = !!(initialProduct);
     const [selectedImage, setSelectedImage] = useState(0);
-    const [product, setProduct] = useState<Product | null>(null);
-    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>(initialRelated ?? []);
+    const [loading, setLoading] = useState(!hasInitialData);
     const [notFound, setNotFound] = useState(false);
 
-    // Fetch product data
+    // Fetch product data (skip if server-prefetched)
     useEffect(() => {
+        if (hasInitialData) return;
+
         async function fetchProduct() {
             setLoading(true);
             setNotFound(false);
@@ -332,7 +337,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
         }
 
         fetchProduct();
-    }, [productId]);
+    }, [productId, hasInitialData]);
 
     const handleShare = async () => {
         const url = window.location.href;
@@ -374,9 +379,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
         return (
             <div className="min-h-screen pt-4 md:pt-6 lg:pt-8 bg-linear-to-b from-white to-[#FAFAFA] dark:from-black dark:to-[#0A0A0A]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                    <div
                         className="text-center py-20"
                     >
                         <div className="bg-red-50 dark:bg-red-500/10 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
@@ -397,7 +400,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                 Browse Products
                             </motion.button>
                         </Link>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         );
@@ -411,9 +414,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
         <div className="min-h-screen bg-linear-to-b from-white via-[#FAFAFA] to-white dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] pt-4 md:pt-6 lg:pt-8 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumb */}
-                <motion.nav
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
+                <nav
                     className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-8"
                 >
                     <Link href="/" className="hover:text-[#0EA5E9] transition-colors">Home</Link>
@@ -425,15 +426,12 @@ export default function ProductDetail({ productId }: { productId: string }) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                     <span className="text-[#2C2C2C] dark:text-gray-200 font-light line-clamp-1">{product.name}</span>
-                </motion.nav>
+                </nav>
 
                 {/* Product Details */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
                     {/* Images Section */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6 }}
+                    <div
                         className="space-y-4"
                     >
                         {/* Mobile Swipeable Gallery */}
@@ -513,13 +511,10 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                 </svg>
                             </div>
                         )}
-                    </motion.div>
+                    </div>
 
                     {/* Product Info Section */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6 }}
+                    <div
                         className="space-y-6"
                     >
                         {/* Category & Share */}
@@ -670,16 +665,12 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* Related Products */}
                 {relatedProducts.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
+                    <div
                         className="mt-16"
                     >
                         <div className="flex items-center justify-between mb-8">
@@ -718,7 +709,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
                                 </svg>
                             </Link>
                         </div>
-                    </motion.div>
+                    </div>
                 )}
             </div>
         </div>

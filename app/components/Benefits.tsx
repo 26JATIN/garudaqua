@@ -99,7 +99,7 @@ export default function Benefits() {
                             viewport={{ once: true }}
                             className="group relative"
                         >
-                            <div className="relative bg-white dark:bg-[#0A0A0A] rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-white/[0.06] group-hover:border-[#0EA5E9]/30 h-full">
+                            <div className="relative bg-white dark:bg-[#0A0A0A] rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-white/6 group-hover:border-[#0EA5E9]/30 h-full">
                                 {/* Icon */}
                                 <div className="relative mb-6">
                                     <div className={`w-20 h-20 rounded-2xl bg-linear-to-br ${benefit.color} flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform duration-300`}>

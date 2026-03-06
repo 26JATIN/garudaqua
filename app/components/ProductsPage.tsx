@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -38,6 +37,19 @@ interface ProductCardProps {
     index: number;
 }
 
+interface ProductsPageProps {
+    initialCategories?: Category[];
+    initialSubcategories?: Subcategory[];
+    initialProducts?: Product[];
+    initialTotal?: number;
+    initialSearchParams?: {
+        category?: string;
+        subcategory?: string;
+        search?: string;
+        sort?: string;
+    };
+}
+
 
 // Helper to get category name from Product (handles both string and object formats)
 function getCategoryName(category: Product["category"]): string {
@@ -45,29 +57,39 @@ function getCategoryName(category: Product["category"]): string {
     return category?.name || "";
 }
 
-export default function ProductsPage() {
-    const searchParams = useSearchParams();
-    const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "all");
-    const [selectedSubcategory, setSelectedSubcategory] = useState(searchParams.get("subcategory") || "All");
-    const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
-    const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
+export default function ProductsPage({
+    initialCategories,
+    initialSubcategories,
+    initialProducts,
+    initialTotal,
+    initialSearchParams,
+}: ProductsPageProps) {
+    const [selectedCategory, setSelectedCategory] = useState(initialSearchParams?.category || "all");
+    const [selectedSubcategory, setSelectedSubcategory] = useState(initialSearchParams?.subcategory || "All");
+    const [searchTerm, setSearchTerm] = useState(initialSearchParams?.search || "");
+    const [sortBy, setSortBy] = useState(initialSearchParams?.sort || "featured");
     const [viewMode, setViewMode] = useState("grid");
 
     // API data states
-    const [categories, setCategories] = useState<Category[]>([{ id: "all", name: "All" }]);
-    const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [totalProducts, setTotalProducts] = useState(0);
-    const [loadingCategories, setLoadingCategories] = useState(true);
-    const [loadingSubcategories, setLoadingSubcategories] = useState(true);
-    const [loadingProducts, setLoadingProducts] = useState(true);
+    const hasInitialData = !!(initialCategories && initialSubcategories && initialProducts);
+    const [categories, setCategories] = useState<Category[]>(
+        initialCategories ? [{ id: "all", name: "All" }, ...initialCategories] : [{ id: "all", name: "All" }]
+    );
+    const [subcategories, setSubcategories] = useState<Subcategory[]>(initialSubcategories || []);
+    const [products, setProducts] = useState<Product[]>(initialProducts || []);
+    const [totalProducts, setTotalProducts] = useState(initialTotal || 0);
+    const [loadingCategories, setLoadingCategories] = useState(!hasInitialData);
+    const [loadingSubcategories, setLoadingSubcategories] = useState(!hasInitialData);
+    const [loadingProducts, setLoadingProducts] = useState(!hasInitialData);
 
     const productsGridRef = useRef<HTMLDivElement>(null);
     const categoryScrollRef = useRef<HTMLDivElement>(null);
     const subcategoryScrollRef = useRef<HTMLDivElement>(null);
+    const isInitialMount = useRef(hasInitialData);
 
-    // Fetch categories on mount
+    // Fetch categories on mount (skip if server-provided)
     useEffect(() => {
+        if (hasInitialData) return;
         async function fetchCategories() {
             try {
                 const res = await fetch("/api/categories");
@@ -85,8 +107,9 @@ export default function ProductsPage() {
         fetchCategories();
     }, []);
 
-    // Fetch subcategories on mount
+    // Fetch subcategories on mount (skip if server-provided)
     useEffect(() => {
+        if (hasInitialData) return;
         async function fetchSubcategories() {
             try {
                 const res = await fetch("/api/subcategories");
@@ -106,19 +129,23 @@ export default function ProductsPage() {
 
     // Sync state when URL params change (e.g. browser back/forward)
     useEffect(() => {
-        const categoryFromUrl = searchParams.get("category") || "all";
-        const subcategoryFromUrl = searchParams.get("subcategory") || "All";
-        const searchFromUrl = searchParams.get("search") || "";
-        const sortFromUrl = searchParams.get("sort") || "featured";
+        const handlePopState = () => {
+            const params = new URLSearchParams(window.location.search);
+            setSelectedCategory(params.get("category") || "all");
+            setSelectedSubcategory(params.get("subcategory") || "All");
+            setSearchTerm(params.get("search") || "");
+            setSortBy(params.get("sort") || "featured");
+        };
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+    }, []);
 
-        setSelectedCategory(categoryFromUrl);
-        setSelectedSubcategory(subcategoryFromUrl);
-        setSearchTerm(searchFromUrl);
-        setSortBy(sortFromUrl);
-    }, [searchParams]);
-
-    // Fetch products when filters change
+    // Fetch products when filters change (skip first render if server-provided)
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
 
         async function fetchProducts() {
             setLoadingProducts(true);
@@ -270,10 +297,7 @@ export default function ProductsPage() {
         <div className="min-h-screen bg-linear-to-b from-white via-[#FAFAFA] to-white dark:from-black dark:via-[#050505] dark:to-black pt-4 md:pt-6 lg:pt-8 pb-6 md:pb-8 lg:pb-12">
             <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
                 {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                <div
                     className="text-center mb-6 md:mb-8 lg:mb-10"
                 >
                     <p className="text-xs md:text-sm text-[#0EA5E9] font-light tracking-widest uppercase mb-1 md:mb-2">
@@ -289,10 +313,7 @@ export default function ProductsPage() {
                     </p>
 
                     {searchTerm && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.3, delay: 0.2 }}
+                        <div
                             className="mt-6 inline-flex items-center gap-3 bg-white dark:bg-white/10 px-6 py-3 rounded-full shadow-sm"
                         >
                             <span className="text-sm text-gray-600 dark:text-gray-300">
@@ -307,15 +328,12 @@ export default function ProductsPage() {
                                 </svg>
                                 Clear Search
                             </button>
-                        </motion.div>
+                        </div>
                     )}
-                </motion.div>
+                </div>
 
                 {/* Category Story Badges */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
+                <div
                     className="mb-6 md:mb-8 lg:mb-10"
                 >
                     {loadingCategories ? (
@@ -353,7 +371,7 @@ export default function ProductsPage() {
                                             <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
                                                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
                                                     {category.image ? (
-                                                        <img src={cloudinaryUrl(category.image, 128)} alt={category.name} className="w-full h-full object-cover" loading="lazy" width={64} height={64} />
+                                                        <img src={cloudinaryUrl(category.image, 128)} alt="" className="w-full h-full object-cover" loading="lazy" width={64} height={64} />
                                                     ) : (
                                                         <svg className="w-6 h-6 md:w-7 md:h-7 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -401,14 +419,11 @@ export default function ProductsPage() {
                             </button>
                         </div>
                     )}
-                </motion.div>
+                </div>
 
                 {/* Subcategory Filters */}
                 {visibleSubcategories.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.25 }}
+                    <div
                         className="mb-6 md:mb-8 lg:mb-10"
                     >
                         <div className="flex items-center justify-between mb-4">
@@ -416,14 +431,14 @@ export default function ProductsPage() {
                                 <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
-                                <h3 className="text-base md:text-lg font-medium text-[#2C2C2C] dark:text-gray-100">
+                                <h2 className="text-base md:text-lg font-medium text-[#2C2C2C] dark:text-gray-100">
                                     Browse Types
                                     {selectedCategory !== "all" && (
                                         <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
                                             in {getCategoryDisplayName(selectedCategory)}
                                         </span>
                                     )}
-                                </h3>
+                                </h2>
                             </div>
                             {selectedSubcategory !== "All" && (
                                 <button
@@ -512,7 +527,7 @@ export default function ProductsPage() {
                                             <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
                                                 <div className="w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
                                                     {subcategory.image ? (
-                                                        <img src={cloudinaryUrl(subcategory.image, 160)} alt={subcategory.name} className="w-full h-full object-cover" loading="lazy" width={80} height={80} />
+                                                        <img src={cloudinaryUrl(subcategory.image, 160)} alt="" className="w-full h-full object-cover" loading="lazy" width={80} height={80} />
                                                     ) : (
                                                         <svg className="w-7 h-7 md:w-8 md:h-8 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -552,15 +567,12 @@ export default function ProductsPage() {
                                 </svg>
                             </button>
                         </div>
-                    </motion.div>
+                    </div>
                 )}
 
                 {/* Filter & Sort Bar */}
-                <motion.div
+                <div
                     ref={productsGridRef}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
                     className="mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100 dark:border-white/6"
                 >
                     <div className="flex items-center gap-2">
@@ -580,6 +592,7 @@ export default function ProductsPage() {
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
+                                aria-label="Sort products by"
                                 className="w-full sm:w-auto appearance-none bg-gray-50 dark:bg-white/6 border border-gray-200 dark:border-white/10 rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-2.5 pr-8 md:pr-10 text-xs md:text-sm font-light text-[#2C2C2C] dark:text-gray-200 hover:border-[#0EA5E9] focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all cursor-pointer"
                             >
                                 <option value="featured">Featured</option>
@@ -593,10 +606,11 @@ export default function ProductsPage() {
                         <div className="flex items-center gap-0.5 md:gap-1 bg-gray-50 dark:bg-white/6 rounded-lg md:rounded-xl p-0.5 md:p-1">
                             <button
                                 onClick={() => setViewMode("grid")}
-                                className={`p-1.5 md:p-2.5 rounded-md md:rounded-lg transition-all ${
+                                className={`p-2.5 md:p-2.5 rounded-md md:rounded-lg transition-all ${
                                     viewMode === "grid" ? "bg-white dark:bg-white/10 text-[#0EA5E9] shadow-sm" : "text-gray-400 hover:text-gray-600"
                                 }`}
                                 title="Grid View"
+                                aria-label="Grid view"
                             >
                                 <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -604,10 +618,11 @@ export default function ProductsPage() {
                             </button>
                             <button
                                 onClick={() => setViewMode("list")}
-                                className={`p-1.5 md:p-2.5 rounded-md md:rounded-lg transition-all ${
+                                className={`p-2.5 md:p-2.5 rounded-md md:rounded-lg transition-all ${
                                     viewMode === "list" ? "bg-white dark:bg-white/10 text-[#0EA5E9] shadow-sm" : "text-gray-400 hover:text-gray-600"
                                 }`}
                                 title="List View"
+                                aria-label="List view"
                             >
                                 <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -615,15 +630,13 @@ export default function ProductsPage() {
                             </button>
                         </div>
                     </div>
-                </motion.div>
+                </div>
 
                 {/* Products Grid/List */}
                 {loadingProducts ? (
                     <ProductsLoadingSkeleton />
                 ) : products.length === 0 ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                    <div
                         className="flex flex-col items-center justify-center h-64 text-center"
                     >
                         <svg className="w-20 h-20 text-[#0EA5E9] opacity-40 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -639,16 +652,10 @@ export default function ProductsPage() {
                                   ? "Try selecting a different category"
                                   : "Check back soon for new items"}
                         </p>
-                    </motion.div>
+                    </div>
                 ) : (
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={`${selectedCategory}-${viewMode}-${sortBy}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.4 }}
-                            className={
+                    <div
+                        className={
                                 viewMode === "grid"
                                     ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8"
                                     : "space-y-4"
@@ -661,8 +668,7 @@ export default function ProductsPage() {
                                     <ProductListItem key={product.id} product={product} index={index} />
                                 )
                             )}
-                        </motion.div>
-                    </AnimatePresence>
+                    </div>
                 )}
             </div>
         </div>
@@ -675,10 +681,7 @@ function ProductCard({ product, index }: ProductCardProps) {
     const productHref = `/products/${product.id}`;
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
+        <div
             className="group"
         >
             <Link href={productHref} className="block">
@@ -720,7 +723,7 @@ function ProductCard({ product, index }: ProductCardProps) {
                     </div>
                 </div>
             </Link>
-        </motion.div>
+        </div>
     );
 }
 
@@ -730,10 +733,7 @@ function ProductListItem({ product, index }: ProductCardProps) {
     const productHref = `/products/${product.id}`;
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.05 }}
+        <div
             className="group"
         >
             <Link href={productHref} className="block">
@@ -778,6 +778,6 @@ function ProductListItem({ product, index }: ProductCardProps) {
                     </div>
                 </div>
             </Link>
-        </motion.div>
+        </div>
     );
 }
