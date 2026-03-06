@@ -18,7 +18,6 @@ export default function cloudinaryLoader({
     `q_${quality || "auto"}`,
     "f_auto",
     "c_limit",
-    "fl_progressive",
   ].join(",");
 
   return src.replace("/upload/", `/upload/${params}/`);
