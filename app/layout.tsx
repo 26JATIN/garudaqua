@@ -10,7 +10,7 @@ import ThemeToaster from "./components/ThemeToaster";
 import PWARegister from "./components/PWARegister";
 import type { Metadata } from "next";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const SITE_URL = "https://garudaqua.in";
 

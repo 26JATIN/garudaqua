@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Hero from './components/hero';
-import CategoryShowcase from './components/CategoryShowcase';
 import Footer from './components/Footer';
 import { prisma } from '@/lib/prisma';
 
 // Lazy load below-the-fold components to reduce initial JS bundle
+const CategoryShowcase = dynamic(() => import('./components/CategoryShowcase'));
 const Benefits = dynamic(() => import('./components/Benefits'));
 const ImageGallery = dynamic(() => import('./components/ImageGallery'));
 const VideoShowcaseSection = dynamic(() => import('./components/HeroVideoShowcase'));

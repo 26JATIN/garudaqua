@@ -96,20 +96,21 @@ export default function Hero({ initialSlides }: HeroProps) {
                                 ease: "linear",
                             }}
                         >
-                            {/* Desktop Image — only priority when no mobile variant */}
+                            {/* Desktop Image — preloaded on all viewports but sizes resolves to 1px on mobile */}
                             <Image
                                 src={slides[currentSlide].image}
                                 alt={slides[currentSlide].title || "Garud Aqua"}
                                 fill
                                 className={`object-cover object-top ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
-                                priority={currentSlide === 0 && !slides[currentSlide].mobileImage}
-                                fetchPriority={currentSlide === 0 && !slides[currentSlide].mobileImage ? "high" : undefined}
-                                quality={75}
-                                sizes="(max-width: 1024px) 1024px, 1920px"
-                                loading={currentSlide === 0 && !slides[currentSlide].mobileImage ? "eager" : "lazy"}
+                                priority={currentSlide === 0}
+                                fetchPriority={currentSlide === 0 ? "high" : undefined}
+                                quality={60}
+                                sizes={slides[currentSlide].mobileImage
+                                    ? "(max-width: 640px) 1px, 1200px"
+                                    : "1200px"}
                             />
 
-                            {/* Mobile Image — sole priority + preload on mobile */}
+                            {/* Mobile Image — preloaded on all viewports but sizes resolves to 1px on desktop */}
                             {slides[currentSlide].mobileImage && (
                                 <Image
                                     src={slides[currentSlide].mobileImage}
@@ -119,7 +120,7 @@ export default function Hero({ initialSlides }: HeroProps) {
                                     priority={currentSlide === 0}
                                     fetchPriority={currentSlide === 0 ? "high" : undefined}
                                     quality={50}
-                                    sizes="(max-width: 480px) 480px, 640px"
+                                    sizes="(min-width: 641px) 1px, 480px"
                                 />
                             )}
                         </motion.div>
