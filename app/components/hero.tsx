@@ -12,10 +12,14 @@ interface HeroSlide {
     isActive: boolean;
 }
 
-export default function Hero() {
+interface HeroProps {
+    initialSlides?: HeroSlide[];
+}
+
+export default function Hero({ initialSlides }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [slides, setSlides] = useState<HeroSlide[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [slides, setSlides] = useState<HeroSlide[]>(initialSlides || []);
+    const [loading, setLoading] = useState(!initialSlides || initialSlides.length === 0);
     const [isPaused, setIsPaused] = useState(false);
 
     const fetchSlides = useCallback(async () => {
@@ -31,9 +35,12 @@ export default function Hero() {
         }
     }, []);
 
+    // Only fetch client-side if no initial slides were provided
     useEffect(() => {
-        fetchSlides();
-    }, [fetchSlides]);
+        if (!initialSlides || initialSlides.length === 0) {
+            fetchSlides();
+        }
+    }, [fetchSlides, initialSlides]);
 
     // Auto-advance slides
     useEffect(() => {
@@ -98,7 +105,7 @@ export default function Hero() {
                                 priority={currentSlide === 0}
                                 fetchPriority={currentSlide === 0 ? "high" : undefined}
                                 quality={75}
-                                sizes="100vw"
+                                sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1920px"
                             />
 
                             {/* Mobile Image */}
