@@ -112,7 +112,7 @@ export default function Hero({ initialSlides }: HeroProps) {
                                 className={`object-cover object-top ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
                                 priority={currentSlide === 0}
                                 fetchPriority={currentSlide === 0 ? "high" : undefined}
-                                quality={60}
+                                quality={50}
                                 sizes={slides[currentSlide].mobileImage
                                     ? "(max-width: 640px) 1px, 1200px"
                                     : "1200px"}
@@ -128,7 +128,7 @@ export default function Hero({ initialSlides }: HeroProps) {
                                     priority={currentSlide === 0}
                                     fetchPriority={currentSlide === 0 ? "high" : undefined}
                                     quality={50}
-                                    sizes="(min-width: 641px) 1px, 480px"
+                                    sizes="(min-width: 641px) 1px, 240px"
                                 />
                             )}
                         </motion.div>
