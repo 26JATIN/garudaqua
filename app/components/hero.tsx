@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -21,6 +21,14 @@ export default function Hero({ initialSlides }: HeroProps) {
     const [slides, setSlides] = useState<HeroSlide[]>(initialSlides || []);
     const [loading, setLoading] = useState(!initialSlides || initialSlides.length === 0);
     const [isPaused, setIsPaused] = useState(false);
+    const isFirstRender = useRef(true);
+
+    // After first slide transition, allow crossfade animations
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+        }
+    }, [currentSlide]);
 
     const fetchSlides = useCallback(async () => {
         try {
@@ -78,7 +86,7 @@ export default function Hero({ initialSlides }: HeroProps) {
                 <AnimatePresence mode="sync">
                     <motion.div
                         key={currentSlide}
-                        initial={{ opacity: 0 }}
+                        initial={isFirstRender.current ? { opacity: 1 } : { opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{

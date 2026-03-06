@@ -44,8 +44,35 @@ async function getHeroSlides() {
   }
 }
 
+async function getCategoryData() {
+  try {
+    const [categories, subcategories] = await Promise.all([
+      prisma.category.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+        select: { id: true, name: true, isActive: true, image: true, description: true },
+      }),
+      prisma.subcategory.findMany({
+        where: { isActive: true },
+        orderBy: { order: "asc" },
+        include: { category: { select: { id: true, name: true } } },
+        
+      }),
+    ]);
+    return {
+      categories: categories.map(c => ({ id: c.id, name: c.name, isActive: c.isActive, image: c.image, description: c.description })),
+      subcategories: subcategories.map(s => ({ id: s.id, name: s.name, isActive: s.isActive, image: s.image, category: { id: s.category.id, name: s.category.name } })),
+    };
+  } catch {
+    return { categories: [], subcategories: [] };
+  }
+}
+
 export default async function Home() {
-  const heroSlides = await getHeroSlides();
+  const [heroSlides, categoryData] = await Promise.all([
+    getHeroSlides(),
+    getCategoryData(),
+  ]);
 
   return (
     <main className="min-h-screen relative overflow-x-hidden">
@@ -55,7 +82,7 @@ export default async function Home() {
       {/* Hero Section */}
       <Hero initialSlides={heroSlides} />
       {/*Category Showcase*/}
-      <CategoryShowcase />
+      <CategoryShowcase initialCategories={categoryData.categories} initialSubcategories={categoryData.subcategories} />
       <Benefits/>
       <ImageGallery/>
       <VideoShowcaseSection/>

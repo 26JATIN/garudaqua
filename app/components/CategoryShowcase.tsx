@@ -292,12 +292,17 @@ export const Card = React.memo(({
 
 Card.displayName = 'Card';
 
-export default function CategoryShowcase() {
+interface CategoryShowcaseProps {
+  initialCategories?: Category[];
+  initialSubcategories?: Subcategory[];
+}
+
+export default function CategoryShowcase({ initialCategories, initialSubcategories }: CategoryShowcaseProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState<Category[]>(initialCategories || []);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>(initialSubcategories || []);
+  const [isLoading, setIsLoading] = useState(!initialCategories || !initialSubcategories);
   const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
 
@@ -328,13 +333,14 @@ export default function CategoryShowcase() {
   }, []);
 
   useEffect(() => {
+    if (initialCategories && initialSubcategories) return;
     async function loadData() {
       setIsLoading(true);
       await Promise.all([fetchCategories(), fetchSubcategories()]);
       setIsLoading(false);
     }
     loadData();
-  }, [fetchCategories, fetchSubcategories]);
+  }, [fetchCategories, fetchSubcategories, initialCategories, initialSubcategories]);
 
   const MAX_DISPLAYED = 16;
 
@@ -709,24 +715,32 @@ export default function CategoryShowcase() {
           }
         }
 
-        @keyframes skeleton-loading {
-          0% {
-            background-position: -200px 0;
-          }
-          100% {
-            background-position: calc(200px + 100%) 0;
-          }
+        .skeleton-loader {
+          position: relative;
+          overflow: hidden;
+          background: #f0f0f0;
         }
 
-        .skeleton-loader {
-          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-          background-size: 200px 100%;
+        .skeleton-loader::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
           animation: skeleton-loading 1.5s infinite;
+          will-change: transform;
+        }
+
+        @keyframes skeleton-loading {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
         }
 
         .dark .skeleton-loader {
-          background: linear-gradient(90deg, #0A0A0A 25%, #111 50%, #0A0A0A 75%);
-          background-size: 200px 100%;
+          background: #0A0A0A;
+        }
+
+        .dark .skeleton-loader::after {
+          background: linear-gradient(90deg, transparent, #111, transparent);
         }
       ` }} />
     </section>
