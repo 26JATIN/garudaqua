@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
+import { cloudinaryUrl } from "@/lib/utils";
 
 // ===== Type Definitions =====
 interface Category {
@@ -352,7 +353,7 @@ export default function ProductsPage() {
                                             <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
                                                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
                                                     {category.image ? (
-                                                        <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                                                        <img src={cloudinaryUrl(category.image, 128)} alt={category.name} className="w-full h-full object-cover" loading="lazy" width={64} height={64} />
                                                     ) : (
                                                         <svg className="w-6 h-6 md:w-7 md:h-7 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -511,7 +512,7 @@ export default function ProductsPage() {
                                             <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
                                                 <div className="w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
                                                     {subcategory.image ? (
-                                                        <img src={subcategory.image} alt={subcategory.name} className="w-full h-full object-cover" />
+                                                        <img src={cloudinaryUrl(subcategory.image, 160)} alt={subcategory.name} className="w-full h-full object-cover" loading="lazy" width={80} height={80} />
                                                     ) : (
                                                         <svg className="w-7 h-7 md:w-8 md:h-8 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />

@@ -1,5 +1,4 @@
 import React from "react";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavbarProvider } from "./context/NavbarContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -9,8 +8,6 @@ import { Toaster } from "sonner";
 import ThemeToaster from "./components/ThemeToaster";
 import PWARegister from "./components/PWARegister";
 import type { Metadata } from "next";
-
-const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const SITE_URL = "https://garudaqua.in";
 
@@ -125,15 +122,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-        <link rel="icon" href="/icons/icon-192x192.png" type="image/png" sizes="192x192" />
-        <link rel="icon" href="/favicon.png" type="image/png" />
-        <link rel="shortcut icon" href="/icons/icon-192x192.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" sizes="192x192" />
-        <link rel="apple-touch-icon" href="/icons/icon-152x152.png" sizes="152x152" />
-        <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" id="theme-color-meta" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -204,7 +193,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })();
         `}} />
       </head>
-      <body className={`${inter.className} bg-white dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
+      <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
         <PWARegister />
         <Providers>
           <ThemeToaster />

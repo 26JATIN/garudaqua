@@ -81,45 +81,32 @@ export default function Navbar() {
                             {/* Right Actions */}
                             <div className="flex items-center gap-3">
                                 {/* Navigation Links */}
-                                <motion.div
-                                    className="flex items-center gap-1 mr-2"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.1 }}
-                                >
+                                <div className="flex items-center gap-1 mr-2">
                                     <Link
                                         href="/products"
                                         className="px-4 py-2 text-sm font-medium text-var(--nav-text) hover:bg-var(--nav-hover-bg) rounded-xl transition-all duration-300"
                                     >
                                         Products
                                     </Link>
-                                </motion.div>
+                                </div>
 
-                                <motion.div
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.15 }}
-                                >
+                                <div>
                                     <Link
                                         href="/blogs"
                                         className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300"
                                     >
                                         Blog
                                     </Link>
-                                </motion.div>
+                                </div>
 
-                                <motion.div
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.2 }}
-                                >
+                                <div>
                                     <Link
                                         href="/about"
                                         className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300"
                                     >
                                         About
                                     </Link>
-                                </motion.div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -135,7 +122,6 @@ export default function Navbar() {
                     backdropFilter: "blur(24px) saturate(200%)",
                     boxShadow: "var(--navbar-shadow)"
                 }}
-                initial={{ y: -100 }}
                 animate={{
                     y: isNavbarHidden ? -100 : 0,
                     opacity: isNavbarHidden ? 0 : 1
@@ -177,7 +163,6 @@ export default function Navbar() {
                     boxShadow: "var(--navbar-shadow)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)",
                 }}
-                initial={{ y: 100 }}
                 animate={{
                     y: isNavbarHidden ? 100 : 0,
                     opacity: isNavbarHidden ? 0 : 1

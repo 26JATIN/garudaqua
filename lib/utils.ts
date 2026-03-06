@@ -4,3 +4,13 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+/**
+ * Add Cloudinary transforms to a URL for optimized delivery.
+ * Returns the original URL if it's not a Cloudinary URL.
+ */
+export function cloudinaryUrl(src: string, width: number, quality: number = 80): string {
+  if (!src || !src.includes("res.cloudinary.com")) return src;
+  const params = `w_${width},q_${quality},f_auto,c_fill`;
+  return src.replace("/upload/", `/upload/${params}/`);
+}

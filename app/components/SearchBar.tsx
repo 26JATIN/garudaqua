@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cloudinaryUrl } from '@/lib/utils';
 
 interface Suggestion {
     id: string;
@@ -373,9 +374,12 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                                             <div className="shrink-0 w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
                                                 {suggestion.image ? (
                                                     <img
-                                                        src={suggestion.image}
+                                                        src={cloudinaryUrl(suggestion.image, 80)}
                                                         alt={suggestion.text}
                                                         className="w-full h-full object-cover"
+                                                        loading="lazy"
+                                                        width={40}
+                                                        height={40}
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full bg-[#0EA5E9]/10 flex items-center justify-center">
