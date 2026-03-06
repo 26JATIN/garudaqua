@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Hero from './components/hero';
 import CategoryShowcase from './components/CategoryShowcase';
 import Footer from './components/Footer';
-import Benefits from './components/Benefits';
-import Newsletter from './components/Newsletter';
-import VideoShowcaseSection from './components/HeroVideoShowcase';
-import ImageGallery from './components/ImageGallery';
-import Testimonials from './components/Testimonials';
 import { prisma } from '@/lib/prisma';
+
+// Lazy load below-the-fold components to reduce initial JS bundle
+const Benefits = dynamic(() => import('./components/Benefits'));
+const ImageGallery = dynamic(() => import('./components/ImageGallery'));
+const VideoShowcaseSection = dynamic(() => import('./components/HeroVideoShowcase'));
+const Testimonials = dynamic(() => import('./components/Testimonials'));
+const Newsletter = dynamic(() => import('./components/Newsletter'));
 
 export const metadata: Metadata = {
   title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings | Sriganganagar",

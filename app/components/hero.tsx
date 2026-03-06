@@ -96,19 +96,20 @@ export default function Hero({ initialSlides }: HeroProps) {
                                 ease: "linear",
                             }}
                         >
-                            {/* Desktop Image */}
+                            {/* Desktop Image — no priority to avoid double preload on mobile */}
                             <Image
                                 src={slides[currentSlide].image}
                                 alt={slides[currentSlide].title || "Garud Aqua"}
                                 fill
                                 className={`object-cover object-top ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
-                                priority={currentSlide === 0}
+                                priority={currentSlide === 0 && !slides[currentSlide].mobileImage}
                                 fetchPriority={currentSlide === 0 ? "high" : undefined}
                                 quality={75}
-                                sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1920px"
+                                sizes="(max-width: 1024px) 1024px, 1920px"
+                                loading={currentSlide === 0 ? "eager" : "lazy"}
                             />
 
-                            {/* Mobile Image */}
+                            {/* Mobile Image — sole priority image on mobile */}
                             {slides[currentSlide].mobileImage && (
                                 <Image
                                     src={slides[currentSlide].mobileImage}
@@ -117,8 +118,8 @@ export default function Hero({ initialSlides }: HeroProps) {
                                     className="sm:hidden object-cover object-center"
                                     priority={currentSlide === 0}
                                     fetchPriority={currentSlide === 0 ? "high" : undefined}
-                                    quality={75}
-                                    sizes="100vw"
+                                    quality={60}
+                                    sizes="640px"
                                 />
                             )}
                         </motion.div>
