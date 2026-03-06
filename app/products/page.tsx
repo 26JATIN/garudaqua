@@ -65,20 +65,8 @@ export default async function Page({
   const params = await searchParams;
   const { categories, subcategories, products } = await getInitialData();
 
-  // Build preload URLs for the first 2 product images (LCP candidates)
-  const preloadImages = products
-    .filter((p: { image?: string }) => p.image?.includes('res.cloudinary.com'))
-    .slice(0, 2)
-    .map((p: { image: string }) =>
-      p.image.replace('/upload/', '/upload/w_384,q_75,f_auto,c_limit/')
-    );
-
   return (
     <>
-      {/* Preload LCP-candidate product images */}
-      {preloadImages.map((src: string) => (
-        <link key={src} rel="preload" as="image" href={src} fetchPriority="high" />
-      ))}
       <Suspense fallback={
       <div className="min-h-screen pt-4 md:pt-6 lg:pt-8 bg-gray-50 dark:bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

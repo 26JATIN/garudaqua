@@ -695,8 +695,8 @@ function ProductCard({ product, index }: ProductCardProps) {
                                 className="object-cover transform group-hover:scale-110 transition-transform duration-700"
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                 quality={75}
-                                priority={index < 4}
-                                loading={index < 4 ? undefined : "lazy"}
+                                priority={index === 0}
+                                loading={index === 0 ? undefined : "lazy"}
                             />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center">
