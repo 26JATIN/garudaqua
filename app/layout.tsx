@@ -17,8 +17,7 @@ const SITE_URL = "https://garudaqua.in";
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
   themeColor: [
@@ -124,6 +123,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="icon" href="/icons/icon-192x192.png" type="image/png" sizes="192x192" />
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="shortcut icon" href="/icons/icon-192x192.png" type="image/png" />

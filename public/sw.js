@@ -1,5 +1,5 @@
 // Garud Aqua Solutions — Service Worker
-const CACHE_NAME = "garudaqua-v1";
+const CACHE_NAME = "garudaqua-v2";
 const STATIC_ASSETS = [
   "/",
   "/products",
@@ -8,8 +8,8 @@ const STATIC_ASSETS = [
   "/manifest.json",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
-  "/MobileLogo.png",
-  "/DesktopLogo.png",
+  "/MobileLogo.webp",
+  "/DesktopLogo.webp",
 ];
 
 // Install: cache static assets

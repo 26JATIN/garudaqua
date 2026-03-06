@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useNavbar } from '../context/NavbarContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
@@ -70,10 +71,14 @@ export default function Navbar() {
                                     href="/"
                                     className="flex items-center"
                                 >
-                                    <img
-                                        src="/DesktopLogo.png"
+                                    <Image
+                                        src="/DesktopLogo.webp"
                                         alt="Garud Aqua"
+                                        width={181}
+                                        height={80}
                                         className="h-20 w-auto"
+                                        priority
+                                        unoptimized
                                     />
                                 </Link>
                             </motion.div>
@@ -158,10 +163,14 @@ export default function Navbar() {
                 <div className="px-4 py-2 flex items-center gap-2">
                     {/* Mobile Logo */}
                     <Link href="/" className="shrink-0">
-                        <img
-                            src="/MobileLogo.png"
+                        <Image
+                            src="/MobileLogo.webp"
                             alt="Garud Aqua"
+                            width={48}
+                            height={48}
                             className="h-12 w-12 object-contain scale-200"
+                            priority
+                            unoptimized
                         />
                     </Link>
                     {/* Search Bar */}

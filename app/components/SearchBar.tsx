@@ -323,6 +323,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                 {/* Search button */}
                 <motion.button
                     type="submit"
+                    aria-label="Search"
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-xl bg-[#2C2C2C] text-white hover:bg-[#0EA5E9] transition-all duration-300 shadow-md"
                     whileHover={{ scale: 1.05, rotate: 5 }}
                     whileTap={{ scale: 0.95 }}
