@@ -1,10 +1,6 @@
 // Garud Aqua Solutions — Service Worker
-const CACHE_NAME = "garudaqua-v2";
+const CACHE_NAME = "garudaqua-v3";
 const STATIC_ASSETS = [
-  "/",
-  "/products",
-  "/contact",
-  "/enquire",
   "/manifest.json",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
@@ -94,18 +90,17 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Stale-while-revalidate for pages
+  // Network-first for HTML pages — avoids double-fetch with nginx cache
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const fetchPromise = fetch(request).then((response) => {
+    fetch(request)
+      .then((response) => {
         if (response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         }
         return response;
-      });
-      return cached || fetchPromise;
-    })
+      })
+      .catch(() => caches.match(request))
   );
 });
 

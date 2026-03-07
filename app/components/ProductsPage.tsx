@@ -688,15 +688,15 @@ function ProductCard({ product, index }: ProductCardProps) {
                 <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1 md:group-hover:-translate-y-2">
                     <div className="relative aspect-4/5 overflow-hidden bg-gray-100 dark:bg-gray-800">
                         {product.image ? (
-                            <Image
+                                <Image
                                 src={product.image}
                                 alt={product.name}
                                 fill
                                 className="object-cover transform group-hover:scale-110 transition-transform duration-700"
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                quality={75}
-                                priority={index === 0}
-                                loading={index === 0 ? undefined : "lazy"}
+                                quality={60}
+                                priority={index < 4}
+                                loading={index < 4 ? undefined : "lazy"}
                             />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center">

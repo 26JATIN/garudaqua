@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   reactCompiler: true,
+  poweredByHeader: false,
+  compress: false, // Let nginx handle compression — avoids double-compression overhead
   images: {
     loader: "custom",
     loaderFile: "./lib/cloudinary-loader.ts",
