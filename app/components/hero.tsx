@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+
 
 interface HeroSlide {
     id: string;
@@ -12,12 +12,15 @@ interface HeroSlide {
     isActive: boolean;
 }
 
+
 interface HeroProps {
     initialSlides?: HeroSlide[];
 }
 
 export default function Hero({ initialSlides }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [prevSlide, setPrevSlide] = useState<number | null>(null);
+    const [showPrev, setShowPrev] = useState(false);
     const [slides, setSlides] = useState<HeroSlide[]>(initialSlides || []);
     const [loading, setLoading] = useState(!initialSlides || initialSlides.length === 0);
     const [isPaused, setIsPaused] = useState(false);
@@ -49,13 +52,17 @@ export default function Hero({ initialSlides }: HeroProps) {
         if (slides.length <= 1 || isPaused) return;
         const timer = setInterval(() => {
             setHasTransitioned(true);
+            setPrevSlide(currentSlide);
+            setShowPrev(true);
             setCurrentSlide((prev) => (prev + 1) % slides.length);
         }, 6000);
         return () => clearInterval(timer);
-    }, [slides.length, isPaused]);
+    }, [slides.length, isPaused, currentSlide]);
 
     const goToSlide = (index: number) => {
         setHasTransitioned(true);
+        setPrevSlide(currentSlide);
+        setShowPrev(true);
         setCurrentSlide(index);
         setIsPaused(true);
         setTimeout(() => setIsPaused(false), 8000);
@@ -79,84 +86,58 @@ export default function Hero({ initialSlides }: HeroProps) {
         >
             {/* Image Slideshow */}
             <div className="absolute inset-0">
-                {!hasTransitioned ? (
-                    /* First slide — render as plain HTML for instant SSR paint (no framer-motion needed) */
-                    <div className="absolute inset-0" style={{ animation: 'hero-zoom 8s linear forwards' }}>
-                        {/* Desktop Image */}
+                {/* First slide — render as plain HTML for instant SSR paint (no crossfade needed) */}
+                {/* Always render current image fully opaque, only fade out previous image on top */}
+                <div className="absolute inset-0" key={`curr-${currentSlide}`}> 
+                    <Image
+                        src={slides[currentSlide].image}
+                        alt={slides[currentSlide].title || "Garud Aqua"}
+                        fill
+                        className={`object-cover object-top ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
+                        quality={50}
+                        sizes={slides[currentSlide].mobileImage
+                            ? "(max-width: 640px) 1px, 100vw"
+                            : "100vw"}
+                    />
+                    {slides[currentSlide].mobileImage && (
                         <Image
-                            src={slides[0].image}
-                            alt={slides[0].title || "Garud Aqua"}
+                            src={slides[currentSlide].mobileImage}
+                            alt={slides[currentSlide].title || "Garud Aqua"}
                             fill
-                            className={`object-cover object-top ${slides[0].mobileImage ? 'hidden sm:block' : ''}`}
-                            loading="eager"
-                            fetchPriority="high"
+                            className="sm:hidden object-cover object-center"
                             quality={50}
-                            sizes={slides[0].mobileImage
+                            sizes="(min-width: 641px) 1px, 100vw"
+                        />
+                    )}
+                </div>
+                {showPrev && prevSlide !== null && prevSlide !== currentSlide && (
+                    <div
+                        className="absolute inset-0 hero-fade-out"
+                        key={`prev-${prevSlide}`}
+                        onAnimationEnd={() => setShowPrev(false)}
+                        style={{ background: `url('${slides[prevSlide].image}') center center / cover no-repeat` }}
+                    >
+                        <Image
+                            src={slides[prevSlide].image}
+                            alt={slides[prevSlide].title || "Garud Aqua"}
+                            fill
+                            className={`object-cover object-top ${slides[prevSlide].mobileImage ? 'hidden sm:block' : ''}`}
+                            quality={50}
+                            sizes={slides[prevSlide].mobileImage
                                 ? "(max-width: 640px) 1px, 100vw"
                                 : "100vw"}
                         />
-                        {/* Mobile Image */}
-                        {slides[0].mobileImage && (
+                        {slides[prevSlide].mobileImage && (
                             <Image
-                                src={slides[0].mobileImage}
-                                alt={slides[0].title || "Garud Aqua"}
+                                src={slides[prevSlide].mobileImage}
+                                alt={slides[prevSlide].title || "Garud Aqua"}
                                 fill
                                 className="sm:hidden object-cover object-center"
-                                loading="eager"
-                                fetchPriority="high"
                                 quality={50}
                                 sizes="(min-width: 641px) 1px, 100vw"
                             />
                         )}
                     </div>
-                ) : (
-                    /* After first transition — use framer-motion for crossfade */
-                    <AnimatePresence mode="sync">
-                        <motion.div
-                            key={currentSlide}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{
-                                opacity: { duration: 1.5, ease: [0.4, 0, 0.2, 1] },
-                            }}
-                            className="absolute inset-0"
-                        >
-                            {/* Ken Burns zoom effect */}
-                            <motion.div
-                                className="absolute inset-0"
-                                initial={{ scale: 1.0 }}
-                                animate={{ scale: 1.08 }}
-                                transition={{
-                                    duration: 8,
-                                    ease: "linear",
-                                }}
-                            >
-                                {/* Desktop Image */}
-                                <Image
-                                    src={slides[currentSlide].image}
-                                    alt={slides[currentSlide].title || "Garud Aqua"}
-                                    fill
-                                    className={`object-cover object-top ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
-                                    quality={50}
-                                    sizes={slides[currentSlide].mobileImage
-                                        ? "(max-width: 640px) 1px, 100vw"
-                                        : "100vw"}
-                                />
-                                {/* Mobile Image */}
-                                {slides[currentSlide].mobileImage && (
-                                    <Image
-                                        src={slides[currentSlide].mobileImage}
-                                        alt={slides[currentSlide].title || "Garud Aqua"}
-                                        fill
-                                        className="sm:hidden object-cover object-center"
-                                        quality={50}
-                                        sizes="(min-width: 641px) 1px, 100vw"
-                                    />
-                                )}
-                            </motion.div>
-                        </motion.div>
-                    </AnimatePresence>
                 )}
             </div>
 
@@ -182,24 +163,13 @@ export default function Hero({ initialSlides }: HeroProps) {
                                 <div className="absolute inset-0 rounded-full bg-white/40" />
 
                                 {/* Active fill with progress animation */}
-                                {index === currentSlide && !hasTransitioned ? (
+                                {index === currentSlide ? (
                                     <div
-                                        className="absolute inset-0 rounded-full bg-white"
+                                        className="absolute inset-0 rounded-full bg-white hero-progress-bar"
                                         style={{
                                             transformOrigin: "left",
                                             animation: `hero-progress ${isPaused ? 8 : 6}s linear forwards`,
                                         }}
-                                    />
-                                ) : index === currentSlide ? (
-                                    <motion.div
-                                        className="absolute inset-0 rounded-full bg-white"
-                                        initial={{ scaleX: 0 }}
-                                        animate={{ scaleX: 1 }}
-                                        transition={{
-                                            duration: isPaused ? 8 : 6,
-                                            ease: "linear",
-                                        }}
-                                        style={{ transformOrigin: "left" }}
                                     />
                                 ) : null}
                             </div>
@@ -210,9 +180,18 @@ export default function Hero({ initialSlides }: HeroProps) {
 
             {/* CSS animations for first slide (no JS needed) */}
             <style>{`
-                @keyframes hero-zoom {
-                    from { transform: scale(1); }
-                    to { transform: scale(1.08); }
+                /* No fade-in for current, only fade-out for previous */
+                .hero-fade-out {
+                    animation: hero-fadeout 1.8s cubic-bezier(0.4,0,0.2,1) both;
+                    z-index: 3;
+                }
+                @keyframes hero-fadein {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes hero-fadeout {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
                 }
                 @keyframes hero-progress {
                     from { transform: scaleX(0); }
