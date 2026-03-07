@@ -1,27 +1,23 @@
 "use client";
-import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
 export default function ThemeToggle({ className = "" }: { className?: string }) {
     const { isDark, toggleTheme } = useTheme();
 
     return (
-        <motion.button
+        <button
             onClick={toggleTheme}
-            className={`relative p-2.5 rounded-xl transition-all duration-300 ${
+            className={`relative p-2.5 rounded-xl transition-all duration-300 hover:scale-[1.08] hover:-translate-y-px active:scale-95 ${
                 isDark 
                     ? 'bg-white/8 hover:bg-white/[0.14] text-yellow-300' 
                     : 'bg-black/6 hover:bg-black/10 text-gray-700'
             } ${className}`}
-            whileHover={{ scale: 1.08, y: -1 }}
-            whileTap={{ scale: 0.95 }}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             title={isDark ? 'Light mode' : 'Dark mode'}
         >
-            <motion.div
-                initial={false}
-                animate={{ rotate: isDark ? 180 : 0 }}
-                transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            <div
+                className="transition-transform duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+                style={{ transform: isDark ? 'rotate(180deg)' : 'rotate(0deg)' }}
             >
                 {isDark ? (
                     // Sun icon
@@ -34,7 +30,7 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
                         <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 )}
-            </motion.div>
-        </motion.button>
+            </div>
+        </button>
     );
 }

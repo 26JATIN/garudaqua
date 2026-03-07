@@ -5,17 +5,35 @@ import Link from "next/link";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import { Timeline } from "@/components/ui/timeline";
 
+// Fade-up variant for above-the-fold elements — starts visible for SSR,
+// framer-motion animates if JS loads. Using whileInView ensures the content
+// is visible even without JS (initial state is shown).
+const fadeUp = {
+    hidden: { opacity: 0, y: 18 },
+    visible: { opacity: 1, y: 0 },
+};
+
 export default function AboutPage() {
     return (
         <main className="min-h-screen bg-[#0A0A0A]">
-            <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-4 sm:pt-18 pb-20">
+            {/* CSS fallback — if JS/framer-motion fails to hydrate, content becomes visible after 2s */}
+            <style>{`
+                .about-hero [style*="opacity: 0"], .about-hero [style*="opacity:0"] {
+                    animation: about-reveal 0s 2s forwards;
+                }
+                @keyframes about-reveal {
+                    to { opacity: 1 !important; transform: none !important; }
+                }
+            `}</style>
+            <section className="about-hero max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-4 sm:pt-18 pb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
                     {/* Left — headline */}
                     <div>
                         <motion.p
-                            initial={{ opacity: 0, y: 14 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial="hidden"
+                            animate="visible"
+                            variants={fadeUp}
                             transition={{ duration: 0.5 }}
                             className="text-[#38BDF8] text-sm font-medium tracking-wide mb-5"
                         >
@@ -23,8 +41,9 @@ export default function AboutPage() {
                         </motion.p>
 
                         <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial="hidden"
+                            animate="visible"
+                            variants={fadeUp}
                             transition={{ duration: 0.6, delay: 0.1 }}
                             className="text-5xl sm:text-6xl lg:text-7xl font-semibold text-white leading-[1.06] tracking-tight mb-3"
                         >
@@ -41,8 +60,9 @@ export default function AboutPage() {
                         />
 
                         <motion.p
-                            initial={{ opacity: 0, y: 18 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial="hidden"
+                            animate="visible"
+                            variants={fadeUp}
                             transition={{ duration: 0.6, delay: 0.3 }}
                             className="text-white/50 text-lg leading-relaxed max-w-md mb-3"
                         >
@@ -59,8 +79,9 @@ export default function AboutPage() {
                         </motion.p>
 
                         <motion.div
-                            initial={{ opacity: 0, y: 16 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial="hidden"
+                            animate="visible"
+                            variants={fadeUp}
                             transition={{ duration: 0.5, delay: 0.45 }}
                             className="flex flex-wrap gap-3"
                         >
@@ -80,7 +101,8 @@ export default function AboutPage() {
                     {/* Right — wobble cards grid */}
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
                         transition={{ duration: 0.7, delay: 0.2 }}
                         className="grid grid-cols-1 gap-3"
                     >

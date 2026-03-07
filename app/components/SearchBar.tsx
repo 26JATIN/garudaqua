@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import { cloudinaryUrl } from '@/lib/utils';
 
 interface Suggestion {
@@ -283,68 +282,47 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                 />
 
                 {/* Loading indicator */}
-                <AnimatePresence>
-                    {isLoading && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute right-14 top-1/2 -translate-y-1/2"
-                        >
-                            <div className="animate-spin w-4 h-4 border-2 border-[#0EA5E9] border-t-transparent rounded-full" />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                {isLoading && (
+                    <div className="absolute right-14 top-1/2 -translate-y-1/2 animate-fade-in">
+                        <div className="animate-spin w-4 h-4 border-2 border-[#0EA5E9] border-t-transparent rounded-full" />
+                    </div>
+                )}
 
                 {/* Clear button */}
-                <AnimatePresence>
-                    {searchQuery && !isLoading && (
-                        <motion.button
-                            type="button"
-                            onClick={() => {
-                                setSearchQuery('');
-                                setSuggestions([]);
-                                setIsOpen(false);
-                            }}
-                            className="absolute right-14 top-1/2 -translate-y-1/2 p-2 rounded-xl hover:bg-gray-100/80 dark:hover:bg-white/10 transition-all duration-200"
-                            title="Clear search"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                        >
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </motion.button>
-                    )}
-                </AnimatePresence>
+                {searchQuery && !isLoading && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSearchQuery('');
+                            setSuggestions([]);
+                            setIsOpen(false);
+                        }}
+                        className="absolute right-14 top-1/2 -translate-y-1/2 p-2 rounded-xl hover:bg-gray-100/80 dark:hover:bg-white/10 hover:scale-110 active:scale-90 transition-all duration-200 animate-fade-in"
+                        title="Clear search"
+                    >
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                )}
 
                 {/* Search button */}
-                <motion.button
+                <button
                     type="submit"
                     aria-label="Search"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-xl bg-[#2C2C2C] text-white hover:bg-[#0EA5E9] transition-all duration-300 shadow-md"
-                    whileHover={{ scale: 1.05, rotate: 5 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-xl bg-[#2C2C2C] text-white hover:bg-[#0EA5E9] hover:scale-105 active:scale-95 transition-all duration-300 shadow-md"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                </motion.button>
+                </button>
             </form>
 
             {/* Suggestions Dropdown */}
-            <AnimatePresence mode="wait">
-                {isOpen && (suggestions.length > 0 || isLoading) && searchQuery.trim().length >= 2 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -5 }}
-                        transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-                        className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden z-50"
-                    >
+            {isOpen && (suggestions.length > 0 || isLoading) && searchQuery.trim().length >= 2 && (
+                <div
+                    className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden z-50 animate-dropdown-in"
+                >
                         {isLoading ? (
                             <div className="py-2">
                                 {[1, 2, 3].map((i) => (
@@ -428,9 +406,8 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                                 </div>
                             </>
                         )}
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
         </div>
     );
 }

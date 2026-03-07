@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useNavbar } from '../context/NavbarContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
@@ -45,14 +44,15 @@ export default function Navbar() {
                                     href="/"
                                     className="flex items-center"
                                 >
-                                    <Image
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
                                         src="/DesktopLogo.webp"
                                         alt="Garud Aqua"
                                         width={181}
                                         height={80}
                                         className="h-20 w-auto"
                                         loading="eager"
-                                        unoptimized
+                                        decoding="async"
                                     />
                                 </Link>
                             </div>
@@ -113,14 +113,15 @@ export default function Navbar() {
                 <div className="px-4 py-2 flex items-center gap-2">
                     {/* Mobile Logo */}
                     <Link href="/" className="shrink-0">
-                        <Image
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
                             src="/MobileLogo.webp"
                             alt="Garud Aqua"
                             width={48}
                             height={48}
                             className="h-12 w-12 object-contain scale-200"
-                            priority
-                            unoptimized
+                            loading="eager"
+                            decoding="async"
                         />
                     </Link>
                     {/* Search Bar */}

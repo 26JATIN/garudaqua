@@ -130,14 +130,14 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen relative overflow-x-hidden">
-      {/* Preload first hero slide LCP image — starts fetching before JS hydration */}
+      {/* Preload first hero slide mobile image — use 100vw for full-width hero */}
       {heroSlides.length > 0 && heroSlides[0].mobileImage && (
         <link
           rel="preload"
           as="image"
           type="image/webp"
-          imageSrcSet={buildPreloadSrcSet(heroSlides[0].mobileImage, 50, [256, 384, 640])}
-          imageSizes="(min-width: 641px) 1px, 240px"
+          imageSrcSet={buildPreloadSrcSet(heroSlides[0].mobileImage, 50, [384, 640, 750])}
+          imageSizes="(min-width: 641px) 1px, 100vw"
           fetchPriority="high"
         />
       )}
@@ -146,8 +146,8 @@ export default async function Home() {
           rel="preload"
           as="image"
           type="image/webp"
-          imageSrcSet={buildPreloadSrcSet(heroSlides[0].image, 50, [640, 828, 1080, 1200])}
-          imageSizes="(max-width: 640px) 1px, 1200px"
+          imageSrcSet={buildPreloadSrcSet(heroSlides[0].image, 50, [828, 1080, 1200])}
+          imageSizes="(max-width: 640px) 1px, 100vw"
           fetchPriority="high"
         />
       )}
