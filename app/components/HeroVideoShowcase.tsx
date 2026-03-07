@@ -11,13 +11,17 @@ interface HeroVideo {
     order: number;
     isActive: boolean;
     duration: number;
-    linkedProductId: string;
+    linkedProductId: string | null;
 }
 
-export default function VideoShowcaseSection() {
-    const [videos, setVideos] = useState<HeroVideo[]>([]);
+interface VideoShowcaseProps {
+    initialVideos?: HeroVideo[];
+}
+
+export default function VideoShowcaseSection({ initialVideos }: VideoShowcaseProps) {
+    const [videos, setVideos] = useState<HeroVideo[]>(initialVideos || []);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!initialVideos || initialVideos.length === 0);
     const [isMuted, setIsMuted] = useState(true);
     const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
     const videoElementRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -36,9 +40,12 @@ export default function VideoShowcaseSection() {
         }
     }, []);
 
+    // Only fetch client-side if no initial data was provided
     useEffect(() => {
-        fetchVideos();
-    }, [fetchVideos]);
+        if (!initialVideos || initialVideos.length === 0) {
+            fetchVideos();
+        }
+    }, [fetchVideos, initialVideos]);
 
     // Auto-play videos when they come into view
     useEffect(() => {

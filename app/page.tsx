@@ -12,6 +12,9 @@ const VideoShowcaseSection = dynamic(() => import('./components/HeroVideoShowcas
 const Testimonials = dynamic(() => import('./components/Testimonials'));
 const Newsletter = dynamic(() => import('./components/Newsletter'));
 
+// ISR: serve cached page, revalidate every 60s in the background
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings | Sriganganagar",
   description:
@@ -81,10 +84,48 @@ async function getCategoryData() {
   }
 }
 
+async function getGalleryData() {
+  try {
+    const items = await prisma.galleryItem.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    });
+    return items
+      .filter(item => item.mediaType === "IMAGE")
+      .map(item => ({ image: item.mediaUrl, text: item.title }));
+  } catch {
+    return [];
+  }
+}
+
+async function getVideoData() {
+  try {
+    const videos = await prisma.heroVideo.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    });
+    return videos.map(v => ({
+      id: v.id,
+      title: v.title,
+      description: v.description,
+      videoUrl: v.videoUrl,
+      thumbnailUrl: v.thumbnailUrl,
+      order: v.order,
+      isActive: v.isActive,
+      duration: v.duration,
+      linkedProductId: v.linkedProductId,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export default async function Home() {
-  const [heroSlides, categoryData] = await Promise.all([
+  const [heroSlides, categoryData, galleryItems, videoData] = await Promise.all([
     getHeroSlides(),
     getCategoryData(),
+    getGalleryData(),
+    getVideoData(),
   ]);
 
   return (
@@ -118,8 +159,8 @@ export default async function Home() {
       {/*Category Showcase*/}
       <CategoryShowcase initialCategories={categoryData.categories} initialSubcategories={categoryData.subcategories} />
       <Benefits/>
-      <ImageGallery/>
-      <VideoShowcaseSection/>
+      <ImageGallery initialItems={galleryItems}/>
+      <VideoShowcaseSection initialVideos={videoData}/>
       <Testimonials/>
       <Newsletter/>
       <Footer/>

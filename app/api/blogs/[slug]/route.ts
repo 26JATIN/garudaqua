@@ -47,7 +47,11 @@ export async function GET(
       categoryName: r.blogCategory?.name || r.category.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase()),
     }));
 
-    return NextResponse.json({ blog: blogWithCategoryName, related: relatedWithCategoryName });
+    return NextResponse.json({ blog: blogWithCategoryName, related: relatedWithCategoryName }, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
+    });
   } catch (error) {
     console.error("Error fetching blog:", error);
     return NextResponse.json(

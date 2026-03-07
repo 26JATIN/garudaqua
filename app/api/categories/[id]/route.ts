@@ -22,7 +22,11 @@ export async function GET(
         { status: 404 }
       );
     }
-    return NextResponse.json(category);
+    return NextResponse.json(category, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
+    });
   } catch (error) {
     console.error("Error fetching category:", error);
     return NextResponse.json(

@@ -23,9 +23,13 @@ interface ApiGalleryItem {
     tags: string[];
 }
 
-export default function ImageGallery() {
-    const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+interface ImageGalleryProps {
+    initialItems?: GalleryItem[];
+}
+
+export default function ImageGallery({ initialItems }: ImageGalleryProps) {
+    const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(initialItems || []);
+    const [isLoading, setIsLoading] = useState(!initialItems || initialItems.length === 0);
 
     const fetchGallery = useCallback(async () => {
         try {
@@ -47,13 +51,16 @@ export default function ImageGallery() {
     }, []);
 
     useEffect(() => {
-        async function loadData() {
-            setIsLoading(true);
-            await fetchGallery();
-            setIsLoading(false);
+        // Only fetch client-side if no initial data was provided
+        if (!initialItems || initialItems.length === 0) {
+            async function loadData() {
+                setIsLoading(true);
+                await fetchGallery();
+                setIsLoading(false);
+            }
+            loadData();
         }
-        loadData();
-    }, [fetchGallery]);
+    }, [fetchGallery, initialItems]);
 
     if (galleryItems.length === 0) {
         return null;

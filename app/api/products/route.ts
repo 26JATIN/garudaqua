@@ -52,6 +52,10 @@ export async function GET(request: Request) {
       total,
       page,
       totalPages: Math.ceil(total / limit),
+    }, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
     });
   } catch (error) {
     console.error("Error fetching products:", error);
