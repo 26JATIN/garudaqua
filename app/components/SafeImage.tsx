@@ -26,7 +26,7 @@ export default function SafeImage({
     priority = false,
     loading = "lazy",
     fallbackSrc = "/product-placeholder.svg",
-    quality = 80,
+    quality = 60,
     sizes,
 }: SafeImageProps) {
     const [error, setError] = useState(false);

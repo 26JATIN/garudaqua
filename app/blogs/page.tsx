@@ -36,8 +36,13 @@ async function getInitialData() {
   const total = await prisma.blogPost.count({ where: { isPublished: true } });
 
   return {
-    categories: JSON.parse(JSON.stringify(categories)),
-    blogs: JSON.parse(JSON.stringify(blogsData)),
+    categories,
+    blogs: blogsData.map((b) => ({
+      ...b,
+      createdAt: b.createdAt.toISOString(),
+      updatedAt: b.updatedAt.toISOString(),
+      publishedAt: b.publishedAt ? b.publishedAt.toISOString() : new Date().toISOString(),
+    })),
     total,
     totalPages: Math.ceil(total / 10),
   };

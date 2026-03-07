@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { useAnimateOnView } from "@/lib/useAnimateOnView";
 
 interface HeroVideo {
     id: string;
@@ -26,6 +26,8 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
     const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
     const videoElementRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const ref = useAnimateOnView();
 
     const fetchVideos = useCallback(async () => {
         try {
@@ -112,36 +114,27 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
     if (videos.length === 0) return null;
 
     return (
-        <section className="py-20 bg-linear-to-b from-gray-50 to-white dark:from-black dark:to-[#0A0A0A] overflow-hidden">
+        <section ref={ref as React.RefObject<HTMLElement>} className="py-20 bg-linear-to-b from-gray-50 to-white dark:from-black dark:to-[#0A0A0A] overflow-hidden">
             <div className="container mx-auto px-4">
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
-                >
+                <div className="animate-on-view text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-light text-gray-900 dark:text-gray-100 mb-4">
                         Products in <span className="text-[#0EA5E9]">Action</span>
                     </h2>
                     <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                         See our water tanks and piping solutions showcased in real-world applications
                     </p>
-                </motion.div>
+                </div>
 
                 {/* Video Carousel */}
                 <div className="relative">
                     <div ref={scrollContainerRef} className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 px-4 md:px-0" style={{ scrollbarWidth: "none" }}>
                         {videos.map((video, index) => (
-                            <motion.div
+                            <div
                                 key={video.id}
                                 ref={(el: HTMLDivElement | null) => { videoRefs.current[index] = el; }}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className="shrink-0 snap-center w-70 md:w-80 lg:w-90"
+                                className="animate-on-view shrink-0 snap-center w-70 md:w-80 lg:w-90"
+                                style={{ animationDelay: `${index * 0.1}s` }}
                             >
                                 <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl aspect-9/16 group">
                                     {/* Video Player */}
@@ -196,7 +189,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                                         {String(index + 1).padStart(2, "0")} / {String(videos.length).padStart(2, "0")}
                                     </span>
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
 
@@ -228,13 +221,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                 </div>
 
                 {/* CTA */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                    className="text-center mt-16"
-                >
+                <div className="animate-on-view text-center mt-16" style={{ animationDelay: '0.3s' }}>
                     <a
                         href="/products"
                         className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 group"
@@ -244,7 +231,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </a>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

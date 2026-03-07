@@ -11,6 +11,6 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function cloudinaryUrl(src: string, width: number, quality: number = 80): string {
   if (!src || !src.includes("res.cloudinary.com")) return src;
-  const params = `w_${width},q_${quality},f_webp,c_fill`;
+  const params = `w_${width},q_${quality},f_auto,c_fill`;
   return src.replace("/upload/", `/upload/${params}/`);
 }

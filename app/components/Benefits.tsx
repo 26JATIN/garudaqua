@@ -1,8 +1,10 @@
 "use client";
-import { motion } from "framer-motion";
 import React from "react";
+import { useAnimateOnView } from "@/lib/useAnimateOnView";
 
 export default function Benefits() {
+    const ref = useAnimateOnView();
+
     const benefits: { id: number; title: string; description: string; details: string; icon: React.ReactNode; color: string }[] = [
         {
             id: 1,
@@ -55,7 +57,7 @@ export default function Benefits() {
     ];
 
     return (
-        <section className="py-20 lg:py-32 relative overflow-hidden">
+        <section ref={ref as React.RefObject<HTMLElement>} className="py-20 lg:py-32 relative overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0 bg-linear-to-br from-white via-[#FAFAFA] to-[#F0F9FF] dark:from-black dark:via-[#050505] dark:to-[#0A0A0A]" />
 
@@ -67,13 +69,7 @@ export default function Benefits() {
 
             <div className="max-w-7xl mx-auto px-4 relative z-10">
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-16 lg:mb-20"
-                >
+                <div className="animate-on-view text-center mb-16 lg:mb-20">
                     <div className="inline-block mb-6">
                         <div className="text-sm md:text-base text-[#0EA5E9] font-light tracking-[0.2em] uppercase relative">
                             Why Choose Garud Aqua
@@ -86,18 +82,15 @@ export default function Benefits() {
                     <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 font-light max-w-3xl mx-auto leading-relaxed">
                         Trusted water storage and plumbing solutions backed by quality, service, and expertise.
                     </p>
-                </motion.div>
+                </div>
 
                 {/* Benefits Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
                     {benefits.map((benefit, index) => (
-                        <motion.div
+                        <div
                             key={benefit.id}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            viewport={{ once: true }}
-                            className="group relative"
+                            className={`animate-on-view group relative`}
+                            style={{ animationDelay: `${index * 0.1}s` }}
                         >
                             <div className="relative bg-white dark:bg-[#0A0A0A] rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-white/6 group-hover:border-[#0EA5E9]/30 h-full">
                                 {/* Icon */}
@@ -130,18 +123,12 @@ export default function Benefits() {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 
                 {/* Bottom CTA */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.6 }}
-                    viewport={{ once: true }}
-                    className="text-center mt-16"
-                >
+                <div className="animate-on-view text-center mt-16" style={{ animationDelay: '0.6s' }}>
                     <p className="text-lg text-gray-600 dark:text-gray-400 font-light mb-6">
                         Join hundreds of dealers and builders who rely on Garud Aqua for quality products
                     </p>
@@ -157,7 +144,7 @@ export default function Benefits() {
                             Trusted by 500+ dealers nationwide
                         </span>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

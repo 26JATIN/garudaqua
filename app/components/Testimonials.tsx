@@ -1,6 +1,6 @@
 "use client";
-import { motion } from "framer-motion";
 import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
+import { useAnimateOnView } from "@/lib/useAnimateOnView";
 
 export default function Testimonials() {
     const testimonials = [
@@ -142,8 +142,10 @@ export default function Testimonials() {
         purchase: testimonial.purchase,
     }));
 
+    const ref = useAnimateOnView();
+
     return (
-        <section className="py-20 lg:py-32 relative overflow-hidden">
+        <section ref={ref as React.RefObject<HTMLElement>} className="py-20 lg:py-32 relative overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0 bg-linear-to-br from-[#FAFAFA] via-white to-[#F0F9FF] dark:from-black dark:via-[#050505] dark:to-[#0A0A0A]" />
 
@@ -155,13 +157,7 @@ export default function Testimonials() {
 
             <div className="max-w-7xl mx-auto px-4 relative z-10">
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-16 lg:mb-20"
-                >
+                <div className="animate-on-view text-center mb-16 lg:mb-20">
                     <div className="inline-block mb-6">
                         <div className="text-sm md:text-base text-[#0EA5E9] font-light tracking-[0.2em] uppercase relative">
                             Testimonials
@@ -174,43 +170,27 @@ export default function Testimonials() {
                     <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 font-light max-w-3xl mx-auto leading-relaxed">
                         Hear from the contractors, dealers, and builders who rely on Garud Aqua for quality water storage and plumbing solutions.
                     </p>
-                </motion.div>
+                </div>
 
                 {/* Stats Row */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    viewport={{ once: true }}
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-16"
-                >
+                <div className="animate-on-view grid grid-cols-2 lg:grid-cols-4 gap-8 mb-16" style={{ animationDelay: '0.2s' }}>
                     {stats.map((stat, index) => (
-                        <motion.div
+                        <div
                             key={index}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            viewport={{ once: true }}
                             className="text-center group"
                         >
                             <h3 className="text-3xl lg:text-4xl font-light text-[#0EA5E9] mb-2 group-hover:scale-110 transition-transform duration-300">
                                 {stat.number}
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400 font-light">{stat.label}</p>
-                        </motion.div>
+                        </div>
                     ))}
-                </motion.div>
+                </div>
 
                 {/* Infinite Moving Cards - Testimonials */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4 }}
-                    viewport={{ once: true }}
-                    className="mb-12"
-                >
+                <div className="animate-on-view mb-12" style={{ animationDelay: '0.4s' }}>
                     <InfiniteMovingCards items={formattedTestimonials} direction="left" speed="slow" pauseOnHover={true} />
-                </motion.div>
+                </div>
             </div>
         </section>
     );

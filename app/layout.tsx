@@ -3,7 +3,6 @@ import "./globals.css";
 import { NavbarProvider } from "./context/NavbarContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import ConditionalNavbar from "./components/ConditionalNavbar";
-import Providers from "./components/Providers";
 import { Toaster } from "sonner";
 import ThemeToaster from "./components/ThemeToaster";
 import PWARegister from "./components/PWARegister";
@@ -193,19 +192,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })();
         `}} />
       </head>
-      <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+      <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100">
         <PWARegister />
-        <Providers>
+        <ThemeProvider>
           <ThemeToaster />
-          <ThemeProvider>
-            <NavbarProvider>
-              <ConditionalNavbar />
-              <main>
-                {children}
-              </main>
-            </NavbarProvider>
-          </ThemeProvider>
-        </Providers>
+          <NavbarProvider>
+            <ConditionalNavbar />
+            <main>
+              {children}
+            </main>
+          </NavbarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -56,16 +56,7 @@ export const InfiniteMovingCards = ({
   }, [speed]);
 
   const addAnimation = useCallback(() => {
-    if (containerRef.current && scrollerRef.current) {
-      const scrollerContent = Array.from(scrollerRef.current.children);
-
-      scrollerContent.forEach((item) => {
-        const duplicatedItem = item.cloneNode(true);
-        if (scrollerRef.current) {
-          scrollerRef.current.appendChild(duplicatedItem);
-        }
-      });
-
+    if (containerRef.current) {
       getDirection();
       getSpeed();
       setStart(true);
@@ -92,7 +83,7 @@ export const InfiniteMovingCards = ({
           pauseOnHover && "hover:paused"
         )}
       >
-        {items.map((item, idx) => (
+        {[...items, ...items].map((item, idx) => (
           <li
             className="relative w-70 sm:w-80 md:w-95 lg:w-105 max-w-full shrink-0 rounded-3xl border border-gray-100 dark:border-white/6 bg-white dark:bg-[#0A0A0A] px-4 sm:px-6 md:px-8 py-5 sm:py-6 md:py-8 group hover:border-[#0EA5E9]/30 transition-all duration-500 shadow-lg hover:shadow-2xl"
             key={`${item.name}-${idx}`}

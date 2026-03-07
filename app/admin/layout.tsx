@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ManifestOverride from "../components/ManifestOverride";
+import Providers from "../components/Providers";
 
 export const metadata: Metadata = {
   title: {
@@ -20,13 +21,13 @@ export default function AdminRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <Providers>
       <ManifestOverride
         manifestHref="/admin-manifest.json"
         themeColor="#0f172a"
         appName="GA Admin"
       />
       {children}
-    </>
+    </Providers>
   );
 }

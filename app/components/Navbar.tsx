@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useNavbar } from '../context/NavbarContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
@@ -29,8 +30,6 @@ export default function Navbar() {
                 <div
                     className="backdrop-blur-xl backdrop-saturate-200 border-b transition-[background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
                     style={{
-                        WebkitBackdropFilter: "blur(24px) saturate(200%)",
-                        backdropFilter: "blur(24px) saturate(200%)",
                         backgroundColor: visible ? "var(--navbar-bg-scroll)" : "var(--navbar-bg)",
                         borderBottomColor: visible ? "var(--navbar-border-scroll)" : "var(--navbar-border)",
                         boxShadow: visible ? "var(--navbar-shadow-scroll)" : "var(--navbar-shadow)"
@@ -44,15 +43,13 @@ export default function Navbar() {
                                     href="/"
                                     className="flex items-center"
                                 >
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
+                                    <Image
                                         src="/DesktopLogo.webp"
                                         alt="Garud Aqua"
                                         width={181}
                                         height={80}
                                         className="h-20 w-auto"
-                                        loading="eager"
-                                        decoding="async"
+                                        priority
                                     />
                                 </Link>
                             </div>
@@ -105,23 +102,19 @@ export default function Navbar() {
                 className={`lg:hidden fixed top-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-b border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
                     backgroundColor: "var(--navbar-bg)",
-                    WebkitBackdropFilter: "blur(24px) saturate(200%)",
-                    backdropFilter: "blur(24px) saturate(200%)",
                     boxShadow: "var(--navbar-shadow)"
                 }}
             >
                 <div className="px-4 py-2 flex items-center gap-2">
                     {/* Mobile Logo */}
                     <Link href="/" className="shrink-0">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <Image
                             src="/MobileLogo.webp"
                             alt="Garud Aqua"
                             width={48}
                             height={48}
                             className="h-12 w-12 object-contain scale-200"
-                            loading="eager"
-                            decoding="async"
+                            priority
                         />
                     </Link>
                     {/* Search Bar */}
@@ -138,8 +131,6 @@ export default function Navbar() {
                 className={`lg:hidden fixed bottom-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
                     backgroundColor: "var(--navbar-bg)",
-                    WebkitBackdropFilter: "blur(24px) saturate(200%)",
-                    backdropFilter: "blur(24px) saturate(200%)",
                     boxShadow: "var(--navbar-shadow)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)",
                 }}

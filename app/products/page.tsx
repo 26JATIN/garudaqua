@@ -20,7 +20,7 @@ export const revalidate = 60; // ISR: revalidate every 60 seconds
 // Build a Cloudinary URL for preloading (same logic as cloudinary-loader)
 function buildPreloadUrl(src: string, width: number, quality: number) {
   if (!src.includes('res.cloudinary.com')) return src;
-  const params = `w_${width},q_${quality},f_webp,c_limit`;
+  const params = `w_${width},q_${quality},f_auto,c_limit`;
   return src.replace('/upload/', `/upload/${params}/`);
 }
 
@@ -63,11 +63,14 @@ async function getInitialData() {
     }),
   ]);
 
-  // Serialize dates/ObjectIds to plain JSON
+  // These queries use `select` so data is already plain (no Date fields to serialize)
   return {
-    categories: JSON.parse(JSON.stringify(categories)),
-    subcategories: JSON.parse(JSON.stringify(subcategories)),
-    products: JSON.parse(JSON.stringify(productData)),
+    categories,
+    subcategories,
+    products: productData.map((p) => ({
+      ...p,
+      subcategory: p.subcategory ?? undefined,
+    })),
   };
 }
 
@@ -88,7 +91,6 @@ export default async function Page({
             key={`preload-${product.id}`}
             rel="preload"
             as="image"
-            type="image/webp"
             imageSrcSet={buildPreloadSrcSet(product.image, 50)}
             imageSizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             fetchPriority={i === 0 ? "high" : "auto"}

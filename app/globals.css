@@ -37,19 +37,6 @@
   --destructive: oklch(0.577 0.245 27.325);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
 
   /* Brand Color Palette — Aqua Blue */
   --brand-primary: #0EA5E9;
@@ -95,14 +82,6 @@
   --destructive: oklch(0.704 0.191 22.216);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 
   /* Navbar glass - dark */
   --navbar-bg: rgba(0, 0, 0, 0.75);
@@ -120,16 +99,6 @@
   --pwa-bottom-bg: #000000;
 
   color-scheme: dark;
-
-  --chart-1: oklch(0.488 0.243 264.376);
-
-  --chart-2: oklch(0.696 0.17 162.48);
-
-  --chart-3: oklch(0.769 0.188 70.08);
-
-  --chart-4: oklch(0.627 0.265 303.9);
-
-  --chart-5: oklch(0.645 0.246 16.439);
 }
 
 body {
@@ -992,4 +961,87 @@ textarea:focus-visible {
 }
 .animate-dropdown-in {
   animation: dropdown-in 0.2s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+
+/* ===== CSS IntersectionObserver-triggered animations (replaces framer-motion whileInView) ===== */
+@keyframes view-fade-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes view-fade-left {
+  from { opacity: 0; transform: translateX(-50px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes view-fade-right {
+  from { opacity: 0; transform: translateX(50px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes view-scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes view-scale-up {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Elements start hidden, animate when .is-visible is added via IntersectionObserver */
+.animate-on-view {
+  opacity: 0;
+}
+.animate-on-view.is-visible {
+  animation: view-fade-up 0.6s ease-out both;
+}
+.animate-on-view-left {
+  opacity: 0;
+}
+.animate-on-view-left.is-visible {
+  animation: view-fade-left 0.8s ease-out both;
+}
+.animate-on-view-right {
+  opacity: 0;
+}
+.animate-on-view-right.is-visible {
+  animation: view-fade-right 0.8s ease-out both;
+}
+.animate-on-view-scale {
+  opacity: 0;
+}
+.animate-on-view-scale.is-visible {
+  animation: view-scale-in 0.5s ease-out both;
+}
+
+/* Stagger delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+
+/* Particle animation pure CSS replacement */
+@keyframes particle-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.2; }
+  50%      { transform: scale(1.5); opacity: 0.5; }
+}
+
+/* Orbit animations for Newsletter visual */
+@keyframes orbit-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes orbit-ccw {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-view,
+  .animate-on-view-left,
+  .animate-on-view-right,
+  .animate-on-view-scale {
+    opacity: 1;
+    animation: none !important;
+  }
 }

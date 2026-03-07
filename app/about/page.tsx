@@ -1,90 +1,41 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import { Timeline } from "@/components/ui/timeline";
-
-// Fade-up variant for above-the-fold elements — starts visible for SSR,
-// framer-motion animates if JS loads. Using whileInView ensures the content
-// is visible even without JS (initial state is shown).
-const fadeUp = {
-    hidden: { opacity: 0, y: 18 },
-    visible: { opacity: 1, y: 0 },
-};
+import { useAnimateOnView } from "@/lib/useAnimateOnView";
 
 export default function AboutPage() {
+    const ref = useAnimateOnView();
+
     return (
-        <main className="min-h-screen bg-[#0A0A0A]">
-            {/* CSS fallback — if JS/framer-motion fails to hydrate, content becomes visible after 2s */}
-            <style>{`
-                .about-hero [style*="opacity: 0"], .about-hero [style*="opacity:0"] {
-                    animation: about-reveal 0s 2s forwards;
-                }
-                @keyframes about-reveal {
-                    to { opacity: 1 !important; transform: none !important; }
-                }
-            `}</style>
+        <main ref={ref as React.RefObject<HTMLElement>} className="min-h-screen bg-[#0A0A0A]">
             <section className="about-hero max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-4 sm:pt-18 pb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
                     {/* Left — headline */}
-                    <div>
-                        <motion.p
-                            initial="hidden"
-                            animate="visible"
-                            variants={fadeUp}
-                            transition={{ duration: 0.5 }}
-                            className="text-[#38BDF8] text-sm font-medium tracking-wide mb-5"
-                        >
+                    <div className="animate-on-view-left">
+                        <p className="text-[#38BDF8] text-sm font-medium tracking-wide mb-5">
                             GARUD AQUA SOLUTIONS · SRIGANGANAGAR, INDIA
-                        </motion.p>
+                        </p>
 
-                        <motion.h1
-                            initial="hidden"
-                            animate="visible"
-                            variants={fadeUp}
-                            transition={{ duration: 0.6, delay: 0.1 }}
-                            className="text-5xl sm:text-6xl lg:text-7xl font-semibold text-white leading-[1.06] tracking-tight mb-3"
-                        >
+                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold text-white leading-[1.06] tracking-tight mb-3">
                             Garud Aqua
                             <br />
                             Solutions
-                        </motion.h1>
+                        </h1>
 
-                        <motion.div
-                            initial={{ opacity: 0, scaleX: 0 }}
-                            animate={{ opacity: 1, scaleX: 1 }}
-                            transition={{ duration: 0.5, delay: 0.25 }}
-                            className="origin-left w-16 h-0.5 bg-[#0EA5E9] mb-6"
-                        />
+                        <div className="w-16 h-0.5 bg-[#0EA5E9] mb-6" />
 
-                        <motion.p
-                            initial="hidden"
-                            animate="visible"
-                            variants={fadeUp}
-                            transition={{ duration: 0.6, delay: 0.3 }}
-                            className="text-white/50 text-lg leading-relaxed max-w-md mb-3"
-                        >
+                        <p className="text-white/50 text-lg leading-relaxed max-w-md mb-3">
                             Trusted manufacturer, retailer, and wholesale supplier of water storage tanks, sprayer tanks, and CPVC/PVC piping systems.
-                        </motion.p>
+                        </p>
 
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                            className="text-white/30 text-xs font-medium tracking-widest uppercase mb-8"
-                        >
+                        <p className="text-white/30 text-xs font-medium tracking-widest uppercase mb-8">
                             Since 2014 · Rajasthan, India
-                        </motion.p>
+                        </p>
 
-                        <motion.div
-                            initial="hidden"
-                            animate="visible"
-                            variants={fadeUp}
-                            transition={{ duration: 0.5, delay: 0.45 }}
-                            className="flex flex-wrap gap-3"
-                        >
+                        <div className="flex flex-wrap gap-3">
                             <Link href="/products"
                                 className="px-6 py-3 bg-white text-black text-sm font-semibold rounded-full hover:bg-white/90 transition-colors"
                             >
@@ -95,17 +46,11 @@ export default function AboutPage() {
                             >
                                 Contact Us
                             </Link>
-                        </motion.div>
+                        </div>
                     </div>
 
                     {/* Right — wobble cards grid */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.7, delay: 0.2 }}
-                        className="grid grid-cols-1 gap-3"
-                    >
+                    <div className="animate-on-view-right grid grid-cols-1 gap-3">
                         {/* Top card — company card */}
                         <WobbleCard containerClassName="bg-[#1a237e]">
                             <div className="flex items-start justify-between mb-6">
@@ -162,25 +107,20 @@ export default function AboutPage() {
                                 ))}
                             </div>
                         </WobbleCard>
-                    </motion.div>
+                    </div>
                 </div>
             </section>
 
             {/* Mission statement — full-width teal card */}
             <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pb-6">
-                <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                >
+                <div className="animate-on-view">
                     <WobbleCard containerClassName="bg-[linear-gradient(135deg,#0a7c6e,#0e7490,#0e6fa5)] w-full">
                         <p className="text-white font-bold text-2xl sm:text-3xl lg:text-[2.6rem] leading-[1.2] max-w-4xl">
                             Our mission is to deliver reliable, high-quality water management
                             solutions that empower farmers, businesses, and households across India.
                         </p>
                     </WobbleCard>
-                </motion.div>
+                </div>
             </section>
 
             {/* How We Help — left heading + right service cards */}
@@ -188,17 +128,11 @@ export default function AboutPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10 items-start">
 
                     {/* Left heading */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
-                        className="lg:sticky lg:top-32"
-                    >
+                    <div className="animate-on-view lg:sticky lg:top-32">
                         <h2 className="text-white font-bold text-4xl sm:text-5xl leading-[1.1]">
                             How Can We<br />Help You?
                         </h2>
-                    </motion.div>
+                    </div>
 
                     {/* Right — service cards grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -253,13 +187,10 @@ export default function AboutPage() {
                                 cta: "Get a Quote",
                             },
                         ].map((item, i) => (
-                            <motion.div
+                            <div
                                 key={item.title}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: i * 0.08 }}
-                                className="bg-[#111111] rounded-2xl p-6 flex flex-col gap-5 min-h-65"
+                                className="animate-on-view bg-[#111111] rounded-2xl p-6 flex flex-col gap-5 min-h-65"
+                                style={{ animationDelay: `${i * 0.08}s` }}
                             >
                                 {/* Icon */}
                                 <div
@@ -285,7 +216,7 @@ export default function AboutPage() {
                                         <span className="text-black/40 font-normal">✕</span>
                                     </Link>
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -477,13 +408,7 @@ export default function AboutPage() {
             <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pb-24">
 
                 {/* Eyebrow + heading */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                    className="text-center mb-12"
-                >
+                <div className="animate-on-view text-center mb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs font-medium tracking-widest uppercase mb-8">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
                         Get in Touch
@@ -499,15 +424,10 @@ export default function AboutPage() {
                         Whether you need bulk pricing, product advice, or simply want to know more about what we do —{" "}
                         <span className="text-white/80 font-semibold">we&apos;d love to hear from you.</span>
                     </p>
-                </motion.div>
+                </div>
 
                 {/* CTA card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.1 }}
-                >
+                <div className="animate-on-view" style={{ animationDelay: '0.1s' }}>
                     <WobbleCard containerClassName="bg-[linear-gradient(135deg,#3730a3,#4f46e5,#6d28d9)] w-full">
                         <div className="flex flex-col items-center text-center gap-6 py-4">
                             <p className="text-white font-bold text-2xl sm:text-3xl">
@@ -532,7 +452,7 @@ export default function AboutPage() {
                             </div>
                         </div>
                     </WobbleCard>
-                </motion.div>
+                </div>
             </section>
         </main>
     );
