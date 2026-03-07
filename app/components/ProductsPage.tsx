@@ -91,6 +91,8 @@ export default function ProductsPage({
         search: initialSearchParams?.search || "",
         sort: initialSearchParams?.sort || "featured",
     });
+    // Once any filter is changed from initial values, always fetch on subsequent changes
+    const filtersEverChangedRef = useRef(false);
 
     // Fetch categories on mount (skip if server-provided)
     useEffect(() => {
@@ -147,7 +149,7 @@ export default function ProductsPage({
 
     // Fetch products when filters change (skip if values match server-provided initial data)
     useEffect(() => {
-        if (hasInitialData) {
+        if (hasInitialData && !filtersEverChangedRef.current) {
             const init = initialFiltersRef.current;
             const filtersUnchanged =
                 selectedCategory === init.category &&
@@ -155,6 +157,8 @@ export default function ProductsPage({
                 searchTerm === init.search &&
                 sortBy === init.sort;
             if (filtersUnchanged) return;
+            // Filters have changed from initial — mark so we always fetch from now on
+            filtersEverChangedRef.current = true;
         }
 
         async function fetchProducts() {
