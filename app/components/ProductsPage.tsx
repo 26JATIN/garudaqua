@@ -84,7 +84,13 @@ export default function ProductsPage({
     const productsGridRef = useRef<HTMLDivElement>(null);
     const categoryScrollRef = useRef<HTMLDivElement>(null);
     const subcategoryScrollRef = useRef<HTMLDivElement>(null);
-    const isInitialMount = useRef(hasInitialData);
+    // Track whether filters have actually changed from their initial values
+    const initialFiltersRef = useRef({
+        category: initialSearchParams?.category || "all",
+        subcategory: initialSearchParams?.subcategory || "All",
+        search: initialSearchParams?.search || "",
+        sort: initialSearchParams?.sort || "featured",
+    });
 
     // Fetch categories on mount (skip if server-provided)
     useEffect(() => {
@@ -139,11 +145,16 @@ export default function ProductsPage({
         return () => window.removeEventListener("popstate", handlePopState);
     }, []);
 
-    // Fetch products when filters change (skip first render if server-provided)
+    // Fetch products when filters change (skip if values match server-provided initial data)
     useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
+        if (hasInitialData) {
+            const init = initialFiltersRef.current;
+            const filtersUnchanged =
+                selectedCategory === init.category &&
+                selectedSubcategory === init.subcategory &&
+                searchTerm === init.search &&
+                sortBy === init.sort;
+            if (filtersUnchanged) return;
         }
 
         async function fetchProducts() {
@@ -619,7 +630,7 @@ export default function ProductsPage({
                 </div>
 
                 {/* Products Grid/List */}
-                {loadingProducts ? (
+                {loadingProducts && products.length === 0 ? (
                     <ProductsLoadingSkeleton />
                 ) : products.length === 0 ? (
                     <div
@@ -640,20 +651,22 @@ export default function ProductsPage({
                         </p>
                     </div>
                 ) : (
-                    <div
-                        className={
-                                viewMode === "grid"
-                                    ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8"
-                                    : "space-y-4"
-                            }
-                        >
-                            {products.map((product, index) =>
-                                viewMode === "grid" ? (
-                                    <ProductCard key={product.id} product={product} index={index} />
-                                ) : (
-                                    <ProductListItem key={product.id} product={product} index={index} />
-                                )
-                            )}
+                    <div className={`relative ${loadingProducts ? "opacity-50 pointer-events-none" : ""} transition-opacity duration-200`}>
+                        <div
+                            className={
+                                    viewMode === "grid"
+                                        ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8"
+                                        : "space-y-4"
+                                }
+                            >
+                                {products.map((product, index) =>
+                                    viewMode === "grid" ? (
+                                        <ProductCard key={product.id} product={product} index={index} />
+                                    ) : (
+                                        <ProductListItem key={product.id} product={product} index={index} />
+                                    )
+                                )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -681,8 +694,8 @@ function ProductCard({ product, index }: ProductCardProps) {
                                 className="object-cover transform group-hover:scale-110 transition-transform duration-700"
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                 quality={50}
-                                priority={index < 2}
-                                loading={index < 2 ? undefined : "lazy"}
+                                priority={index < 4}
+                                loading={index < 4 ? "eager" : "lazy"}
                             />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center">
