@@ -1,41 +1,31 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useNavbar } from '../context/NavbarContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
-import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 
 export default function Navbar() {
     const { isNavbarHidden } = useNavbar();
     const [visible, setVisible] = useState(false);
     const ref = useRef<HTMLElement>(null);
-    const { scrollY } = useScroll();
 
     // Track scroll position for floating effect
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        if (latest > 100) {
-            setVisible(true);
-        } else {
-            setVisible(false);
-        }
-    });
+    useEffect(() => {
+        const handleScroll = () => {
+            setVisible(window.scrollY > 100);
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
         <>
             {/* Desktop Navbar - Enhanced Apple Liquid Glass Effect */}
-            <motion.nav
+            <nav
                 ref={ref}
-                className="fixed inset-x-0 top-0 z-100 hidden lg:block"
-                animate={{
-                    y: isNavbarHidden ? -100 : 0,
-                    opacity: isNavbarHidden ? 0 : 1
-                }}
-                transition={{
-                    duration: 0.3,
-                    ease: [0.25, 0.1, 0.25, 1]
-                }}
+                className={`fixed inset-x-0 top-0 z-100 hidden lg:block transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
             >
                 <div
                     className="backdrop-blur-xl backdrop-saturate-200 border-b transition-[background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
@@ -50,10 +40,7 @@ export default function Navbar() {
                     <div className="max-w-7xl mx-auto px-6 py-1">
                         <div className="flex items-center justify-between">
                             {/* Logo */}
-                            <motion.div
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
+                            <div className="transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]">
                                 <Link
                                     href="/"
                                     className="flex items-center"
@@ -68,7 +55,7 @@ export default function Navbar() {
                                         unoptimized
                                     />
                                 </Link>
-                            </motion.div>
+                            </div>
 
                             {/* Center Search Bar */}
                             <div className="flex-1 max-w-xl mx-12 flex items-center gap-2">
@@ -111,24 +98,16 @@ export default function Navbar() {
                         </div>
                     </div>
                 </div>
-            </motion.nav>
+            </nav>
 
             {/* Mobile Top Search Bar - Enhanced Apple Liquid Glass Effect */}
-            <motion.div
-                className="lg:hidden fixed top-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-b border-(--navbar-border)"
+            <div
+                className={`lg:hidden fixed top-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-b border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
                     backgroundColor: "var(--navbar-bg)",
                     WebkitBackdropFilter: "blur(24px) saturate(200%)",
                     backdropFilter: "blur(24px) saturate(200%)",
                     boxShadow: "var(--navbar-shadow)"
-                }}
-                animate={{
-                    y: isNavbarHidden ? -100 : 0,
-                    opacity: isNavbarHidden ? 0 : 1
-                }}
-                transition={{
-                    duration: 0.3,
-                    ease: [0.25, 0.1, 0.25, 1]
                 }}
             >
                 <div className="px-4 py-2 flex items-center gap-2">
@@ -151,11 +130,11 @@ export default function Navbar() {
                     {/* Theme Toggle */}
                     <ThemeToggle />
                 </div>
-            </motion.div>
+            </div>
 
             {/* Mobile Bottom Navigation - Enhanced Apple Liquid Glass Effect */}
-            <motion.div
-                className="lg:hidden fixed bottom-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border)"
+            <div
+                className={`lg:hidden fixed bottom-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
                     backgroundColor: "var(--navbar-bg)",
                     WebkitBackdropFilter: "blur(24px) saturate(200%)",
@@ -163,18 +142,10 @@ export default function Navbar() {
                     boxShadow: "var(--navbar-shadow)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)",
                 }}
-                animate={{
-                    y: isNavbarHidden ? 100 : 0,
-                    opacity: isNavbarHidden ? 0 : 1
-                }}
-                transition={{
-                    duration: 0.3,
-                    ease: [0.25, 0.1, 0.25, 1]
-                }}
             >
                 <div className="flex items-center justify-around py-1.5">
                     {/* Home */}
-                    <motion.div whileTap={{ scale: 0.92 }}>
+                    <div className="transition-transform duration-100 active:scale-[0.92]">
                         <Link href="/" className="flex flex-col items-center px-3 py-1 space-y-0.5">
                             <div className="p-1.5 rounded-xl">
                                 <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,10 +154,10 @@ export default function Navbar() {
                             </div>
                             <span className="text-[10px] text-(--nav-text-muted) font-medium">Home</span>
                         </Link>
-                    </motion.div>
+                    </div>
 
                     {/* Browse */}
-                    <motion.div whileTap={{ scale: 0.92 }}>
+                    <div className="transition-transform duration-100 active:scale-[0.92]">
                         <Link href="/products" className="flex flex-col items-center px-3 py-1 space-y-0.5">
                             <div className="p-1.5 rounded-xl">
                                 <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,10 +166,10 @@ export default function Navbar() {
                             </div>
                             <span className="text-[10px] text-(--nav-text-muted) font-medium">Products</span>
                         </Link>
-                    </motion.div>
+                    </div>
 
                     {/* Blog */}
-                    <motion.div whileTap={{ scale: 0.92 }}>
+                    <div className="transition-transform duration-100 active:scale-[0.92]">
                         <Link href="/blogs" className="flex flex-col items-center px-3 py-1 space-y-0.5">
                             <div className="p-1.5 rounded-xl">
                                 <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,10 +178,10 @@ export default function Navbar() {
                             </div>
                             <span className="text-[10px] text-(--nav-text-muted) font-medium">Blog</span>
                         </Link>
-                    </motion.div>
+                    </div>
 
                     {/* About */}
-                    <motion.div whileTap={{ scale: 0.92 }}>
+                    <div className="transition-transform duration-100 active:scale-[0.92]">
                         <Link href="/about" className="flex flex-col items-center px-3 py-1 space-y-0.5">
                             <div className="p-1.5 rounded-xl">
                                 <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,9 +190,9 @@ export default function Navbar() {
                             </div>
                             <span className="text-[10px] text-(--nav-text-muted) font-medium">About</span>
                         </Link>
-                    </motion.div>
+                    </div>
                 </div>
-            </motion.div>
+            </div>
         </>
     );
 }
