@@ -32,7 +32,28 @@ function buildPreloadSrcSet(src: string, quality: number) {
     .join(', ');
 }
 
-async function getInitialData() {
+async function getInitialData(filters: {
+  category?: string;
+  subcategory?: string;
+  search?: string;
+  sort?: string;
+}) {
+  const where: Record<string, unknown> = { isActive: true };
+
+  if (filters.category) where.categoryId = filters.category;
+  if (filters.subcategory) where.subcategoryId = filters.subcategory;
+  if (filters.search) {
+    where.OR = [
+      { name: { contains: filters.search, mode: 'insensitive' } },
+      { description: { contains: filters.search, mode: 'insensitive' } },
+    ];
+  }
+
+  const orderBy =
+    filters.sort === 'newest'
+      ? [{ createdAt: 'desc' as const }]
+      : [{ category: { sortOrder: 'asc' as const } }, { createdAt: 'desc' as const }];
+
   const [categories, subcategories, productData] = await Promise.all([
     prisma.category.findMany({
       where: { isActive: true },
@@ -50,8 +71,8 @@ async function getInitialData() {
       },
     }),
     prisma.product.findMany({
-      where: { isActive: true },
-      orderBy: [{ category: { sortOrder: 'asc' } }, { createdAt: 'desc' }],
+      where,
+      orderBy,
       take: 200,
       select: {
         id: true,
@@ -63,7 +84,6 @@ async function getInitialData() {
     }),
   ]);
 
-  // These queries use `select` so data is already plain (no Date fields to serialize)
   return {
     categories,
     subcategories,
@@ -80,7 +100,11 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  const { categories, subcategories, products } = await getInitialData();
+  const category = typeof params.category === 'string' ? params.category : undefined;
+  const subcategory = typeof params.subcategory === 'string' ? params.subcategory : undefined;
+  const search = typeof params.search === 'string' ? params.search : undefined;
+  const sort = typeof params.sort === 'string' ? params.sort : undefined;
+  const { categories, subcategories, products } = await getInitialData({ category, subcategory, search, sort });
 
   return (
     <>
@@ -102,12 +126,7 @@ export default async function Page({
         initialSubcategories={subcategories}
         initialProducts={products}
         initialTotal={products.length}
-        initialSearchParams={{
-          category: typeof params.category === 'string' ? params.category : undefined,
-          subcategory: typeof params.subcategory === 'string' ? params.subcategory : undefined,
-          search: typeof params.search === 'string' ? params.search : undefined,
-          sort: typeof params.sort === 'string' ? params.sort : undefined,
-        }}
+        initialSearchParams={{ category, subcategory, search, sort }}
       />
     </>
   );
