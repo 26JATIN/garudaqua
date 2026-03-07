@@ -16,7 +16,7 @@ export default function cloudinaryLoader({
   const params = [
     `w_${width}`,
     `q_${quality || "auto"}`,
-    "f_auto",
+    "f_webp",
     "c_limit",
   ].join(",");
 

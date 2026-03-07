@@ -4,12 +4,12 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactCompiler: true,
   poweredByHeader: false,
-  compress: false, // Let nginx handle compression — avoids double-compression overhead
   images: {
     loader: "custom",
     loaderFile: "./lib/cloudinary-loader.ts",
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [128, 256, 384],
+    formats: ["image/webp"],
     qualities: [50, 60, 70, 75],
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },

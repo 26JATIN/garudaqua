@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -353,13 +352,11 @@ export default function ProductsPage({
 
                             <div ref={categoryScrollRef} className="flex gap-3 md:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
                                 {categories.map((category) => (
-                                    <motion.button
+                                    <button
                                         key={category.id}
                                         data-category-selected={selectedCategory === category.id ? "true" : undefined}
-                                        whileHover={{ scale: 1.05, y: -2 }}
-                                        whileTap={{ scale: 0.95 }}
                                         onClick={() => handleCategoryClick(category.id)}
-                                        className="flex flex-col items-center gap-1.5 md:gap-2 min-w-16 md:min-w-19 lg:min-w-20 group"
+                                        className="flex flex-col items-center gap-1.5 md:gap-2 min-w-16 md:min-w-19 lg:min-w-20 group transition-transform duration-200 hover:scale-105 hover:-translate-y-0.5 active:scale-95"
                                     >
                                         <div
                                             className={`relative rounded-full p-0.75 transition-all duration-300 ${
@@ -381,15 +378,13 @@ export default function ProductsPage({
                                             </div>
 
                                             {selectedCategory === category.id && (
-                                                <motion.div
-                                                    layoutId="activeRing"
-                                                    className="absolute -inset-0.5 rounded-full"
+                                                <div
+                                                    className="absolute -inset-0.5 rounded-full animate-pulse"
                                                     style={{
                                                         background: "linear-gradient(135deg, #0EA5E9, #0369A1)",
                                                         filter: "blur(4px)",
                                                         opacity: 0.4,
                                                     }}
-                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                                 />
                                             )}
                                         </div>
@@ -403,7 +398,7 @@ export default function ProductsPage({
                                         >
                                             {category.name}
                                         </span>
-                                    </motion.button>
+                                    </button>
                                 ))}
                             </div>
 
@@ -466,12 +461,10 @@ export default function ProductsPage({
 
                             <div ref={subcategoryScrollRef} className="flex gap-3 md:gap-4 lg:gap-5 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
                                 {/* All badge */}
-                                <motion.button
-                                    whileHover={{ scale: 1.05, y: -2 }}
-                                    whileTap={{ scale: 0.95 }}
+                                <button
                                     onClick={() => handleSubcategoryClick("All")}
                                     data-subcategory-selected={selectedSubcategory === "All" ? "true" : undefined}
-                                    className="flex flex-col items-center gap-1.5 md:gap-2 min-w-17.5 md:min-w-20 lg:min-w-22.5 group"
+                                    className="flex flex-col items-center gap-1.5 md:gap-2 min-w-17.5 md:min-w-20 lg:min-w-22.5 group transition-transform duration-200 hover:scale-105 hover:-translate-y-0.5 active:scale-95"
                                 >
                                     <div
                                         className={`relative rounded-full p-0.75 transition-all duration-300 ${
@@ -488,11 +481,9 @@ export default function ProductsPage({
                                             </div>
                                         </div>
                                         {selectedSubcategory === "All" && (
-                                            <motion.div
-                                                layoutId="activeSubcategory"
-                                                className="absolute -inset-0.5 rounded-full"
+                                            <div
+                                                className="absolute -inset-0.5 rounded-full animate-pulse"
                                                 style={{ background: "linear-gradient(135deg, #0EA5E9, #0369A1)", filter: "blur(4px)", opacity: 0.4 }}
-                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                             />
                                         )}
                                     </div>
@@ -505,17 +496,14 @@ export default function ProductsPage({
                                     >
                                         All
                                     </span>
-                                </motion.button>
-
+                                </button>
                                 {/* Subcategory badges */}
                                 {visibleSubcategories.map((subcategory) => (
-                                    <motion.button
+                                    <button
                                         key={subcategory.id}
                                         data-subcategory-selected={selectedSubcategory === subcategory.id ? "true" : undefined}
-                                        whileHover={{ scale: 1.05, y: -2 }}
-                                        whileTap={{ scale: 0.95 }}
                                         onClick={() => handleSubcategoryClick(subcategory.id)}
-                                        className="flex flex-col items-center gap-1.5 md:gap-2 min-w-17.5 md:min-w-20 lg:min-w-22.5 group"
+                                        className="flex flex-col items-center gap-1.5 md:gap-2 min-w-17.5 md:min-w-20 lg:min-w-22.5 group transition-transform duration-200 hover:scale-105 hover:-translate-y-0.5 active:scale-95"
                                     >
                                         <div
                                             className={`relative rounded-full p-0.75 transition-all duration-300 ${
@@ -536,11 +524,9 @@ export default function ProductsPage({
                                                 </div>
                                             </div>
                                             {selectedSubcategory === subcategory.id && (
-                                                <motion.div
-                                                    layoutId="activeSubcategory"
-                                                    className="absolute -inset-0.5 rounded-full"
+                                                <div
+                                                    className="absolute -inset-0.5 rounded-full animate-pulse"
                                                     style={{ background: "linear-gradient(135deg, #0EA5E9, #0369A1)", filter: "blur(4px)", opacity: 0.4 }}
-                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                                 />
                                             )}
                                         </div>
@@ -553,7 +539,7 @@ export default function ProductsPage({
                                         >
                                             {subcategory.name}
                                         </span>
-                                    </motion.button>
+                                    </button>
                                 ))}
                             </div>
 
@@ -694,9 +680,9 @@ function ProductCard({ product, index }: ProductCardProps) {
                                 fill
                                 className="object-cover transform group-hover:scale-110 transition-transform duration-700"
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                quality={60}
-                                priority={index < 4}
-                                loading={index < 4 ? undefined : "lazy"}
+                                quality={50}
+                                priority={index < 2}
+                                loading={index < 2 ? undefined : "lazy"}
                             />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center">

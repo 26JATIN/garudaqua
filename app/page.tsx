@@ -25,6 +25,19 @@ export const metadata: Metadata = {
   },
 };
 
+// Build a Cloudinary URL for preloading
+function buildPreloadUrl(src: string, width: number, quality: number) {
+  if (!src.includes('res.cloudinary.com')) return src;
+  const params = `w_${width},q_${quality},f_webp,c_limit`;
+  return src.replace('/upload/', `/upload/${params}/`);
+}
+
+function buildPreloadSrcSet(src: string, quality: number, widths: number[]) {
+  return widths
+    .map(w => `${buildPreloadUrl(src, w, quality)} ${w}w`)
+    .join(', ');
+}
+
 async function getHeroSlides() {
   try {
     const slides = await prisma.heroSlide.findMany({
@@ -76,6 +89,27 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen relative overflow-x-hidden">
+      {/* Preload first hero slide LCP image — starts fetching before JS hydration */}
+      {heroSlides.length > 0 && heroSlides[0].mobileImage && (
+        <link
+          rel="preload"
+          as="image"
+          type="image/webp"
+          imageSrcSet={buildPreloadSrcSet(heroSlides[0].mobileImage, 50, [256, 384, 640])}
+          imageSizes="(min-width: 641px) 1px, 240px"
+          fetchPriority="high"
+        />
+      )}
+      {heroSlides.length > 0 && heroSlides[0].image && (
+        <link
+          rel="preload"
+          as="image"
+          type="image/webp"
+          imageSrcSet={buildPreloadSrcSet(heroSlides[0].image, 50, [640, 828, 1080, 1200])}
+          imageSizes="(max-width: 640px) 1px, 1200px"
+          fetchPriority="high"
+        />
+      )}
       {/* Gradient Background */}
       <div className="fixed inset-0 bg-linear-to-br from-white via-[#FEFEFE] to-[#F3F8FE] dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] -z-10" />
 

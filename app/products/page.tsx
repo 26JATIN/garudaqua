@@ -18,6 +18,21 @@ export const metadata: Metadata = {
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
+// Build a Cloudinary URL for preloading (same logic as cloudinary-loader)
+function buildPreloadUrl(src: string, width: number, quality: number) {
+  if (!src.includes('res.cloudinary.com')) return src;
+  const params = `w_${width},q_${quality},f_webp,c_limit`;
+  return src.replace('/upload/', `/upload/${params}/`);
+}
+
+// Build srcSet string for preload (matches Next.js Image deviceSizes)
+function buildPreloadSrcSet(src: string, quality: number) {
+  const widths = [256, 384, 640, 750, 828];
+  return widths
+    .map(w => `${buildPreloadUrl(src, w, quality)} ${w}w`)
+    .join(', ');
+}
+
 async function getInitialData() {
   const [categories, subcategories, productData] = await Promise.all([
     prisma.category.findMany({
@@ -67,6 +82,20 @@ export default async function Page({
 
   return (
     <>
+      {/* Preload LCP images — browser starts fetching immediately, before JS hydration */}
+      {products.slice(0, 2).map((product: { id: string; image?: string }, i: number) =>
+        product.image ? (
+          <link
+            key={`preload-${product.id}`}
+            rel="preload"
+            as="image"
+            type="image/webp"
+            imageSrcSet={buildPreloadSrcSet(product.image, 50)}
+            imageSizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            fetchPriority={i === 0 ? "high" : "auto"}
+          />
+        ) : null
+      )}
       <Suspense fallback={
       <div className="min-h-screen pt-4 md:pt-6 lg:pt-8 bg-gray-50 dark:bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
