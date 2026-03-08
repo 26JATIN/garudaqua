@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { uploadToCloudinaryDirect } from "@/lib/cloudinary-upload";
 
 // ===== Types =====
 interface BlogPost {
@@ -283,12 +284,7 @@ export default function BlogManagement() {
 
         setUploading(true);
         try {
-            const fd = new FormData();
-            fd.append("file", file);
-            fd.append("folder", "garudaqua/blogs");
-            const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-            if (!res.ok) throw new Error("Upload failed");
-            const { url } = await res.json();
+            const { url } = await uploadToCloudinaryDirect(file, "garudaqua/blogs");
             setFormData((prev) => ({ ...prev, featuredImage: url }));
             setImagePreview(url);
             toast.success("Image uploaded");

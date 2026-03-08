@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
+import { uploadToCloudinaryDirect } from "@/lib/cloudinary-upload";
 
 // ===== Types =====
 interface HeroVideo {
@@ -176,21 +177,7 @@ export default function AdminHeroVideosPage() {
 
             setUploadingVideo(true);
             try {
-                const uploadFormData = new FormData();
-                uploadFormData.append("file", file);
-                uploadFormData.append("folder", "garudaqua/videos");
-
-                const res = await fetch("/api/admin/upload", {
-                    method: "POST",
-                    body: uploadFormData,
-                });
-
-                if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    throw new Error(errorData.error || "Failed to upload video");
-                }
-
-                const { url, duration } = await res.json();
+                const { url, duration } = await uploadToCloudinaryDirect(file, "garudaqua/videos");
                 setFormData((prev) => ({
                     ...prev,
                     videoUrl: url,
@@ -219,21 +206,7 @@ export default function AdminHeroVideosPage() {
 
             setUploadingThumbnail(true);
             try {
-                const uploadFormData = new FormData();
-                uploadFormData.append("file", file);
-                uploadFormData.append("folder", "garudaqua/videos");
-
-                const res = await fetch("/api/admin/upload", {
-                    method: "POST",
-                    body: uploadFormData,
-                });
-
-                if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    throw new Error(errorData.error || "Failed to upload thumbnail");
-                }
-
-                const { url } = await res.json();
+                const { url } = await uploadToCloudinaryDirect(file, "garudaqua/videos");
                 setFormData((prev) => ({ ...prev, thumbnailUrl: url }));
                 toast.success("Thumbnail uploaded");
             } catch (err) {

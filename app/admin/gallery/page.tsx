@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
+import { uploadToCloudinaryDirect } from "@/lib/cloudinary-upload";
 
 interface GalleryItem {
     id: string;
@@ -128,12 +129,7 @@ export default function AdminGalleryPage() {
             if (!file) return;
             setUploading(true);
             try {
-                const fd = new FormData();
-                fd.append("file", file);
-                fd.append("folder", "garudaqua/gallery");
-                const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-                if (!res.ok) throw new Error("Upload failed");
-                const { url } = await res.json();
+                const { url } = await uploadToCloudinaryDirect(file, "garudaqua/gallery");
                 setFormData((prev) => ({ ...prev, [field]: url, alt: prev.alt || file.name.replace(/\.[^/.]+$/, "") }));
                 toast.success("File uploaded");
             } catch {
