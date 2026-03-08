@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import VariantManager from "./VariantManager";
 import { toast } from "sonner";
+import { uploadDirect } from "@/lib/upload-direct";
 
 // ===== Types =====
 interface VariantOption {
@@ -177,12 +178,7 @@ export default function ProductForm({
             // Upload to Cloudinary
             setUploading(true);
             try {
-                const fd = new FormData();
-                fd.append("file", file);
-                fd.append("folder", "garudaqua/products");
-                const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-                if (!res.ok) throw new Error("Upload failed");
-                const { url } = await res.json();
+                const { url } = await uploadDirect(file, "garudaqua/products");
                 setImagePreview(url);
                 setFormData((prev) => ({ ...prev, image: url }));
                 toast.success("Image uploaded successfully");
@@ -214,15 +210,7 @@ export default function ProductForm({
 
             try {
                 const uploadPromises = Array.from(files).map(async (file) => {
-                    const fd = new FormData();
-                    fd.append("file", file);
-                    fd.append("folder", "garudaqua/products");
-                    const res = await fetch("/api/admin/upload", {
-                        method: "POST",
-                        body: fd,
-                    });
-                    if (!res.ok) throw new Error("Upload failed");
-                    const { url } = await res.json();
+                    const { url } = await uploadDirect(file, "garudaqua/products");
                     return url as string;
                 });
 

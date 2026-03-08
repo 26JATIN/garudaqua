@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { uploadDirect } from "@/lib/upload-direct";
 
 // ===== Types =====
 interface BlogPost {
@@ -279,16 +280,10 @@ export default function BlogManagement() {
         const file = e.target.files?.[0];
         if (!file) return;
         if (!file.type.startsWith("image/")) { toast.error("Please upload an image"); return; }
-        if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
 
         setUploading(true);
         try {
-            const fd = new FormData();
-            fd.append("file", file);
-            fd.append("folder", "garudaqua/blogs");
-            const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-            if (!res.ok) throw new Error("Upload failed");
-            const { url } = await res.json();
+            const { url } = await uploadDirect(file, "garudaqua/blogs");
             setFormData((prev) => ({ ...prev, featuredImage: url }));
             setImagePreview(url);
             toast.success("Image uploaded");

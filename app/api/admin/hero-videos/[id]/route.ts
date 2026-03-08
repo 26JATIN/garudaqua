@@ -34,7 +34,7 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.thumbnailUrl);
     }
 
-    purgeCloudflareCache(["/"]);
+    await purgeCloudflareCache(["/"]);
     return NextResponse.json(video);
   } catch (error) {
     console.error("Error updating hero video:", error);
@@ -58,7 +58,7 @@ export async function DELETE(
     if (video?.videoUrl) await deleteCloudinaryByUrl(video.videoUrl, "video");
     if (video?.thumbnailUrl) await deleteCloudinaryByUrl(video.thumbnailUrl);
 
-    purgeCloudflareCache(["/"]);
+    await purgeCloudflareCache(["/"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting hero video:", error);

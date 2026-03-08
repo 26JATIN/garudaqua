@@ -18,7 +18,7 @@ export async function PUT(
         isActive: body.isActive,
       },
     });
-    purgeCloudflareCache(["/blogs"]);
+    await purgeCloudflareCache(["/blogs"]);
     return NextResponse.json(category);
   } catch (error) {
     console.error("Error updating blog category:", error);
@@ -43,7 +43,7 @@ export async function DELETE(
     });
 
     await prisma.blogCategory.delete({ where: { id } });
-    purgeCloudflareCache(["/blogs"]);
+    await purgeCloudflareCache(["/blogs"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting blog category:", error);

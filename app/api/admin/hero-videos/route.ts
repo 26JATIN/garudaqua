@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         linkedProductId: body.linkedProductId || null,
       },
     });
-    purgeCloudflareCache(["/"]);
+    await purgeCloudflareCache(["/"]);
     return NextResponse.json(video, { status: 201 });
   } catch (error) {
     console.error("Error creating hero video:", error);

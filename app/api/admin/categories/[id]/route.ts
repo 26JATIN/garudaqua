@@ -29,7 +29,7 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.image);
     }
 
-    purgeCloudflareCache(["/", "/products"]);
+    await purgeCloudflareCache(["/", "/products"]);
     return NextResponse.json(category);
   } catch (error) {
     console.error("Error updating category:", error);
@@ -52,7 +52,7 @@ export async function DELETE(
 
     if (category?.image) await deleteCloudinaryByUrl(category.image);
 
-    purgeCloudflareCache(["/", "/products"]);
+    await purgeCloudflareCache(["/", "/products"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting category:", error);

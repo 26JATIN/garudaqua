@@ -48,7 +48,7 @@ export async function POST(request: Request) {
           : new Date(),
       },
     });
-    purgeCloudflareCache(["/blogs"]);
+    await purgeCloudflareCache(["/blogs"]);
     return NextResponse.json(blog, { status: 201 });
   } catch (error) {
     console.error("Error creating blog:", error);

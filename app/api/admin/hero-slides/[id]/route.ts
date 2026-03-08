@@ -31,7 +31,7 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.mobileImage);
     }
 
-    purgeCloudflareCache(["/"]);
+    await purgeCloudflareCache(["/"]);
     return NextResponse.json(slide);
   } catch (error) {
     console.error("Error updating hero slide:", error);
@@ -55,7 +55,7 @@ export async function DELETE(
     if (slide?.image) await deleteCloudinaryByUrl(slide.image);
     if (slide?.mobileImage) await deleteCloudinaryByUrl(slide.mobileImage);
 
-    purgeCloudflareCache(["/"]);
+    await purgeCloudflareCache(["/"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting hero slide:", error);

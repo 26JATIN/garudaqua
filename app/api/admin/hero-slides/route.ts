@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         isActive: body.isActive ?? true,
       },
     });
-    purgeCloudflareCache(["/"]);
+    await purgeCloudflareCache(["/"]);
     return NextResponse.json(slide, { status: 201 });
   } catch (error) {
     console.error("Error creating hero slide:", error);

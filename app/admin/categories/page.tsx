@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
+import { uploadDirect } from "@/lib/upload-direct";
 
 // ===== Types =====
 interface Category {
@@ -82,12 +83,7 @@ export default function CategoriesAdmin() {
     const uploadImage = useCallback(async (file: File, folder: string): Promise<string | null> => {
         setUploading(true);
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("folder", folder);
-            const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-            if (!res.ok) throw new Error("Upload failed");
-            const { url } = await res.json();
+            const { url } = await uploadDirect(file, folder);
             return url;
         } catch (error) {
             console.error("Error uploading image:", error);

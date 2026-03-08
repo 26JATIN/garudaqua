@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
+import { uploadDirect } from "@/lib/upload-direct";
 
 interface HeroSlide {
     id: string;
@@ -115,12 +116,7 @@ export default function AdminHeroSlidesPage() {
             if (!file) return;
             setUploading(field === "image" ? "desktop" : "mobile");
             try {
-                const fd = new FormData();
-                fd.append("file", file);
-                fd.append("folder", "garudaqua/hero-slides");
-                const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-                if (!res.ok) throw new Error("Upload failed");
-                const { url } = await res.json();
+                const { url } = await uploadDirect(file, "garudaqua/hero-slides");
                 setFormData((prev) => ({ ...prev, [field]: url }));
                 toast.success(`${field === "image" ? "Desktop" : "Mobile"} image uploaded`);
             } catch {
@@ -152,13 +148,7 @@ export default function AdminHeroSlidesPage() {
             for (let i = 0; i < fileArray.length; i++) {
                 setBulkProgress({ current: i + 1, total: fileArray.length });
                 try {
-                    // Upload image to Cloudinary
-                    const fd = new FormData();
-                    fd.append("file", fileArray[i]);
-                    fd.append("folder", "garudaqua/hero-slides");
-                    const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: fd });
-                    if (!uploadRes.ok) throw new Error("Upload failed");
-                    const { url } = await uploadRes.json();
+                    const { url } = await uploadDirect(fileArray[i], "garudaqua/hero-slides");
 
                     // Create hero slide
                     const slideRes = await fetch("/api/admin/hero-slides", {

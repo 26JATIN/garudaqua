@@ -52,7 +52,7 @@ export async function PUT(
     );
     await Promise.all(removedImages.map((img: string) => deleteCloudinaryByUrl(img)));
 
-    purgeCloudflareCache(["/products", `/products/${id}`]);
+    await purgeCloudflareCache(["/products", `/products/${id}`]);
     return NextResponse.json(product);
   } catch (error) {
     console.error("Error updating product:", error);
@@ -84,7 +84,7 @@ export async function DELETE(
       (product.images || []).map((img: string) => deleteCloudinaryByUrl(img))
     );
 
-    purgeCloudflareCache(["/products", `/products/${id}`]);
+    await purgeCloudflareCache(["/products", `/products/${id}`]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting product:", error);

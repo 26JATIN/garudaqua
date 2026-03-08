@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
+import { uploadDirect } from "@/lib/upload-direct";
 
 // ===== Types =====
 interface HeroVideo {
@@ -172,25 +173,10 @@ export default function AdminHeroVideosPage() {
         input.onchange = async (e: Event) => {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (!file) return;
-            if (file.size > 50 * 1024 * 1024) { toast.error("Video must be under 50MB"); return; }
 
             setUploadingVideo(true);
             try {
-                const uploadFormData = new FormData();
-                uploadFormData.append("file", file);
-                uploadFormData.append("folder", "garudaqua/videos");
-
-                const res = await fetch("/api/admin/upload", {
-                    method: "POST",
-                    body: uploadFormData,
-                });
-
-                if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    throw new Error(errorData.error || "Failed to upload video");
-                }
-
-                const { url, duration } = await res.json();
+                const { url, duration } = await uploadDirect(file, "garudaqua/videos");
                 setFormData((prev) => ({
                     ...prev,
                     videoUrl: url,
@@ -215,25 +201,10 @@ export default function AdminHeroVideosPage() {
         input.onchange = async (e: Event) => {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (!file) return;
-            if (file.size > 10 * 1024 * 1024) { toast.error("Thumbnail must be under 10MB"); return; }
 
             setUploadingThumbnail(true);
             try {
-                const uploadFormData = new FormData();
-                uploadFormData.append("file", file);
-                uploadFormData.append("folder", "garudaqua/videos");
-
-                const res = await fetch("/api/admin/upload", {
-                    method: "POST",
-                    body: uploadFormData,
-                });
-
-                if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    throw new Error(errorData.error || "Failed to upload thumbnail");
-                }
-
-                const { url } = await res.json();
+                const { url } = await uploadDirect(file, "garudaqua/videos");
                 setFormData((prev) => ({ ...prev, thumbnailUrl: url }));
                 toast.success("Thumbnail uploaded");
             } catch (err) {
