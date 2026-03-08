@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { purgeCloudflareCache } from "@/lib/cloudflare";
+import { revalidateAndWarm } from "@/lib/revalidate";
 
 export async function GET() {
   try {
@@ -33,9 +32,7 @@ export async function POST(request: Request) {
         isActive: body.isActive ?? true,
       },
     });
-    revalidatePath("/");
-    revalidatePath("/products");
-    await purgeCloudflareCache(["/", "/products"]);
+    await revalidateAndWarm(["/", "/products"]);
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
     console.error("Error creating category:", error);

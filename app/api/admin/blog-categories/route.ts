@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { purgeCloudflareCache } from "@/lib/cloudflare";
+import { revalidateAndWarm } from "@/lib/revalidate";
 
 function slugify(text: string): string {
   return text
@@ -39,8 +38,7 @@ export async function POST(request: Request) {
         isActive: body.isActive ?? true,
       },
     });
-    revalidatePath("/blogs");
-    await purgeCloudflareCache(["/blogs"]);
+    await revalidateAndWarm(["/blogs"]);
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
     console.error("Error creating blog category:", error);

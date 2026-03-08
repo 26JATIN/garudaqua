@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { purgeCloudflareCache } from "@/lib/cloudflare";
+import { revalidateAndWarm } from "@/lib/revalidate";
 
 export async function PUT(
   request: Request,
@@ -19,8 +18,7 @@ export async function PUT(
         isActive: body.isActive,
       },
     });
-    revalidatePath("/blogs");
-    await purgeCloudflareCache(["/blogs"]);
+    await revalidateAndWarm(["/blogs"]);
     return NextResponse.json(category);
   } catch (error) {
     console.error("Error updating blog category:", error);
@@ -45,8 +43,7 @@ export async function DELETE(
     });
 
     await prisma.blogCategory.delete({ where: { id } });
-    revalidatePath("/blogs");
-    await purgeCloudflareCache(["/blogs"]);
+    await revalidateAndWarm(["/blogs"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting blog category:", error);

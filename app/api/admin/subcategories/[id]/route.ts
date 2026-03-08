@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
-import { purgeCloudflareCache } from "@/lib/cloudflare";
+import { revalidateAndWarm } from "@/lib/revalidate";
 
 export async function PUT(
   request: Request,
@@ -33,9 +32,7 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.image);
     }
 
-    revalidatePath("/");
-    revalidatePath("/products");
-    await purgeCloudflareCache(["/", "/products"]);
+    await revalidateAndWarm(["/", "/products"]);
     return NextResponse.json(subcategory);
   } catch (error) {
     console.error("Error updating subcategory:", error);
@@ -58,9 +55,7 @@ export async function DELETE(
 
     if (subcategory?.image) await deleteCloudinaryByUrl(subcategory.image);
 
-    revalidatePath("/");
-    revalidatePath("/products");
-    await purgeCloudflareCache(["/", "/products"]);
+    await revalidateAndWarm(["/", "/products"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting subcategory:", error);

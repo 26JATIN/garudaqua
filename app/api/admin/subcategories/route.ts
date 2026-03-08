@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { purgeCloudflareCache } from "@/lib/cloudflare";
+import { revalidateAndWarm } from "@/lib/revalidate";
 
 export async function GET(request: NextRequest) {
   try {
@@ -45,9 +44,7 @@ export async function POST(request: Request) {
         category: { select: { id: true, name: true } },
       },
     });
-    revalidatePath("/");
-    revalidatePath("/products");
-    await purgeCloudflareCache(["/", "/products"]);
+    await revalidateAndWarm(["/", "/products"]);
     return NextResponse.json(subcategory, { status: 201 });
   } catch (error) {
     console.error("Error creating subcategory:", error);

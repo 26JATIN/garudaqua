@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { purgeCloudflareCache } from "@/lib/cloudflare";
+import { revalidateAndWarm } from "@/lib/revalidate";
 
 function slugify(text: string): string {
   return text
@@ -59,8 +58,7 @@ export async function POST(request: Request) {
         subcategory: { select: { id: true, name: true } },
       },
     });
-    revalidatePath("/products");
-    await purgeCloudflareCache(["/products"]);
+    await revalidateAndWarm(["/products"]);
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
-import { purgeCloudflareCache } from "@/lib/cloudflare";
+import { revalidateAndWarm } from "@/lib/revalidate";
 
 export async function PUT(
   request: Request,
@@ -37,8 +36,7 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.thumbnailUrl);
     }
 
-    revalidatePath("/");
-    await purgeCloudflareCache(["/"]);
+    await revalidateAndWarm(["/"]);
     return NextResponse.json(item);
   } catch (error) {
     console.error("Error updating gallery item:", error);
@@ -65,8 +63,7 @@ export async function DELETE(
     }
     if (item?.thumbnailUrl) await deleteCloudinaryByUrl(item.thumbnailUrl);
 
-    revalidatePath("/");
-    await purgeCloudflareCache(["/"]);
+    await revalidateAndWarm(["/"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting gallery item:", error);
