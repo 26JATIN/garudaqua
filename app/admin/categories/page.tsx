@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
-import { uploadToCloudinaryDirect } from "@/lib/cloudinary-upload";
 
 // ===== Types =====
 interface Category {
@@ -83,7 +82,12 @@ export default function CategoriesAdmin() {
     const uploadImage = useCallback(async (file: File, folder: string): Promise<string | null> => {
         setUploading(true);
         try {
-            const { url } = await uploadToCloudinaryDirect(file, folder);
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folder", folder);
+            const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+            if (!res.ok) throw new Error("Upload failed");
+            const { url } = await res.json();
             return url;
         } catch (error) {
             console.error("Error uploading image:", error);

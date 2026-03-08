@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
-import { uploadToCloudinaryDirect } from "@/lib/cloudinary-upload";
 
 interface HeroSlide {
     id: string;
@@ -116,7 +115,12 @@ export default function AdminHeroSlidesPage() {
             if (!file) return;
             setUploading(field === "image" ? "desktop" : "mobile");
             try {
-                const { url } = await uploadToCloudinaryDirect(file, "garudaqua/hero-slides");
+                const fd = new FormData();
+                fd.append("file", file);
+                fd.append("folder", "garudaqua/hero-slides");
+                const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+                if (!res.ok) throw new Error("Upload failed");
+                const { url } = await res.json();
                 setFormData((prev) => ({ ...prev, [field]: url }));
                 toast.success(`${field === "image" ? "Desktop" : "Mobile"} image uploaded`);
             } catch {
@@ -148,7 +152,13 @@ export default function AdminHeroSlidesPage() {
             for (let i = 0; i < fileArray.length; i++) {
                 setBulkProgress({ current: i + 1, total: fileArray.length });
                 try {
-                    const { url } = await uploadToCloudinaryDirect(fileArray[i], "garudaqua/hero-slides");
+                    // Upload image to Cloudinary
+                    const fd = new FormData();
+                    fd.append("file", fileArray[i]);
+                    fd.append("folder", "garudaqua/hero-slides");
+                    const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: fd });
+                    if (!uploadRes.ok) throw new Error("Upload failed");
+                    const { url } = await uploadRes.json();
 
                     // Create hero slide
                     const slideRes = await fetch("/api/admin/hero-slides", {
