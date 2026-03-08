@@ -1,19 +1,19 @@
 const CF_ZONE_ID = process.env.CF_ZONE_ID;
 const CF_API_TOKEN = process.env.CF_API_TOKEN;
-const SITE_URL = process.env.NEXTAUTH_URL || "https://garudaqua.in";
 
 /**
- * Purge specific paths from Cloudflare's edge cache.
+ * Purge the ENTIRE Cloudflare edge cache for the zone.
+ * Uses purge_everything instead of per-URL purge for reliability —
+ * per-URL purge misses variants (trailing slash, query strings, etc.).
+ *
  * Silently no-ops if CF env vars are not set (local dev).
  * MUST be awaited — otherwise the serverless function exits before the purge completes.
  */
-export async function purgeCloudflareCache(paths: string[] = ["/"]) {
+export async function purgeCloudflareCache(_paths?: string[]) {
   if (!CF_ZONE_ID || !CF_API_TOKEN) {
     console.log("[CF] Skipping cache purge — env vars not set");
     return;
   }
-
-  const files = paths.map((p) => `${SITE_URL}${p}`);
 
   try {
     const res = await fetch(
@@ -24,7 +24,7 @@ export async function purgeCloudflareCache(paths: string[] = ["/"]) {
           Authorization: `Bearer ${CF_API_TOKEN}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ files }),
+        body: JSON.stringify({ purge_everything: true }),
       }
     );
 
@@ -33,7 +33,7 @@ export async function purgeCloudflareCache(paths: string[] = ["/"]) {
     if (!data.success) {
       console.error("[CF] Cache purge failed:", JSON.stringify(data.errors));
     } else {
-      console.log("[CF] Purged:", files.join(", "));
+      console.log("[CF] Purged entire zone cache ✅");
     }
   } catch (e) {
     console.error("[CF] Cache purge request failed:", e);
