@@ -20,8 +20,8 @@ export async function revalidateAndWarm(paths: string[]) {
     revalidatePath(p);
   }
 
-  // Step 2 — purge entire Cloudflare CDN zone
-  await purgeCloudflareCache();
+  // Step 2 — purge Cloudflare CDN for affected paths
+  await purgeCloudflareCache(allPaths);
 
   // Step 3 — warm ALL public pages in parallel (fire-and-forget)
   for (const p of allPaths) {
