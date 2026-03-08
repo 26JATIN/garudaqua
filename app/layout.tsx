@@ -7,7 +7,7 @@ import { Toaster } from "sonner";
 import ThemeToaster from "./components/ThemeToaster";
 import PWARegister from "./components/PWARegister";
 import type { Metadata } from "next";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const SITE_URL = "https://garudaqua.in";
 
 export const viewport = {
@@ -200,6 +200,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ConditionalNavbar />
             <main>
               {children}
+              <SpeedInsights />
             </main>
           </NavbarProvider>
         </ThemeProvider>
