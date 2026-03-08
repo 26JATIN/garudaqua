@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 
 export async function PUT(
   request: Request,
@@ -35,6 +36,7 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.thumbnailUrl);
     }
 
+    purgeCloudflareCache(["/"]);
     return NextResponse.json(item);
   } catch (error) {
     console.error("Error updating gallery item:", error);
@@ -61,6 +63,7 @@ export async function DELETE(
     }
     if (item?.thumbnailUrl) await deleteCloudinaryByUrl(item.thumbnailUrl);
 
+    purgeCloudflareCache(["/"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting gallery item:", error);

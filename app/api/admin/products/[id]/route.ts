@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 
 export async function PUT(
   request: Request,
@@ -51,6 +52,7 @@ export async function PUT(
     );
     await Promise.all(removedImages.map((img: string) => deleteCloudinaryByUrl(img)));
 
+    purgeCloudflareCache(["/products", `/products/${id}`]);
     return NextResponse.json(product);
   } catch (error) {
     console.error("Error updating product:", error);
@@ -82,6 +84,7 @@ export async function DELETE(
       (product.images || []).map((img: string) => deleteCloudinaryByUrl(img))
     );
 
+    purgeCloudflareCache(["/products", `/products/${id}`]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting product:", error);

@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
         category: { select: { id: true, name: true } },
       },
     });
+    purgeCloudflareCache(["/", "/products"]);
     return NextResponse.json(subcategory, { status: 201 });
   } catch (error) {
     console.error("Error creating subcategory:", error);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 
 function slugify(text: string): string {
   return text
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
         subcategory: { select: { id: true, name: true } },
       },
     });
+    purgeCloudflareCache(["/products"]);
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);

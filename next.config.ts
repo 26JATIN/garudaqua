@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "100mb",
+    },
+  },
   images: {
     loader: "custom",
     loaderFile: "./lib/cloudinary-loader.ts",

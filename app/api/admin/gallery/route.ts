@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 
 export async function GET() {
   try {
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
         tags: body.tags || [],
       },
     });
+    purgeCloudflareCache(["/"]);
     return NextResponse.json(item, { status: 201 });
   } catch (error) {
     console.error("Error creating gallery item:", error);

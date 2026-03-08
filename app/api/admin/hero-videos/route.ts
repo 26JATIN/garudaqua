@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 
 export async function GET() {
   try {
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
         linkedProductId: body.linkedProductId || null,
       },
     });
+    purgeCloudflareCache(["/"]);
     return NextResponse.json(video, { status: 201 });
   } catch (error) {
     console.error("Error creating hero video:", error);

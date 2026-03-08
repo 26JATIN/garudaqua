@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 
 function slugify(text: string): string {
   return text
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
           : new Date(),
       },
     });
+    purgeCloudflareCache(["/blogs"]);
     return NextResponse.json(blog, { status: 201 });
   } catch (error) {
     console.error("Error creating blog:", error);
