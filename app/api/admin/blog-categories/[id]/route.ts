@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { purgeCloudflareCache } from "@/lib/cloudflare";
 
@@ -18,6 +19,7 @@ export async function PUT(
         isActive: body.isActive,
       },
     });
+    revalidatePath("/blogs");
     await purgeCloudflareCache(["/blogs"]);
     return NextResponse.json(category);
   } catch (error) {
@@ -43,6 +45,7 @@ export async function DELETE(
     });
 
     await prisma.blogCategory.delete({ where: { id } });
+    revalidatePath("/blogs");
     await purgeCloudflareCache(["/blogs"]);
     return NextResponse.json({ success: true });
   } catch (error) {

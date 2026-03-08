@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { purgeCloudflareCache } from "@/lib/cloudflare";
 
@@ -44,6 +45,8 @@ export async function POST(request: Request) {
         category: { select: { id: true, name: true } },
       },
     });
+    revalidatePath("/");
+    revalidatePath("/products");
     await purgeCloudflareCache(["/", "/products"]);
     return NextResponse.json(subcategory, { status: 201 });
   } catch (error) {

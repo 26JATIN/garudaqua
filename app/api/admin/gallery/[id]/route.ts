@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 import { purgeCloudflareCache } from "@/lib/cloudflare";
@@ -36,6 +37,7 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.thumbnailUrl);
     }
 
+    revalidatePath("/");
     await purgeCloudflareCache(["/"]);
     return NextResponse.json(item);
   } catch (error) {
@@ -63,6 +65,7 @@ export async function DELETE(
     }
     if (item?.thumbnailUrl) await deleteCloudinaryByUrl(item.thumbnailUrl);
 
+    revalidatePath("/");
     await purgeCloudflareCache(["/"]);
     return NextResponse.json({ success: true });
   } catch (error) {

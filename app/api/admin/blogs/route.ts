@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { purgeCloudflareCache } from "@/lib/cloudflare";
 
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
           : new Date(),
       },
     });
+    revalidatePath("/blogs");
     await purgeCloudflareCache(["/blogs"]);
     return NextResponse.json(blog, { status: 201 });
   } catch (error) {

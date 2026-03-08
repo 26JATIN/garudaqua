@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 import { purgeCloudflareCache } from "@/lib/cloudflare";
@@ -39,6 +40,8 @@ export async function PUT(
     }
 
     const slugToPurge = blog.slug || existing?.slug;
+    revalidatePath("/blogs");
+    if (slugToPurge) revalidatePath(`/blogs/${slugToPurge}`);
     await purgeCloudflareCache(["/blogs", ...(slugToPurge ? [`/blogs/${slugToPurge}`] : [])]);
     return NextResponse.json(blog);
   } catch (error) {
@@ -62,6 +65,8 @@ export async function DELETE(
 
     if (blog?.featuredImage) await deleteCloudinaryByUrl(blog.featuredImage);
 
+    revalidatePath("/blogs");
+    if (blog?.slug) revalidatePath(`/blogs/${blog.slug}`);
     await purgeCloudflareCache(["/blogs", ...(blog?.slug ? [`/blogs/${blog.slug}`] : [])]);
     return NextResponse.json({ success: true });
   } catch (error) {
