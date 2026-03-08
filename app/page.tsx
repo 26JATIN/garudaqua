@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import Hero from './components/hero';
 import Footer from './components/Footer';
 import { prisma } from '@/lib/prisma';
+import { webPageSchema } from '@/lib/jsonld';
 
 // Lazy load below-the-fold components to reduce initial JS bundle
 const CategoryShowcase = dynamic(() => import('./components/CategoryShowcase'));
@@ -130,6 +131,11 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen relative overflow-x-hidden">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema({
+        name: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
+        description: "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes, fittings & agricultural water management products.",
+        url: "https://garudaqua.in",
+      })) }} />
       {/* Preload first hero slide mobile image — use 100vw for full-width hero */}
       {heroSlides.length > 0 && heroSlides[0].mobileImage && (
         <link

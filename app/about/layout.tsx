@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { aboutPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "About Us — Our Story, Mission & Team",
@@ -14,5 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default function AboutLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutPageSchema()) }} />
+      {children}
+    </>
+  );
 }

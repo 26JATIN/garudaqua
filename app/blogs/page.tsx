@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import BlogsClient from './BlogsClient';
+import { collectionPageSchema } from '@/lib/jsonld';
 
 export const metadata: Metadata = {
   title: 'Blog — Tips, Guides & Insights | Garud Aqua Solutions',
@@ -60,6 +61,11 @@ export default async function Page() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema({
+        name: "Blog — Tips, Guides & Insights",
+        description: "Expert tips, guides, and insights on water tanks, pipes & plumbing solutions from Garud Aqua Solutions.",
+        url: "https://garudaqua.in/blogs",
+      })) }} />
       {preloadImages.map((src: string) => (
         <link key={src} rel="preload" as="image" href={src} fetchPriority="high" />
       ))}

@@ -7,7 +7,8 @@ import { Toaster } from "sonner";
 import ThemeToaster from "./components/ThemeToaster";
 import PWARegister from "./components/PWARegister";
 import type { Metadata } from "next";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { organizationSchema, websiteSchema } from "@/lib/jsonld";
 const SITE_URL = "https://garudaqua.in";
 
 export const viewport = {
@@ -122,57 +123,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <meta name="theme-color" content="#000000" id="theme-color-meta" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": ["LocalBusiness", "Organization"],
-              "name": "Garud Aqua Solutions",
-              "url": "https://garudaqua.in",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://garudaqua.in/DesktopLogo.png"
-              },
-              "image": "https://garudaqua.in/DesktopLogo.png",
-              "telephone": "+91-94625-94603",
-              "email": "rkg210@gmail.com",
-              "description": "Garud Aqua Solutions is a trusted supplier of HDPE water tanks, PVC pipes, fittings, and agricultural water management products in Sriganganagar, Rajasthan, India.",
-              "priceRange": "₹₹",
-              "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Ground, Murraba No. 62, Killa No. 2, Sihagawali To Akkawali Road, 23 SDS",
-                "addressLocality": "Sadulshahar",
-                "addressRegion": "Rajasthan",
-                "postalCode": "335062",
-                "addressCountry": "IN"
-              },
-              "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": "29.4507",
-                "longitude": "73.4340"
-              },
-              "areaServed": [
-                {
-                  "@type": "State",
-                  "name": "Rajasthan"
-                },
-                {
-                  "@type": "Country",
-                  "name": "India"
-                }
-              ],
-              "knowsAbout": [
-                "HDPE Water Tanks",
-                "PVC Pipes",
-                "Water Fittings",
-                "Agricultural Water Management",
-                "Water Storage Solutions"
-              ],
-              "sameAs": []
-            })
-          }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }} />
         <script dangerouslySetInnerHTML={{
           __html: `
           (function() {

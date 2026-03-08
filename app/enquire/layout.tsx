@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { contactPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Product Enquiry — Request a Quote",
@@ -14,5 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default function EnquireLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageSchema()) }} />
+      {children}
+    </>
+  );
 }

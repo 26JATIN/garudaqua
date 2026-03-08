@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import BlogPostClient from "./BlogPostClient";
+import { articleSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const revalidate = 60;
 
@@ -56,7 +57,43 @@ export async function generateMetadata(
   }
 }
 
-export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  return <BlogPostClient params={params} />;
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const blog = await prisma.blogPost.findUnique({
+    where: { slug, isPublished: true },
+    select: {
+      title: true,
+      excerpt: true,
+      content: true,
+      featuredImage: true,
+      author: true,
+      slug: true,
+      publishedAt: true,
+      updatedAt: true,
+      tags: true,
+      readTime: true,
+    },
+  }).catch(() => null);
+
+  return (
+    <>
+      {blog && (
+        <>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema({
+            ...blog,
+            tags: Array.isArray(blog.tags) ? (blog.tags as string[]) : [],
+            publishedAt: blog.publishedAt?.toISOString() ?? null,
+            updatedAt: blog.updatedAt?.toISOString() ?? null,
+          })) }} />
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
+            { name: "Home", url: "https://garudaqua.in" },
+            { name: "Blog", url: "https://garudaqua.in/blogs" },
+            { name: blog.title, url: `https://garudaqua.in/blogs/${slug}` },
+          ])) }} />
+        </>
+      )}
+      <BlogPostClient params={params} />
+    </>
+  );
 }
 

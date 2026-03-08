@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import ProductDetail from "./ProductDetail";
+import { productSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const revalidate = 60;
 
@@ -98,6 +99,16 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   return (
     <>
+      {product && (
+        <>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(product)) }} />
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
+            { name: "Home", url: "https://garudaqua.in" },
+            { name: "Products", url: "https://garudaqua.in/products" },
+            { name: product.name, url: `https://garudaqua.in/products/${id}` },
+          ])) }} />
+        </>
+      )}
       {preloadImage && (
         <link rel="preload" as="image" href={preloadImage} fetchPriority="high" />
       )}

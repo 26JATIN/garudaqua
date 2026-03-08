@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import ProductsPage from "../components/ProductsPage";
+import { collectionPageSchema } from '@/lib/jsonld';
 
 export const metadata: Metadata = {
   title: "Products — Water Tanks, Pipes & Fittings",
@@ -108,6 +109,11 @@ export default async function Page({
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema({
+        name: "Products — Water Tanks, Pipes & Fittings",
+        description: "Browse Garud Aqua Solutions' full range of HDPE water tanks, PVC pipes, pipe fittings & water management products.",
+        url: "https://garudaqua.in/products",
+      })) }} />
       {/* Preload LCP images — browser starts fetching immediately, before JS hydration */}
       {products.slice(0, 4).map((product: { id: string; image?: string }, i: number) =>
         product.image ? (
