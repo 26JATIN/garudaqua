@@ -1,9 +1,9 @@
 
 import { purgeCloudflareCache } from "./cloudflare";
 
-export async function revalidateAndWarm(_paths?: string[]) {
-  // Purging is completely disabled as per user request
-  await purgeCloudflareCache();
+export async function revalidateAndWarm(paths?: string[]) {
+  // Purge specific paths from Cloudflare Edge caching
+  await purgeCloudflareCache(paths);
   return;
 }
 

@@ -2,18 +2,34 @@ const CF_ZONE_ID = process.env.CF_ZONE_ID;
 const CF_API_TOKEN = process.env.CF_API_TOKEN;
 
 /**
- * Purge the ENTIRE Cloudflare edge cache for the zone.
- * URL-specific purge doesn't work reliably because Cloudflare caches
- * URL variants (www, trailing slash, query strings) that don't match
- * our exact paths. purge_everything matches what the dashboard "Purge All" does.
+ * Purges specific paths from Cloudflare Edge Cache.
+ * If no paths are provided, it falls back to purging everything.
  */
-export async function purgeCloudflareCache() {
+export async function purgeCloudflareCache(paths?: string[]) {
   if (!CF_ZONE_ID || !CF_API_TOKEN) {
     console.log("[CF] Skipping cache purge — env vars not set");
     return;
   }
 
   try {
+    let body;
+
+    // If specific paths are provided, purge only those URLs
+    if (paths && paths.length > 0) {
+      const filesToPurge: string[] = [];
+      for (const path of paths) {
+        // Purge both non-www and www variants to be safe
+        filesToPurge.push(`https://garudaqua.in${path}`);
+        filesToPurge.push(`https://www.garudaqua.in${path}`);
+      }
+      body = { files: filesToPurge };
+      console.log(`[CF] Purging specific paths:`, paths);
+    } else {
+      // Fallback to purge everything
+      body = { purge_everything: true };
+      console.log(`[CF] Purging entire cache...`);
+    }
+
     const res = await fetch(
       `https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache`,
       {
@@ -22,7 +38,7 @@ export async function purgeCloudflareCache() {
           Authorization: `Bearer ${CF_API_TOKEN}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ purge_everything: true }),
+        body: JSON.stringify(body),
       }
     );
 
@@ -31,7 +47,7 @@ export async function purgeCloudflareCache() {
     if (!data.success) {
       console.error("[CF] Cache purge failed:", JSON.stringify(data.errors));
     } else {
-      console.log("[CF] Purged entire cache ✅");
+      console.log(paths && paths.length > 0 ? "[CF] Purged specific paths ✅" : "[CF] Purged entire cache ✅");
     }
   } catch (e) {
     console.error("[CF] Cache purge request failed:", e);
