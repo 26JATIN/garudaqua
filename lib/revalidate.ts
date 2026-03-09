@@ -16,6 +16,9 @@ export async function revalidateAndWarm(paths: string[]) {
     revalidatePath(p);
   }
 
+  // Wait 5 seconds for the DB update to fully propagate
+  await new Promise((r) => setTimeout(r, 5000));
+
   // Step 2 — purge Cloudflare CDN
   await purgeCloudflareCache(allPaths);
 }
