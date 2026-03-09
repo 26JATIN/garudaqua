@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import dynamicImports from "next/dynamic";
 import Hero from './components/hero';
 import Footer from './components/Footer';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema } from '@/lib/jsonld';
 
-// Lazy load below-the-fold components to reduce initial JS bundle
-const CategoryShowcase = dynamic(() => import('./components/CategoryShowcase'));
-const Benefits = dynamic(() => import('./components/Benefits'));
-const ImageGallery = dynamic(() => import('./components/ImageGallery'));
-const VideoShowcaseSection = dynamic(() => import('./components/HeroVideoShowcase'));
-const Testimonials = dynamic(() => import('./components/Testimonials'));
-const Newsletter = dynamic(() => import('./components/Newsletter'));
+export const dynamic = "force-dynamic";
 
-// ISR: serve cached page, revalidate every 60s in the background
-export const revalidate = 60;
+// Lazy load below-the-fold components to reduce initial JS bundle
+const CategoryShowcase = dynamicImports(() => import('./components/CategoryShowcase'));
+const Benefits = dynamicImports(() => import('./components/Benefits'));
+const ImageGallery = dynamicImports(() => import('./components/ImageGallery'));
+const VideoShowcaseSection = dynamicImports(() => import('./components/HeroVideoShowcase'));
+const Testimonials = dynamicImports(() => import('./components/Testimonials'));
+const Newsletter = dynamicImports(() => import('./components/Newsletter'));
+
+
+
 
 export const metadata: Metadata = {
   title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings | Sriganganagar",

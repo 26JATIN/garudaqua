@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import BlogsClient from './BlogsClient';
 import { collectionPageSchema } from '@/lib/jsonld';
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: 'Blog — Tips, Guides & Insights | Garud Aqua Solutions',
   description:
@@ -17,7 +19,8 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60;
+
+
 
 async function getInitialData() {
   const [categories, blogsData] = await Promise.all([

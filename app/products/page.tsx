@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import ProductsPage from "../components/ProductsPage";
 import { collectionPageSchema } from '@/lib/jsonld';
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Products — Water Tanks, Pipes & Fittings",
   description:
@@ -16,7 +18,8 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60; // ISR: revalidate every 60 seconds
+
+
 
 // Build a Cloudinary URL for preloading (same logic as cloudinary-loader)
 function buildPreloadUrl(src: string, width: number, quality: number) {
