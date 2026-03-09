@@ -23,20 +23,18 @@ export async function revalidateAndWarm(paths: string[]) {
   // Step 2 — purge Cloudflare CDN for affected paths
   await purgeCloudflareCache(allPaths);
 
-  // Step 3 — warm ALL public pages in parallel (awaited with timeout)
-  const warmups = allPaths.map((p) =>
-    fetch(`${SITE_URL}${p}`, {
-      headers: { "x-warmup": "1" },
-      cache: "no-store",
-    }).catch(() => {
-      // swallow errors — warming is best-effort
-    })
+  // Step 3 — warm ALL public pages in parallel
+  // MUST BE AWAITED: Vercel serverless functions freeze immediately when they return.
+  // Unawaited fetches get killed mid-flight and can cause Next.js to cache an error state (black screen).
+  await Promise.all(
+    allPaths.map((p) =>
+      fetch(`${SITE_URL}${p}`, {
+        headers: { "x-warmup": "1" },
+        cache: "no-store",
+      }).catch((e) => {
+        console.error(`[Warm] Failed to warm ${p}:`, e);
+      })
+    )
   );
-
-  // Wait for all warm-ups but cap at 5s so the admin API stays responsive
-  await Promise.race([
-    Promise.allSettled(warmups),
-    new Promise((r) => setTimeout(r, 5000)),
-  ]);
 }
 
