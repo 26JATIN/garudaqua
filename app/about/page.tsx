@@ -9,17 +9,17 @@ export default function AboutPage() {
     const ref = useAnimateOnView();
 
     return (
-        <main ref={ref as React.RefObject<HTMLElement>} className="min-h-screen bg-[#0A0A0A]">
+        <main ref={ref as React.RefObject<HTMLElement>} className="min-h-screen bg-white dark:bg-[#0A0A0A]">
             <section className="about-hero max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-4 sm:pt-18 pb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
                     {/* Left — headline */}
                     <div className="animate-on-view-left">
-                        <p className="text-[#38BDF8] text-sm font-medium tracking-wide mb-5">
+                        <p className="text-[#0284C7] dark:text-[#38BDF8] text-sm font-medium tracking-wide mb-5">
                             GARUD AQUA SOLUTIONS · SRIGANGANAGAR, INDIA
                         </p>
 
-                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold text-white leading-[1.06] tracking-tight mb-3">
+                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold text-gray-900 dark:text-white leading-[1.06] tracking-tight mb-3">
                             Garud Aqua
                             <br />
                             Solutions
@@ -27,22 +27,22 @@ export default function AboutPage() {
 
                         <div className="w-16 h-0.5 bg-[#0EA5E9] mb-6" />
 
-                        <p className="text-white/50 text-lg leading-relaxed max-w-md mb-3">
+                        <p className="text-gray-600 dark:text-white/50 text-lg leading-relaxed max-w-md mb-3">
                             Trusted manufacturer, retailer, and wholesale supplier of water storage tanks, sprayer tanks, and CPVC/PVC piping systems.
                         </p>
 
-                        <p className="text-white/30 text-xs font-medium tracking-widest uppercase mb-8">
+                        <p className="text-gray-500 dark:text-white/30 text-xs font-medium tracking-widest uppercase mb-8">
                             Since 2014 · Rajasthan, India
                         </p>
 
                         <div className="flex flex-wrap gap-3">
                             <Link href="/products"
-                                className="px-6 py-3 bg-white text-black text-sm font-semibold rounded-full hover:bg-white/90 transition-colors"
+                                className="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-black text-sm font-semibold rounded-full hover:bg-gray-800 dark:hover:bg-white/90 transition-colors"
                             >
                                 View Products
                             </Link>
                             <Link href="/contact"
-                                className="px-6 py-3 bg-white/8 border border-white/15 text-white text-sm font-medium rounded-full hover:bg-white/12 transition-colors"
+                                className="px-6 py-3 bg-gray-100 dark:bg-white/8 border border-gray-200 dark:border-white/15 text-gray-900 dark:text-white text-sm font-medium rounded-full hover:bg-gray-200 dark:hover:bg-white/12 transition-colors"
                             >
                                 Contact Us
                             </Link>
@@ -129,7 +129,7 @@ export default function AboutPage() {
 
                     {/* Left heading */}
                     <div className="animate-on-view lg:sticky lg:top-32">
-                        <h2 className="text-white font-bold text-4xl sm:text-5xl leading-[1.1]">
+                        <h2 className="text-gray-900 dark:text-white font-bold text-4xl sm:text-5xl leading-[1.1]">
                             How Can We<br />Help You?
                         </h2>
                     </div>
@@ -189,7 +189,7 @@ export default function AboutPage() {
                         ].map((item, i) => (
                             <div
                                 key={item.title}
-                                className="animate-on-view bg-[#111111] rounded-2xl p-6 flex flex-col gap-5 min-h-65"
+                                className="animate-on-view bg-gray-50 dark:bg-[#111111] border border-gray-100 dark:border-transparent rounded-2xl p-6 flex flex-col gap-5 min-h-65"
                                 style={{ animationDelay: `${i * 0.08}s` }}
                             >
                                 {/* Icon */}
@@ -202,15 +202,15 @@ export default function AboutPage() {
 
                                 {/* Text */}
                                 <div className="flex-1">
-                                    <p className="text-white font-bold text-lg leading-snug mb-3">{item.title}</p>
-                                    <p className="text-[#888888] text-sm leading-relaxed">{item.desc}</p>
+                                    <p className="text-gray-900 dark:text-white font-bold text-lg leading-snug mb-3">{item.title}</p>
+                                    <p className="text-gray-600 dark:text-[#888888] text-sm leading-relaxed">{item.desc}</p>
                                 </div>
 
                                 {/* Button — bottom right, white pill with × */}
                                 <div className="flex justify-end">
                                     <Link
                                         href={item.link}
-                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-xs font-semibold hover:bg-white/90 transition-colors"
+                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-white shadow-sm border border-gray-200 dark:border-transparent text-black text-xs font-semibold hover:bg-gray-50 dark:hover:bg-white/90 transition-colors"
                                     >
                                         {item.cta}
                                         <span className="text-black/40 font-normal">✕</span>
@@ -231,13 +231,13 @@ export default function AboutPage() {
                         title: "Vision & Leadership",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Mr. Rajesh Gupta — Founder & MD</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Mr. Rajesh Gupta — Founder & MD</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Mr. Rajesh Gupta brings a wealth of experience and a deep-rooted passion for innovation. His strategic insights and customer-centric approach have shaped Garud Aqua Solutions into a company known for quality, innovative solutions, and unwavering dedication to customer satisfaction since its inception in 2014.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Founded 2014", "Customer-centric", "Quality first"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -247,13 +247,13 @@ export default function AboutPage() {
                         title: "55+ Years",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Unmatched Industry Expertise</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Unmatched Industry Expertise</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     With over 55 years of experience in pipe fitting and water tank retail, Mr. Gupta has a unique understanding of both customer needs and manufacturer capabilities. This depth of knowledge allows Garud Aqua Solutions to bridge the gap with innovative, market-ready solutions that truly serve the industry.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Pipe fittings", "Water tanks", "Retail expertise", "Manufacturer insight"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -263,13 +263,13 @@ export default function AboutPage() {
                         title: "Sustainability",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Commitment to Excellence & Environment</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Commitment to Excellence & Environment</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Mr. Gupta's relentless pursuit of excellence is matched by his commitment to sustainable practices. Under his guidance, Garud Aqua Solutions continuously pushes the boundaries of innovation — making a positive impact on communities and the environment across Rajasthan and beyond.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Eco-friendly", "Innovation-driven", "Community impact", "Sustainable ops"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -279,13 +279,13 @@ export default function AboutPage() {
                         title: "Today",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">10,000+ Customers. One Vision.</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">10,000+ Customers. One Vision.</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     From a single retail outlet in Sriganganagar to a pan-Rajasthan operation serving over 10,000 customers — Mr. Gupta's vision has been the constant driving force. His mission: to provide reliable and sustainable water management solutions for generations to come.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["10,000+ customers", "Pan-Rajasthan", "Wholesale & retail", "15+ years"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -303,13 +303,13 @@ export default function AboutPage() {
                         title: "Manufacturing",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Advanced Manufacturing Facility</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Advanced Manufacturing Facility</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Our manufacturing facility is equipped with advanced machinery and equipment, operated by skilled technicians and engineers. From water tank production lines to piping system assembly stations, every aspect of our manufacturing process is carefully designed to ensure precision, consistency, and reliability.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Advanced machinery", "Skilled engineers", "Production lines", "Quality consistency"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -319,13 +319,13 @@ export default function AboutPage() {
                         title: "Quality",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Testing & Quality Assurance</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Testing & Quality Assurance</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     We have dedicated testing and quality assurance laboratories where our products undergo rigorous testing and inspection. Our quality control experts use cutting-edge equipment and techniques to verify the performance, durability, and safety of our products — ensuring they meet or exceed industry standards.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["QA labs", "Rigorous testing", "Durability checks", "Industry standards"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -335,13 +335,13 @@ export default function AboutPage() {
                         title: "Logistics",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Warehousing & Logistics</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Warehousing & Logistics</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Our spacious warehouses are strategically located to facilitate efficient storage and distribution. With ample storage capacity and modern logistics infrastructure, we fulfill orders quickly and accurately — ensuring timely delivery to customers across Rajasthan and beyond.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Strategic warehouses", "Fast fulfillment", "Pan-Rajasthan delivery", "Modern logistics"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -351,13 +351,13 @@ export default function AboutPage() {
                         title: "R&D",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Research & Development</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Research & Development</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Innovation is at the heart of everything we do. Our dedicated R&D team focuses on creating new products and improving existing ones. Equipped with advanced technology and resources, our R&D facility supports continuous innovation across our entire product range.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Product innovation", "Advanced R&D", "Continuous improvement", "New solutions"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -367,13 +367,13 @@ export default function AboutPage() {
                         title: "Green Ops",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Environmental Sustainability</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Environmental Sustainability</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     We are committed to minimising our environmental footprint. From energy-efficient manufacturing processes to eco-friendly packaging materials, we strive to incorporate sustainable practices into our infrastructure — promoting responsibility at every level of our operations.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Energy efficiency", "Eco packaging", "Reduced footprint", "Sustainable ops"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -383,18 +383,18 @@ export default function AboutPage() {
                         title: "Support",
                         content: (
                             <div>
-                                <p className="text-neutral-200 font-semibold text-base md:text-lg mb-2">Customer Support Centre</p>
-                                <p className="text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
+                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Customer Support Centre</p>
+                                <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Our infrastructure includes a customer support centre staffed by knowledgeable and friendly professionals dedicated to exceptional service. Whether you have questions about our products or need assistance with an order, our team is always here to help.
                                 </p>
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {["Product queries", "Order assistance", "Expert support", "Friendly service"].map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs">{t}</span>
+                                        <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
                                 <Link
                                     href="/contact"
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-white/90 transition-colors"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-900 dark:bg-white text-white dark:text-black text-xs font-semibold hover:bg-gray-800 dark:hover:bg-white/90 transition-colors"
                                 >
                                     Get in Touch →
                                 </Link>
@@ -409,20 +409,20 @@ export default function AboutPage() {
 
                 {/* Eyebrow + heading */}
                 <div className="animate-on-view text-center mb-12">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/8 border border-white/10 text-white/60 text-xs font-medium tracking-widest uppercase mb-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 dark:bg-white/8 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-white/60 text-xs font-medium tracking-widest uppercase mb-8">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
                         Get in Touch
                     </div>
-                    <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight">
+                    <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
                         Get in{" "}
                         <span className="bg-linear-to-r from-[#38BDF8] via-[#818CF8] to-[#a78bfa] bg-clip-text text-transparent">
                             touch
                         </span>{" "}
                         with us
                     </h2>
-                    <p className="mt-5 text-white/50 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
+                    <p className="mt-5 text-gray-600 dark:text-white/50 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
                         Whether you need bulk pricing, product advice, or simply want to know more about what we do —{" "}
-                        <span className="text-white/80 font-semibold">we&apos;d love to hear from you.</span>
+                        <span className="text-gray-900 dark:text-white/80 font-semibold">we&apos;d love to hear from you.</span>
                     </p>
                 </div>
 
@@ -439,13 +439,13 @@ export default function AboutPage() {
                             <div className="flex flex-wrap gap-3 justify-center">
                                 <Link
                                     href="/contact"
-                                    className="px-7 py-3 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition-colors"
+                                    className="px-7 py-3 rounded-full bg-white dark:bg-white text-black dark:text-black text-sm font-semibold hover:bg-white/90 transition-colors shadow-sm"
                                 >
                                     Contact Us →
                                 </Link>
                                 <Link
                                     href="/products"
-                                    className="px-7 py-3 rounded-full bg-white/15 border border-white/25 text-white text-sm font-medium hover:bg-white/25 transition-colors"
+                                    className="px-7 py-3 rounded-full bg-white/10 dark:bg-white/15 border border-white/20 dark:border-white/25 text-white dark:text-white text-sm font-medium hover:bg-white/20 dark:hover:bg-white/25 transition-colors"
                                 >
                                     Browse Products
                                 </Link>
