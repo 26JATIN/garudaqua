@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import ProductDetail from "./ProductDetail";
 import { productSchema, breadcrumbSchema } from "@/lib/jsonld";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata(
   { params }: { params: Promise<{ id: string }> }

@@ -1,9 +1,9 @@
-/**
- * Cache invalidation disabled.
- * Cloudflare and VPS are operating with no-cache policies for dynamic content.
- */
+
+import { purgeCloudflareCache } from "./cloudflare";
+
 export async function revalidateAndWarm(_paths?: string[]) {
   // Purging is completely disabled as per user request
+  await purgeCloudflareCache();
   return;
 }
 

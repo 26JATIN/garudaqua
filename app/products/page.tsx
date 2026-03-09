@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import ProductsPage from "../components/ProductsPage";
 import { collectionPageSchema } from '@/lib/jsonld';
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Products — Water Tanks, Pipes & Fittings",
