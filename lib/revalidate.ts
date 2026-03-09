@@ -1,13 +1,17 @@
 import { revalidatePath } from "next/cache";
 import { purgeCloudflareCache } from "./cloudflare";
 
-/** All public pages that should be revalidated after any admin update */
+const SITE_URL = process.env.NEXTAUTH_URL || "https://garudaqua.in";
+
+/** All public pages to revalidate and warm after any admin update */
 const ALL_PUBLIC_PAGES = ["/", "/products", "/blogs", "/contact", "/enquire"];
 
 /**
- * Two-step cache invalidation:
+ * Three-step cache invalidation + warm:
  *   1. revalidatePath  — tells Vercel's ISR to regenerate pages on next visit
- *   2. purgeCloudflare — clears Cloudflare's CDN edge cache
+ *   2. purgeCloudflare — purges ENTIRE Cloudflare CDN (same as dashboard "Purge All")
+ *   3. warm            — waits 2s for purge to propagate, then fetches all pages
+ *                         so both Vercel and Cloudflare are pre-loaded with fresh content
  */
 export async function revalidateAndWarm(paths: string[]) {
   // Step 1 — invalidate Vercel ISR cache
@@ -16,10 +20,19 @@ export async function revalidateAndWarm(paths: string[]) {
     revalidatePath(p);
   }
 
-  // Wait 5 seconds for the DB update to fully propagate
-  await new Promise((r) => setTimeout(r, 5000));
+  // Step 2 — purge entire Cloudflare CDN
+  await purgeCloudflareCache();
 
-  // Step 2 — purge Cloudflare CDN
-  await purgeCloudflareCache(allPaths);
+  // Step 3 — wait for purge to propagate, then warm all pages
+  await new Promise((r) => setTimeout(r, 2000));
+
+  await Promise.allSettled(
+    allPaths.map((p) =>
+      fetch(`${SITE_URL}${p}`, {
+        cache: "no-store",
+        headers: { "x-warmup": "1" },
+      })
+    )
+  );
 }
 
