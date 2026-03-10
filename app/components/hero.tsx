@@ -88,7 +88,7 @@ export default function Hero({ initialSlides }: HeroProps) {
             <div className="absolute inset-0">
                 {/* First slide — render as plain HTML for instant SSR paint (no crossfade needed) */}
                 {/* Always render current image fully opaque, only fade out previous image on top */}
-                <div className="absolute inset-0" key={`curr-${currentSlide}`}> 
+                <div className="absolute inset-0" key={`curr-${currentSlide}`}>
                     <Image
                         src={slides[currentSlide].image}
                         alt={slides[currentSlide].title || "Garud Aqua"}
@@ -122,7 +122,7 @@ export default function Hero({ initialSlides }: HeroProps) {
                             alt={slides[prevSlide].title || "Garud Aqua"}
                             fill
                             className={`object-cover object-top ${slides[prevSlide].mobileImage ? 'hidden sm:block' : ''}`}
-                            quality={50}
+                            quality={100}
                             sizes={slides[prevSlide].mobileImage
                                 ? "(max-width: 640px) 1px, 100vw"
                                 : "100vw"}
@@ -133,7 +133,7 @@ export default function Hero({ initialSlides }: HeroProps) {
                                 alt={slides[prevSlide].title || "Garud Aqua"}
                                 fill
                                 className="sm:hidden object-cover object-center"
-                                quality={50}
+                                quality={100}
                                 sizes="(min-width: 641px) 1px, 100vw"
                             />
                         )}
