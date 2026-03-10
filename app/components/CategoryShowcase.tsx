@@ -22,11 +22,12 @@ interface Category {
   description?: string;
 }
 
-interface Subcategory {
+interface Product {
   id: string;
   name: string;
   isActive: boolean;
   image: string;
+  description?: string;
   category: { id: string; name: string };
 }
 
@@ -184,7 +185,7 @@ export const Card = React.memo(({
   // Memoize the card preview to prevent unnecessary re-renders
   const cardPreview = useMemo(() => (
     <div
-      className={`rounded-xl sm:rounded-2xl transition-all duration-700 ease-out hover:scale-105 p-0.5 sm:p-1 md:p-2 aspect-4/3 overflow-hidden relative group`}
+      className={`rounded-xl sm:rounded-2xl transition-all duration-700 ease-out hover:scale-105 p-0.5 sm:p-1 md:p-2 aspect-square overflow-hidden relative group`}
       style={{
         borderRadius: '24px 24px 4px 24px'
       }}
@@ -217,7 +218,7 @@ export const Card = React.memo(({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "relative cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm transition-shadow duration-300",
+        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm transition-shadow duration-300",
         isHovered && "shadow-lg"
       )}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}>
@@ -236,23 +237,19 @@ export const Card = React.memo(({
       </AnimatePresence>
 
       {/* Card content — above the spotlight */}
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-col flex-1 h-full">
         {cardPreview}
-        <div className="space-y-2 sm:space-y-3 md:space-y-4 mt-2 sm:mt-3 md:mt-4">
-          <div className="flex flex-col gap-1 sm:gap-2">
+        <div className="space-y-2 sm:space-y-3 md:space-y-4 mt-2 sm:mt-3 md:mt-4 flex-1 flex flex-col">
+          <div className="flex flex-col gap-1 sm:gap-2 flex-1">
             <div className="flex justify-between items-start gap-2">
               <motion.h3
                 layoutId={layout ? `title-${card.id || card.name}` : undefined}
-                className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1"
+                className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1 truncate"
+                title={card.name}
               >
                 {card.name}
               </motion.h3>
             </div>
-            {card.description && (
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                {card.description}
-              </p>
-            )}
           </div>
 
           {/* Subcategories */}
@@ -294,15 +291,15 @@ Card.displayName = 'Card';
 
 interface CategoryShowcaseProps {
   initialCategories?: Category[];
-  initialSubcategories?: Subcategory[];
+  initialProducts?: Product[];
 }
 
-export default function CategoryShowcase({ initialCategories, initialSubcategories }: CategoryShowcaseProps) {
+export default function CategoryShowcase({ initialCategories, initialProducts }: CategoryShowcaseProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [categories, setCategories] = useState<Category[]>(initialCategories || []);
-  const [subcategories, setSubcategories] = useState<Subcategory[]>(initialSubcategories || []);
-  const [isLoading, setIsLoading] = useState(!initialCategories || !initialSubcategories);
+  const [products, setProducts] = useState<Product[]>(initialProducts || []);
+  const [isLoading, setIsLoading] = useState(!initialCategories || !initialProducts);
   const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
 
@@ -319,13 +316,15 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
     }
   }, []);
 
-  const fetchSubcategories = useCallback(async () => {
+  const fetchProducts = useCallback(async () => {
     try {
-      const res = await fetch("/api/subcategories");
-      if (!res.ok) throw new Error("Failed to fetch subcategories");
+      const res = await fetch("/api/products?limit=100");
+      if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setSubcategories(data);
+      if (data && Array.isArray(data.products)) {
+        setProducts(data.products);
+      } else if (Array.isArray(data)) {
+        setProducts(data);
       }
     } catch {
       // API failed
@@ -333,16 +332,16 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
   }, []);
 
   useEffect(() => {
-    if (initialCategories && initialSubcategories) return;
+    if (initialCategories && initialProducts) return;
     async function loadData() {
       setIsLoading(true);
-      await Promise.all([fetchCategories(), fetchSubcategories()]);
+      await Promise.all([fetchCategories(), fetchProducts()]);
       setIsLoading(false);
     }
     loadData();
-  }, [fetchCategories, fetchSubcategories, initialCategories, initialSubcategories]);
+  }, [fetchCategories, fetchProducts, initialCategories, initialProducts]);
 
-  const MAX_DISPLAYED = 16;
+  const MAX_DISPLAYED = 50;
 
   // Function to scroll to the top of the section smoothly
   const scrollToSection = useCallback(() => {
@@ -395,19 +394,9 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
     return () => observer.disconnect();
   }, []);
 
-  const handleSubcategoryClick = useCallback((subcategory: Subcategory) => {
-    const categoryInfo = categories.find(cat =>
-      cat.id === subcategory.category.id ||
-      cat.name === subcategory.category.name
-    );
-
-    if (categoryInfo) {
-      const subcategoryId = encodeURIComponent(subcategory.id);
-      router.push(`/products?category=${categoryInfo.id}&subcategory=${subcategoryId}`);
-    } else {
-      router.push(`/products?subcategory=${encodeURIComponent(subcategory.id)}`);
-    }
-  }, [router, categories]);
+  const handleProductClick = useCallback((product: Product) => {
+    router.push(`/products/${product.id}`);
+  }, [router]);
 
   // Get unique categories for filter buttons
   const categoryFilters = useMemo(() => {
@@ -420,34 +409,34 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
     return filters;
   }, [categories]);
 
-  // Filter subcategories based on selected category
-  const filteredSubcategories = useMemo(() => {
+  // Filter products based on selected category
+  const filteredProducts = useMemo(() => {
     if (selectedCategory === 'ALL') {
-      return subcategories;
+      return products;
     }
     const category = categories.find(cat => cat.name === selectedCategory);
     if (!category) return [];
 
-    return subcategories.filter(sub =>
-      sub.isActive && (
-        sub.category.id === category.id ||
-        sub.category.name === category.name
+    return products.filter(prod =>
+      prod.isActive && (
+        prod.category.id === category.id ||
+        prod.category.name === category.name
       )
     );
-  }, [subcategories, selectedCategory, categories]);
+  }, [products, selectedCategory, categories]);
 
-  // Get displayed subcategories (limited to MAX_DISPLAYED)
-  const displayedSubcategories = useMemo(() => {
-    return filteredSubcategories.slice(0, MAX_DISPLAYED);
-  }, [filteredSubcategories]);
+  // Get displayed products (limited to MAX_DISPLAYED)
+  const displayedProducts = useMemo(() => {
+    return filteredProducts.slice(0, MAX_DISPLAYED);
+  }, [filteredProducts]);
 
-  const hasMore = filteredSubcategories.length > MAX_DISPLAYED;
+  const hasMore = filteredProducts.length > MAX_DISPLAYED;
 
-  // Memoize rendered subcategories as cards
-  const renderedSubcategories = useMemo(() => {
-    return displayedSubcategories.map((subcategory, index) => (
+  // Memoize rendered products as cards
+  const renderedProducts = useMemo(() => {
+    return displayedProducts.map((product, index) => (
       <motion.div
-        key={`${selectedCategory}-${subcategory.id}`}
+        key={`${selectedCategory}-${product.id}`}
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{
           opacity: 1,
@@ -466,39 +455,39 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
           transition: { duration: 0.3 }
         }}
         layout
+        className="h-full"
       >
         <Card
-          card={subcategory}
+          card={product}
           index={index}
           layout={true}
-          onClick={() => handleSubcategoryClick(subcategory)}
+          onClick={() => handleProductClick(product)}
           subcategories={[]}
           onSubcategoryClick={() => { }}
         />
       </motion.div>
     ));
-  }, [displayedSubcategories, selectedCategory, handleSubcategoryClick]);
+  }, [displayedProducts, selectedCategory, handleProductClick]);
 
   return (
-    <section ref={sectionRef} className="bg-white dark:bg-black py-8 sm:py-12 lg:py-16">
-      <div className="flex flex-col lg:flex-row">
+    <section ref={sectionRef} className="bg-white dark:bg-black py-8 sm:py-12 lg:py-16 px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <div className="flex flex-col lg:flex-row lg:items-start min-h-[60vh] gap-6 lg:gap-0">
         {/* Sidebar - Filter Section */}
-        <div className="w-full lg:w-1/5 p-4 sm:p-6 lg:p-8 xl:p-12 flex flex-col justify-start">
-          <div className="lg:sticky lg:top-24">
-            <div
-              className={`transform transition-all duration-1500 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-[50vh] opacity-0"
-                }`}
-            >
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 lg:mb-8 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform">
-                Explore
-                <br />
-                Categories
-              </h2>
-            </div>
+        <div className="w-full lg:w-1/5 shrink-0 mb-4 sm:mb-6 lg:mb-0 lg:pr-6 xl:pr-8">
+          <div
+            className={`lg:sticky lg:top-8 transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+              }`}
+          >
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 lg:mb-8 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform leading-tight">
+              Explore
+              <br />
+              Categories
+            </h2>
 
             <div
-              className={`transform transition-all duration-1000 ease-out delay-500 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+              className={`transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
                 }`}
+              style={{ transitionDelay: '150ms' }}
             >
               {/* Category Filter Buttons */}
               <div className="space-y-3">
@@ -508,15 +497,15 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
 
                 {/* Desktop: Vertical layout */}
                 <div className="hidden lg:flex flex-col gap-2">
-                  {categoryFilters.map((filter) => {
+                  {categoryFilters.map((filter, index) => {
                     const count = filter === 'ALL'
-                      ? subcategories.length
-                      : subcategories.filter(sub => {
+                      ? products.length
+                      : products.filter(prod => {
                         const category = categories.find(cat => cat.name === filter);
                         if (!category) return false;
-                        return sub.isActive && (
-                          sub.category.id === category.id ||
-                          sub.category.name === category.name
+                        return prod.isActive && (
+                          prod.category.id === category.id ||
+                          prod.category.name === category.name
                         );
                       }).length;
 
@@ -524,10 +513,11 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
                       <button
                         key={filter}
                         onClick={() => handleCategoryChange(filter)}
-                        className={`text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-[1.02] flex items-center justify-between group ${selectedCategory === filter
+                        className={`text-left px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-500 ease-out hover:scale-105 flex items-center justify-between group ${selectedCategory === filter
                           ? 'bg-linear-to-r from-[#0EA5E9] to-[#0284C7] text-white shadow-lg shadow-[#0EA5E9]/20'
-                          : 'text-gray-900 dark:text-gray-100 hover:text-[#0369A1] dark:hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 dark:hover:bg-[#0EA5E9]/10 hover:shadow-md border border-transparent hover:border-[#0EA5E9]/30'
-                          }`}
+                          : 'text-gray-900 dark:text-gray-100 hover:text-[#0369A1] dark:hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 dark:hover:bg-[#0EA5E9]/10 border border-transparent hover:border-[#0EA5E9]/30'
+                          } ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+                        style={{ transitionDelay: `${250 + index * 80}ms` }}
                       >
                         <span className="truncate">{filter}</span>
                         <span className={`ml-2 text-xs px-2 py-1 rounded-full font-semibold transition-all duration-300 ${selectedCategory === filter
@@ -542,17 +532,17 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
                 </div>
 
                 {/* Mobile: Horizontal scrollable layout */}
-                <div className="lg:hidden overflow-x-auto">
-                  <div className="flex gap-2 pb-2">
-                    {categoryFilters.map((filter) => {
+                <div className="lg:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+                  <div className="flex gap-2 pb-2 min-w-max">
+                    {categoryFilters.map((filter, index) => {
                       const count = filter === 'ALL'
-                        ? subcategories.length
-                        : subcategories.filter(sub => {
+                        ? products.length
+                        : products.filter(prod => {
                           const category = categories.find(cat => cat.name === filter);
                           if (!category) return false;
-                          return sub.isActive && (
-                            sub.category.id === category.id ||
-                            sub.category.name === category.name
+                          return prod.isActive && (
+                            prod.category.id === category.id ||
+                            prod.category.name === category.name
                           );
                         }).length;
 
@@ -560,15 +550,16 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
                         <button
                           key={filter}
                           onClick={() => handleCategoryChange(filter)}
-                          className={`whitespace-nowrap px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 group ${selectedCategory === filter
+                          className={`whitespace-nowrap px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-500 ease-out flex items-center gap-2 shrink-0 ${selectedCategory === filter
                             ? 'bg-linear-to-r from-[#0EA5E9] to-[#0284C7] text-white shadow-lg shadow-[#0EA5E9]/20'
-                            : 'bg-white text-gray-900 dark:bg-[#0A0A0A] dark:text-gray-100 hover:text-[#0369A1] dark:hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 dark:hover:bg-[#0EA5E9]/10 hover:shadow-md border border-gray-200 dark:border-white/10 hover:border-[#0EA5E9]/30'
-                            }`}
+                            : 'bg-white text-gray-900 dark:bg-[#0A0A0A] dark:text-gray-100 hover:text-[#0369A1] dark:hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 dark:hover:bg-[#0EA5E9]/10 border border-gray-200 dark:border-white/10 hover:border-[#0EA5E9]/30'
+                            } ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+                          style={{ transitionDelay: `${250 + index * 60}ms` }}
                         >
                           <span>{filter}</span>
                           <span className={`text-xs px-2 py-1 rounded-full font-semibold transition-all duration-300 ${selectedCategory === filter
                             ? 'bg-white/20 text-white backdrop-blur-sm'
-                            : 'bg-white text-[#0369A1] dark:bg-[#0EA5E9]/20 dark:text-[#0EA5E9] group-hover:bg-[#0EA5E9] group-hover:text-white border border-gray-200 dark:border-white/10'
+                            : 'bg-[#0EA5E9]/10 text-[#0369A1] dark:bg-[#0EA5E9]/20 dark:text-[#0EA5E9] group-hover:bg-[#0EA5E9] group-hover:text-white border border-gray-200 dark:border-white/10'
                             }`}>
                             {count}
                           </span>
@@ -578,6 +569,7 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
                   </div>
                 </div>
               </div>
+
               {/* View All Products CTA */}
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
                 <button
@@ -597,23 +589,23 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
         </div>
 
         {/* Main Content - Categories Grid */}
-        <div className="w-full lg:w-4/5">
-          <div className="p-4 sm:p-6 lg:p-8 xl:p-12 space-y-8 sm:space-y-12">
+        <div className="w-full lg:w-4/5 flex-1">
+          <div className="space-y-8 sm:space-y-12">
             {/* Filter Status Indicator */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
               className="flex items-center justify-between border-b border-gray-200 dark:border-white/10 pb-4"
             >
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {selectedCategory === 'ALL' ? 'All Subcategories' : selectedCategory}
+                  {selectedCategory === 'ALL' ? 'All Products' : `${selectedCategory} Products`}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {filteredSubcategories.length <= MAX_DISPLAYED
-                    ? `Showing all ${filteredSubcategories.length} subcategories`
-                    : `Showing ${displayedSubcategories.length} of ${filteredSubcategories.length} subcategories`
+                  {filteredProducts.length <= MAX_DISPLAYED
+                    ? `Showing all ${filteredProducts.length} products`
+                    : `Showing ${displayedProducts.length} of ${filteredProducts.length} products`
                   }
                 </p>
               </div>
@@ -632,16 +624,16 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
             {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-white/50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-white/6">
-                    <div className="aspect-4/3 rounded-xl sm:rounded-2xl skeleton-loader" />
-                    <div className="mt-2 sm:mt-3 md:mt-4 space-y-2">
-                      <div className="h-5 w-3/4 rounded skeleton-loader" />
+                  <div key={i} className="rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-white/50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-white/6 h-full flex flex-col">
+                    <div className="aspect-square rounded-xl sm:rounded-2xl skeleton-loader" />
+                    <div className="mt-2 sm:mt-3 md:mt-4 space-y-2 flex-1">
+                      <div className="h-5 w-full rounded skeleton-loader" />
                       <div className="h-4 w-1/2 rounded skeleton-loader" />
                     </div>
                   </div>
                 ))}
               </div>
-            ) : filteredSubcategories.length > 0 ? (
+            ) : filteredProducts.length > 0 ? (
               <>
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -652,7 +644,7 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
                     transition={{ duration: 0.5, ease: "easeOut" }}
                     className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
                   >
-                    {renderedSubcategories}
+                    {renderedProducts}
                   </motion.div>
                 </AnimatePresence>
 
@@ -676,7 +668,7 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
                       className="group relative px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 font-medium tracking-wide overflow-hidden"
                     >
                       <span className="relative z-10 flex items-center gap-3">
-                        Explore All {filteredSubcategories.length} Subcategories
+                        Explore All {filteredProducts.length} Products
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -691,8 +683,8 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
                 <div className="text-gray-300 mb-4">
                   <Droplets className="w-16 h-16 mx-auto opacity-40" />
                 </div>
-                <h3 className="text-xl font-light text-gray-600 dark:text-gray-400 mb-2">No subcategories available</h3>
-                <p className="text-gray-500 dark:text-gray-600">Check back soon for new categories</p>
+                <h3 className="text-xl font-light text-gray-600 dark:text-gray-400 mb-2">No products available</h3>
+                <p className="text-gray-500 dark:text-gray-600">Check back soon for new products</p>
               </div>
             )}
           </div>
@@ -700,7 +692,8 @@ export default function CategoryShowcase({ initialCategories, initialSubcategori
       </div>
 
       {/* Custom Styles for Performance Optimizations */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .card-hover {
           will-change: transform;
           transform: translate3d(0, 0, 0);

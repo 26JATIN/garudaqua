@@ -84,7 +84,7 @@ export async function DELETE(
       (product.images || []).map((img: string) => deleteCloudinaryByUrl(img))
     );
 
-    await revalidateAndWarm(["/products", `/products/${id}`]);
+    await revalidateAndWarm(["/","/products", `/products/${id}`]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting product:", error);
