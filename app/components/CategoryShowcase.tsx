@@ -301,6 +301,8 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
   const [products, setProducts] = useState<Product[]>(initialProducts || []);
   const [isLoading, setIsLoading] = useState(!initialCategories || !initialProducts);
   const sectionRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const mobileFilterRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const fetchCategories = useCallback(async () => {
@@ -345,10 +347,27 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
 
   // Function to scroll to the top of the section smoothly
   const scrollToSection = useCallback(() => {
-    if (sectionRef.current) {
-      const sectionTop = sectionRef.current.offsetTop;
+    const isMobile = window.innerWidth < 1024;
+
+    if (isMobile && contentRef.current && mobileFilterRef.current) {
+      // On mobile: scroll so the content (filter status + grid) sits right below the sticky filter bar
+      const contentRect = contentRef.current.getBoundingClientRect();
+      const navbarHeight = 60;
+      const filterBarHeight = mobileFilterRef.current.offsetHeight;
+      const scrollTarget = window.scrollY + contentRect.top - navbarHeight - filterBarHeight;
+
       window.scrollTo({
-        top: sectionTop - 80,
+        top: scrollTarget,
+        behavior: 'smooth'
+      });
+    } else if (sectionRef.current) {
+      // On desktop: scroll to top of the section, below navbar
+      const rect = sectionRef.current.getBoundingClientRect();
+      const navbarHeight = 72;
+      const scrollTarget = window.scrollY + rect.top - navbarHeight;
+
+      window.scrollTo({
+        top: scrollTarget,
         behavior: 'smooth'
       });
     }
@@ -470,12 +489,56 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
   }, [displayedProducts, selectedCategory, handleProductClick]);
 
   return (
-    <section ref={sectionRef} className="bg-white dark:bg-black py-8 sm:py-12 lg:py-16 px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-      <div className="flex flex-col lg:flex-row lg:items-start min-h-[60vh] gap-6 lg:gap-0">
-        {/* Sidebar - Filter Section */}
+    <section ref={sectionRef} className="bg-white dark:bg-black py-6 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      {/* Mobile: Sticky filter bar — sits outside the flex layout so it can stick independently */}
+      <div ref={mobileFilterRef} className="lg:hidden sticky top-15 z-30 -mx-3 sm:-mx-6 px-3 sm:px-6 py-3 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5">
+        <div className="space-y-2">
+          <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+            Filter by Category
+          </h3>
+          <div className="overflow-x-auto scrollbar-hide -mx-3 sm:-mx-6 px-3 sm:px-6">
+            <div className="flex gap-2 pb-1 min-w-max">
+              {categoryFilters.map((filter, index) => {
+                const count = filter === 'ALL'
+                  ? products.length
+                  : products.filter(prod => {
+                    const category = categories.find(cat => cat.name === filter);
+                    if (!category) return false;
+                    return prod.isActive && (
+                      prod.category.id === category.id ||
+                      prod.category.name === category.name
+                    );
+                  }).length;
+
+                return (
+                  <button
+                    key={filter}
+                    onClick={() => handleCategoryChange(filter)}
+                    className={`whitespace-nowrap px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 shrink-0 ${selectedCategory === filter
+                      ? 'bg-linear-to-r from-[#0EA5E9] to-[#0284C7] text-white shadow-lg shadow-[#0EA5E9]/20'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 bg-transparent dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-900'
+                      }`}
+                  >
+                    <span>{filter}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full transition-colors ${selectedCategory === filter
+                      ? 'bg-white/20 text-white'
+                      : 'bg-gray-100 dark:bg-[#121212] text-gray-600 dark:text-gray-400'
+                      }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row min-h-[60vh] gap-6 lg:gap-0">
+        {/* Sidebar - Filter Section (Desktop: sticky, Mobile: just heading) */}
         <div className="w-full lg:w-1/5 shrink-0 mb-4 sm:mb-6 lg:mb-0 lg:pr-6 xl:pr-8">
           <div
-            className={`lg:sticky lg:top-8 transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+            className={`lg:sticky lg:top-22 transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
               }`}
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 lg:mb-8 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform leading-tight">
@@ -489,14 +552,14 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                 }`}
               style={{ transitionDelay: '150ms' }}
             >
-              {/* Category Filter Buttons */}
-              <div className="space-y-3">
+              {/* Category Filter Buttons — Desktop only (mobile is the sticky bar above) */}
+              <div className="hidden lg:block space-y-3">
                 <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                   Filter by Category
                 </h3>
 
                 {/* Desktop: Vertical layout */}
-                <div className="hidden lg:flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
                   {categoryFilters.map((filter, index) => {
                     const count = filter === 'ALL'
                       ? products.length
@@ -513,16 +576,16 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                       <button
                         key={filter}
                         onClick={() => handleCategoryChange(filter)}
-                        className={`text-left px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-500 ease-out hover:scale-105 flex items-center justify-between group ${selectedCategory === filter
+                        className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-500 ease-out hover:scale-105 flex items-center justify-between group ${selectedCategory === filter
                           ? 'bg-linear-to-r from-[#0EA5E9] to-[#0284C7] text-white shadow-lg shadow-[#0EA5E9]/20'
-                          : 'text-gray-900 dark:text-gray-100 hover:text-[#0369A1] dark:hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 dark:hover:bg-[#0EA5E9]/10 border border-transparent hover:border-[#0EA5E9]/30'
+                          : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
                           } ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
                         style={{ transitionDelay: `${250 + index * 80}ms` }}
                       >
                         <span className="truncate">{filter}</span>
-                        <span className={`ml-2 text-xs px-2 py-1 rounded-full font-semibold transition-all duration-300 ${selectedCategory === filter
-                          ? 'bg-white/20 text-white backdrop-blur-sm'
-                          : 'bg-[#0EA5E9]/10 text-[#0369A1] dark:bg-[#0EA5E9]/20 dark:text-[#0EA5E9] group-hover:bg-[#0EA5E9] group-hover:text-white'
+                        <span className={`ml-2 text-xs px-2 py-1 rounded-full transition-colors ${selectedCategory === filter
+                          ? 'bg-white/20 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-[#0EA5E9] group-hover:text-white'
                           }`}>
                           {count}
                         </span>
@@ -530,66 +593,13 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                     );
                   })}
                 </div>
-
-                {/* Mobile: Horizontal scrollable layout */}
-                <div className="lg:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
-                  <div className="flex gap-2 pb-2 min-w-max">
-                    {categoryFilters.map((filter, index) => {
-                      const count = filter === 'ALL'
-                        ? products.length
-                        : products.filter(prod => {
-                          const category = categories.find(cat => cat.name === filter);
-                          if (!category) return false;
-                          return prod.isActive && (
-                            prod.category.id === category.id ||
-                            prod.category.name === category.name
-                          );
-                        }).length;
-
-                      return (
-                        <button
-                          key={filter}
-                          onClick={() => handleCategoryChange(filter)}
-                          className={`whitespace-nowrap px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-500 ease-out flex items-center gap-2 shrink-0 ${selectedCategory === filter
-                            ? 'bg-linear-to-r from-[#0EA5E9] to-[#0284C7] text-white shadow-lg shadow-[#0EA5E9]/20'
-                            : 'bg-white text-gray-900 dark:bg-[#0A0A0A] dark:text-gray-100 hover:text-[#0369A1] dark:hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 dark:hover:bg-[#0EA5E9]/10 border border-gray-200 dark:border-white/10 hover:border-[#0EA5E9]/30'
-                            } ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-                          style={{ transitionDelay: `${250 + index * 60}ms` }}
-                        >
-                          <span>{filter}</span>
-                          <span className={`text-xs px-2 py-1 rounded-full font-semibold transition-all duration-300 ${selectedCategory === filter
-                            ? 'bg-white/20 text-white backdrop-blur-sm'
-                            : 'bg-[#0EA5E9]/10 text-[#0369A1] dark:bg-[#0EA5E9]/20 dark:text-[#0EA5E9] group-hover:bg-[#0EA5E9] group-hover:text-white border border-gray-200 dark:border-white/10'
-                            }`}>
-                            {count}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* View All Products CTA */}
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
-                <button
-                  onClick={() => router.push('/products')}
-                  className="w-full group flex items-center justify-between px-4 py-3 rounded-xl bg-[#0EA5E9]/8 dark:bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 hover:bg-[#0EA5E9] hover:border-[#0EA5E9] transition-all duration-300"
-                >
-                  <span className="text-sm font-semibold text-[#0369A1] dark:text-[#0EA5E9] group-hover:text-white transition-colors duration-300">
-                    View All Products
-                  </span>
-                  <svg className="w-4 h-4 text-[#0EA5E9] group-hover:text-white group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </button>
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content - Categories Grid */}
-        <div className="w-full lg:w-4/5 flex-1">
+        <div ref={contentRef} className="w-full lg:w-4/5 flex-1">
           <div className="space-y-8 sm:space-y-12">
             {/* Filter Status Indicator */}
             <motion.div

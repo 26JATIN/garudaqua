@@ -150,6 +150,10 @@ html {
   max-width: 100vw;
   overflow-x: clip;
   overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
+  /* Edge-to-edge PWA: extend page behind gesture pill / nav bar */
+  height: 100%;
+  height: 100dvh; /* Dynamic viewport height for iOS Chrome/Safari */
   background-color: var(--background);
 }
 

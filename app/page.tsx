@@ -139,7 +139,7 @@ export default async function Home() {
   ]);
 
   return (
-    <main className="min-h-screen relative overflow-x-hidden">
+    <main className="min-h-screen relative overflow-x-clip">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema({
         name: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
         description: "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes, fittings & agricultural water management products.",
