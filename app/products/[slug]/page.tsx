@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import ProductDetail from "./ProductDetail";
@@ -7,7 +7,20 @@ import { productSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const revalidate = 60;
 
-/** 24-char hex string = MongoDB ObjectId */
+/** Pre-build all active product pages at deploy time (ISR refreshes them every 60s). */
+export async function generateStaticParams() {
+  try {
+    const products = await prisma.product.findMany({
+      where: { isActive: true },
+      select: { slug: true },
+    });
+    return products.map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
+}
+
+/** 24-char hex string = MongoDB ObjectId (kept only for legacy inbound links that may still exist in the wild) */
 const isObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s);
 
 export async function generateMetadata(
@@ -16,7 +29,8 @@ export async function generateMetadata(
   try {
     const { slug } = await params;
     const product = await prisma.product.findFirst({
-      where: isObjectId(slug) ? { OR: [{ slug }, { id: slug }] } : { slug },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: isObjectId(slug) ? { OR: [{ slug }, { id: slug }] } : { OR: [{ slug }, { formerSlugs: { has: slug } } as any] },
       select: {
         name: true,
         slug: true,
@@ -63,17 +77,35 @@ export async function generateMetadata(
   }
 }
 
+async function findProduct(slug: string) {
+  const include = {
+    category: { select: { id: true, name: true, slug: true } },
+    subcategory: { select: { id: true, name: true, slug: true } },
+  } as const;
+
+  // 1. Try current slug (or ObjectId for legacy links)
+  const bySlug = await prisma.product.findFirst({
+    where: isObjectId(slug) ? { OR: [{ slug }, { id: slug }] } : { slug },
+    include,
+  });
+  if (bySlug) return bySlug;
+
+  // 2. Not found — check if slug is a formerSlug (product was renamed)
+  return prisma.product.findFirst({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    where: { formerSlugs: { has: slug } } as any,
+    include,
+  });
+}
+
 async function getProductData(slug: string) {
   try {
-    const product = await prisma.product.findFirst({
-      where: isObjectId(slug) ? { OR: [{ slug }, { id: slug }] } : { slug },
-      include: {
-        category: { select: { id: true, name: true, slug: true } },
-        subcategory: { select: { id: true, name: true, slug: true } },
-      },
-    });
+    const product = await findProduct(slug);
 
     if (!product) return { product: null, related: [], canonicalSlug: slug };
+
+    // Inactive products are treated as gone — caller will trigger notFound()
+    if (!product.isActive) return { product: null, related: [], canonicalSlug: slug };
 
     const related = await prisma.product.findMany({
       where: {
@@ -111,28 +143,27 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const { product, related, canonicalSlug } = await getProductData(slug);
 
+  // No product or inactive product → proper 404 (Next.js adds X-Robots-Tag: noindex)
+  if (!product) notFound();
+
   // If an ObjectId was used in the URL and the product has a slug, 301 redirect to the clean URL
-  if (product && canonicalSlug !== slug) {
+  if (canonicalSlug !== slug) {
     redirect(`/products/${canonicalSlug}`);
   }
 
   // Preload the main product image for LCP
-  const preloadImage = product?.image?.includes('res.cloudinary.com')
+  const preloadImage = product.image?.includes('res.cloudinary.com')
     ? product.image.replace('/upload/', '/upload/w_800,q_85,f_auto,c_limit/')
     : null;
 
   return (
     <>
-      {product && (
-        <>
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(product)) }} />
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
-            { name: "Home", url: "https://garudaqua.in" },
-            { name: "Products", url: "https://garudaqua.in/products" },
-            { name: product.name, url: `https://garudaqua.in/products/${canonicalSlug}` },
-          ])) }} />
-        </>
-      )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(product)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
+        { name: "Home", url: "https://garudaqua.in" },
+        { name: "Products", url: "https://garudaqua.in/products" },
+        { name: product.name, url: `https://garudaqua.in/products/${canonicalSlug}` },
+      ])) }} />
       {preloadImage && (
         <link rel="preload" as="image" href={preloadImage} fetchPriority="high" />
       )}

@@ -65,7 +65,7 @@ export async function GET(request: Request) {
         text: c.name,
         type: "category" as const,
         image: c.image || null,
-        url: `/products?category=${c.slug || slugify(c.name)}`,
+        url: `/products?category=${c.slug && c.slug !== "" ? c.slug : slugify(c.name)}`,
       })),
       ...subcategories.map((s) => ({
         id: s.id,
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
         type: "subcategory" as const,
         image: s.image || null,
         category: s.category.name,
-        url: `/products?category=${s.category.slug || slugify(s.category.name)}&subcategory=${s.slug || slugify(s.name)}`,
+        url: `/products?category=${s.category.slug && s.category.slug !== "" ? s.category.slug : slugify(s.category.name)}&subcategory=${s.slug && s.slug !== "" ? s.slug : slugify(s.name)}`,
       })),
       ...products.map((p) => ({
         id: p.id,
@@ -82,7 +82,8 @@ export async function GET(request: Request) {
         image: p.image || null,
         category: p.category.name,
         subcategory: p.subcategory?.name || null,
-        url: `/products/${p.slug || slugify(p.name)}`,
+        // p.slug is always populated after backfill; guard against empty string only
+        url: `/products/${p.slug && p.slug !== "" ? p.slug : slugify(p.name)}`,
       })),
     ];
 

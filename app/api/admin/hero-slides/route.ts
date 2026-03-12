@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { revalidateAndWarm } from "@/lib/revalidate";
+import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 export async function GET() {
   try {
@@ -18,6 +19,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const body = await request.json();
     const slide = await prisma.heroSlide.create({

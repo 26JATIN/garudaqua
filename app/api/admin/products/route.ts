@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { revalidateAndWarm } from "@/lib/revalidate";
+import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 function slugify(text: string): string {
   return text
@@ -32,9 +33,33 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const body = await request.json();
     const slug = slugify(body.name);
+
+    // If any other product has this slug in their formerSlugs, remove it.
+    // Otherwise visiting /products/<slug> would redirect to the wrong (renamed) product.
+    await prisma.product.updateMany({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: { formerSlugs: { has: slug } } as any,
+      data: { formerSlugs: { set: [] } }, // we'll fix this per-document below
+    });
+    // updateMany can't do per-document array filtering, so do it properly:
+    const staleHolders = await prisma.product.findMany({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: { formerSlugs: { has: slug } } as any,
+      select: { id: true, formerSlugs: true },
+    });
+    await Promise.all(
+      staleHolders.map((p) =>
+        prisma.product.update({
+          where: { id: p.id },
+          data: { formerSlugs: p.formerSlugs.filter((s) => s !== slug) },
+        })
+      )
+    );
 
     const product = await prisma.product.create({
       data: {

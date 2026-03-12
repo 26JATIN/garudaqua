@@ -11,14 +11,25 @@ export async function GET(
   try {
     const { slug } = await params;
 
-    // Try slug first; fall back to id for legacy ObjectId-based links
-    const product = await prisma.product.findFirst({
+    // Try current slug first (or ObjectId for legacy links), then formerSlugs fallback
+    let product = await prisma.product.findFirst({
       where: isObjectId(slug) ? { OR: [{ slug }, { id: slug }] } : { slug },
       include: {
         category: { select: { id: true, name: true, slug: true } },
         subcategory: { select: { id: true, name: true, slug: true } },
       },
     });
+
+    if (!product) {
+      product = await prisma.product.findFirst({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        where: { formerSlugs: { has: slug } } as any,
+        include: {
+          category: { select: { id: true, name: true, slug: true } },
+          subcategory: { select: { id: true, name: true, slug: true } },
+        },
+      });
+    }
 
     if (!product) {
       return NextResponse.json(

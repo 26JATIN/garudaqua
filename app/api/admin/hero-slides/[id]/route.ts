@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 import { revalidateAndWarm } from "@/lib/revalidate";
+import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const { id } = await params;
     const body = await request.json();
@@ -46,6 +49,8 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const { id } = await params;
 

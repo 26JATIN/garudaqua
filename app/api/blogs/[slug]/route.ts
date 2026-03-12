@@ -7,10 +7,20 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    const blog = await prisma.blogPost.findUnique({
+
+    // Try current slug first, then formerSlugs fallback (handles renamed posts)
+    let blog = await prisma.blogPost.findFirst({
       where: { slug, isPublished: true },
       include: { blogCategory: true },
     });
+
+    if (!blog) {
+      blog = await prisma.blogPost.findFirst({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        where: { isPublished: true, formerSlugs: { has: slug } } as any,
+        include: { blogCategory: true },
+      });
+    }
 
     if (!blog) {
       return NextResponse.json(

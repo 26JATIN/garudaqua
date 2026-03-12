@@ -1,21 +1,31 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+/**
+ * Creates the nodemailer transporter on first use.
+ * Throws a descriptive error at call-time (not at module load) if SMTP env vars
+ * are not configured, so missing config is surfaced clearly in logs.
+ */
+function getTransporter() {
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD } = process.env;
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
+    throw new Error(
+      "[email] SMTP env vars not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD."
+    );
+  }
+  return nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: parseInt(SMTP_PORT || "587"),
+    secure: false,
+    auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+  });
+}
 
 export async function sendEnquiryConfirmation(
   to: string,
   name: string,
   product: string
 ) {
-  await transporter.sendMail({
+  await getTransporter().sendMail({
     from: `"Garud Aqua Solutions" <${process.env.SMTP_USER}>`,
     to,
     subject: "Thank you for your enquiry — Garud Aqua Solutions",
@@ -54,7 +64,7 @@ export async function sendEnquiryNotificationToAdmin(enquiry: {
   quantity: string;
   message: string;
 }) {
-  await transporter.sendMail({
+  await getTransporter().sendMail({
     from: `"GarudAqua" <${process.env.SMTP_USER}>`,
     to: process.env.ADMIN_EMAIL,
     subject: `New Enquiry from ${enquiry.name}${enquiry.product ? ` — ${enquiry.product}` : ""}`,

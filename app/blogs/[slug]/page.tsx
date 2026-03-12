@@ -1,19 +1,35 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import BlogPostClient from "./BlogPostClient";
 import { articleSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const revalidate = 60;
 
+/** Pre-build all published blog pages at deploy time (ISR refreshes them every 60s). */
+export async function generateStaticParams() {
+  try {
+    const blogs = await prisma.blogPost.findMany({
+      where: { isPublished: true },
+      select: { slug: true },
+    });
+    return blogs.map((b) => ({ slug: b.slug }));
+  } catch {
+    return [];
+  }
+}
+
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
   try {
     const { slug } = await params;
-    const blog = await prisma.blogPost.findUnique({
-      where: { slug, isPublished: true },
+    const blog = await prisma.blogPost.findFirst({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: { isPublished: true, OR: [{ slug }, { formerSlugs: { has: slug } } as any] },
       select: {
         title: true,
+        slug: true,
         excerpt: true,
         featuredImage: true,
         author: true,
@@ -24,7 +40,9 @@ export async function generateMetadata(
 
     if (!blog) return { title: "Article Not Found" };
 
-    const url = `https://garudaqua.in/blogs/${slug}`;
+    // Always use canonical (current) slug for metadata URL
+    const canonicalSlug = blog.slug;
+    const url = `https://garudaqua.in/blogs/${canonicalSlug}`;
     const description =
       blog.excerpt?.slice(0, 155) ||
       `Read "${blog.title}" on the Garud Aqua Solutions blog — water management tips and industry insights.`;
@@ -59,8 +77,11 @@ export async function generateMetadata(
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const blog = await prisma.blogPost.findUnique({
-    where: { slug, isPublished: true },
+
+  // Try current slug first, then formerSlugs fallback
+  const blog = await prisma.blogPost.findFirst({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    where: { isPublished: true, OR: [{ slug }, { formerSlugs: { has: slug } } as any] },
     select: {
       title: true,
       excerpt: true,
@@ -75,6 +96,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     },
   }).catch(() => null);
 
+  // 301 redirect if slug is an old formerSlug
+  if (blog && blog.slug !== slug) {
+    redirect(`/blogs/${blog.slug}`);
+  }
+
   return (
     <>
       {blog && (
@@ -88,7 +114,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
             { name: "Home", url: "https://garudaqua.in" },
             { name: "Blog", url: "https://garudaqua.in/blogs" },
-            { name: blog.title, url: `https://garudaqua.in/blogs/${slug}` },
+            { name: blog.title, url: `https://garudaqua.in/blogs/${blog.slug}` },
           ])) }} />
         </>
       )}

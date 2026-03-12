@@ -3,42 +3,48 @@ import { prisma } from "@/lib/prisma";
 
 const SITE_URL = "https://garudaqua.in";
 
+// Use the deploy date env var if set (set it in your CI/CD), otherwise fall back to build time.
+// This means static pages always report an accurate lastModified to Google.
+const DEPLOY_DATE = process.env.NEXT_PUBLIC_DEPLOY_DATE
+  ? new Date(process.env.NEXT_PUBLIC_DEPLOY_DATE)
+  : new Date();
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // ── Static pages — use real known dates, not `new Date()` ──────────────────
+  // ── Static pages ────────────────────────────────────────────────────────────
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
-      lastModified: new Date("2025-01-01"),
+      lastModified: DEPLOY_DATE,
       changeFrequency: "weekly",
       priority: 1.0,
     },
     {
       url: `${SITE_URL}/products`,
-      lastModified: new Date("2025-01-01"),
+      lastModified: DEPLOY_DATE,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/about`,
-      lastModified: new Date("2025-01-01"),
+      lastModified: DEPLOY_DATE,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/blogs`,
-      lastModified: new Date("2025-01-01"),
+      lastModified: DEPLOY_DATE,
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/contact`,
-      lastModified: new Date("2025-01-01"),
+      lastModified: DEPLOY_DATE,
       changeFrequency: "yearly",
       priority: 0.7,
     },
     {
       url: `${SITE_URL}/enquire`,
-      lastModified: new Date("2025-01-01"),
+      lastModified: DEPLOY_DATE,
       changeFrequency: "yearly",
       priority: 0.6,
     },

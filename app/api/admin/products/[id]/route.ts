@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 import { revalidateAndWarm } from "@/lib/revalidate";
+import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 function slugify(text: string): string {
   return text
@@ -25,6 +26,8 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const { id } = await params;
     const body = await request.json();
@@ -41,11 +44,38 @@ export async function PUT(
         ? await uniqueSlug(slugify(body.name), id)
         : existing.slug;
 
+    // Preserve old slug in formerSlugs so old URLs keep working via 301 redirect.
+    // Cap at 10 entries (keep the most recent) so the array never grows unboundedly.
+    const MAX_FORMER_SLUGS = 10;
+    const updatedFormerSlugs =
+      newSlug !== existing.slug && existing.slug
+        ? [...new Set([...(existing.formerSlugs ?? []), existing.slug])].slice(-MAX_FORMER_SLUGS)
+        : existing.formerSlugs;
+
+    // If this product's new slug was previously a formerSlug on another product,
+    // remove it from that product so /products/<newSlug> resolves correctly here.
+    if (newSlug !== existing.slug) {
+      const staleHolders = await prisma.product.findMany({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        where: { id: { not: id }, formerSlugs: { has: newSlug } } as any,
+        select: { id: true, formerSlugs: true },
+      });
+      await Promise.all(
+        staleHolders.map((p) =>
+          prisma.product.update({
+            where: { id: p.id },
+            data: { formerSlugs: p.formerSlugs.filter((s) => s !== newSlug) },
+          })
+        )
+      );
+    }
+
     const product = await prisma.product.update({
       where: { id },
       data: {
         name: body.name,
         slug: newSlug,
+        formerSlugs: updatedFormerSlugs,
         description: body.description,
         image: body.image,
         images: body.images,
@@ -96,6 +126,8 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const { id } = await params;
 

@@ -12,7 +12,18 @@ export async function GET(request: Request) {
     const where: Record<string, unknown> = { isPublished: true };
 
     if (category && category !== "all") {
-      where.category = category;
+      // Resolve the category slug (or id) to a categoryId so the filter is
+      // stable even after a blog-category rename.
+      const blogCategory = await prisma.blogCategory.findFirst({
+        where: { OR: [{ slug: category }, { id: category }] },
+        select: { id: true },
+      });
+      if (blogCategory) {
+        where.categoryId = blogCategory.id;
+      } else {
+        // Unknown category — return empty result set rather than ignoring the filter
+        where.categoryId = "__not_found__";
+      }
     }
     if (search) {
       where.OR = [

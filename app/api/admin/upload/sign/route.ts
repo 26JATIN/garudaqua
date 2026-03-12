@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -13,6 +14,8 @@ cloudinary.config({
  * by Vercel's serverless function body limits.
  */
 export async function POST(request: Request) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const { folder = "garudaqua", resourceType = "auto" } = await request.json();
 

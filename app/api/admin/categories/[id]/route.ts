@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 import { revalidateAndWarm } from "@/lib/revalidate";
+import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -11,18 +12,22 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const { id } = await params;
     const body = await request.json();
 
     const existing = await prisma.category.findUnique({ where: { id } });
 
+    const newSlug = body.name !== existing?.name ? slugify(body.name) : (existing?.slug || slugify(body.name));
+
     const category = await prisma.category.update({
       where: { id },
       data: {
         name: body.name,
         // Regenerate slug when name changes; keep existing slug if name unchanged
-        slug: body.name !== existing?.name ? slugify(body.name) : undefined,
+        slug: newSlug,
         description: body.description,
         image: body.image,
         sortOrder: body.sortOrder,
@@ -35,7 +40,12 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.image);
     }
 
-    await revalidateAndWarm(["/", "/products"]);
+    // Purge listing page, new category filter URL, and old filter URL (if slug changed)
+    const pathsToPurge = ["/", "/products", `/products?category=${newSlug}`];
+    if (existing?.slug && existing.slug !== newSlug) {
+      pathsToPurge.push(`/products?category=${existing.slug}`);
+    }
+    await revalidateAndWarm(pathsToPurge);
     return NextResponse.json(category);
   } catch (error) {
     console.error("Error updating category:", error);
@@ -50,6 +60,8 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const { id } = await params;
 

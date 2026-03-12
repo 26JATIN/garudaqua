@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { uploadToCloudinary } from "@/lib/cloudinary";
+import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 // Allow up to 60s for large video uploads on Vercel
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;

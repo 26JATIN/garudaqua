@@ -62,6 +62,7 @@ model Product {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   slug           String       @unique
+  formerSlugs    String[]     @default([])
   description    String       @default("")
   image          String       @default("")
   images         String[]     @default([])
@@ -149,6 +150,7 @@ model BlogPost {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   title         String
   slug          String        @unique
+  formerSlugs   String[]      @default([])
   excerpt       String        @default("")
   content       String        @default("")
   category      String        @default("other")

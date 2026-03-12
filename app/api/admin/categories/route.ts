@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { revalidateAndWarm } from "@/lib/revalidate";
+import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -25,6 +26,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = await requireAdmin();
+  if (!session) return unauthorizedResponse();
   try {
     const body = await request.json();
     const category = await prisma.category.create({
