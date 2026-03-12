@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from 'next/image';
 
 
@@ -17,15 +17,47 @@ interface HeroProps {
     initialSlides?: HeroSlide[];
 }
 
+// ─── Static first-slide shell ─────────────────────────────────────────────────
+// Rendered server-side (no JS dependency). The LCP image is an ordinary <img>
+// with fetchpriority="high" that the browser preload-scanner can discover
+// immediately from the HTML stream — before any JS downloads or hydrates.
+// Once the client component mounts it takes over and this shell is replaced.
+export function HeroStaticShell({ slide }: { slide: HeroSlide }) {
+    return (
+        <div className="relative w-full h-[80vh] sm:h-[70vh] md:h-[70vh] lg:h-screen overflow-hidden bg-black">
+            <div className="absolute inset-0">
+                {/* Desktop image — hidden on mobile if mobileImage exists */}
+                <Image
+                    src={slide.image}
+                    alt={slide.title || "Garud Aqua"}
+                    fill
+                    priority
+                    className={`object-cover object-top ${slide.mobileImage ? 'hidden sm:block' : ''}`}
+                    quality={50}
+                    sizes={slide.mobileImage ? "(max-width: 640px) 1px, 100vw" : "100vw"}
+                />
+                {/* Mobile image */}
+                {slide.mobileImage && (
+                    <Image
+                        src={slide.mobileImage}
+                        alt={slide.title || "Garud Aqua"}
+                        fill
+                        priority
+                        className="sm:hidden object-cover object-center"
+                        quality={50}
+                        sizes="(min-width: 641px) 1px, 100vw"
+                    />
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function Hero({ initialSlides }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [prevSlide, setPrevSlide] = useState<number | null>(null);
-    const [showPrev, setShowPrev] = useState(false);
     const [slides, setSlides] = useState<HeroSlide[]>(initialSlides || []);
     const [loading, setLoading] = useState(!initialSlides || initialSlides.length === 0);
     const [isPaused, setIsPaused] = useState(false);
-    // Track if user has navigated away from the first slide
-    const [hasTransitioned, setHasTransitioned] = useState(false);
 
     const fetchSlides = useCallback(async () => {
         try {
@@ -51,18 +83,12 @@ export default function Hero({ initialSlides }: HeroProps) {
     useEffect(() => {
         if (slides.length <= 1 || isPaused) return;
         const timer = setInterval(() => {
-            setHasTransitioned(true);
-            setPrevSlide(currentSlide);
-            setShowPrev(true);
             setCurrentSlide((prev) => (prev + 1) % slides.length);
         }, 6000);
         return () => clearInterval(timer);
-    }, [slides.length, isPaused, currentSlide]);
+    }, [slides.length, isPaused]);
 
     const goToSlide = (index: number) => {
-        setHasTransitioned(true);
-        setPrevSlide(currentSlide);
-        setShowPrev(true);
         setCurrentSlide(index);
         setIsPaused(true);
         setTimeout(() => setIsPaused(false), 8000);
@@ -84,61 +110,55 @@ export default function Hero({ initialSlides }: HeroProps) {
         <div
             className="relative w-full h-[80vh] sm:h-[70vh] md:h-[70vh] lg:h-screen overflow-hidden bg-black"
         >
-            {/* Image Slideshow */}
+            {/* ── Image layers ──────────────────────────────────────────────────────
+                All slides are ALWAYS in the DOM.
+                Slide 0 gets priority + no will-change (already the LCP element,
+                promoting it before paint would delay it).
+                Slides 1-N get will-change:opacity only after hydration so they
+                are ready for the first transition without impacting LCP.
+            ─────────────────────────────────────────────────────────────────────── */}
             <div className="absolute inset-0">
-                {/* First slide — render as plain HTML for instant SSR paint (no crossfade needed) */}
-                {/* Always render current image fully opaque, only fade out previous image on top */}
-                <div className="absolute inset-0" key={`curr-${currentSlide}`}>
-                    <Image
-                        src={slides[currentSlide].image}
-                        alt={slides[currentSlide].title || "Garud Aqua"}
-                        fill
-                        className={`object-cover object-top ${slides[currentSlide].mobileImage ? 'hidden sm:block' : ''}`}
-                        quality={50}
-                        sizes={slides[currentSlide].mobileImage
-                            ? "(max-width: 640px) 1px, 100vw"
-                            : "100vw"}
-                    />
-                    {slides[currentSlide].mobileImage && (
-                        <Image
-                            src={slides[currentSlide].mobileImage}
-                            alt={slides[currentSlide].title || "Garud Aqua"}
-                            fill
-                            className="sm:hidden object-cover object-center"
-                            quality={50}
-                            sizes="(min-width: 641px) 1px, 100vw"
-                        />
-                    )}
-                </div>
-                {showPrev && prevSlide !== null && prevSlide !== currentSlide && (
+                {slides.map((slide, index) => (
                     <div
-                        className="absolute inset-0 hero-fade-out"
-                        key={`prev-${prevSlide}`}
-                        onAnimationEnd={() => setShowPrev(false)}
-                        style={{ background: `url('${slides[prevSlide].image}') center center / cover no-repeat` }}
+                        key={slide.id}
+                        className="hero-slide"
+                        aria-hidden={index !== currentSlide}
+                        style={{
+                            opacity: index === currentSlide ? 1 : 0,
+                            // Defer GPU layer promotion for non-LCP slides so the
+                            // compositor does not compete with the LCP image decode.
+                            willChange: index === 0 ? 'auto' : 'opacity',
+                        }}
                     >
                         <Image
-                            src={slides[prevSlide].image}
-                            alt={slides[prevSlide].title || "Garud Aqua"}
+                            src={slide.image}
+                            alt={slide.title || "Garud Aqua"}
                             fill
-                            className={`object-cover object-top ${slides[prevSlide].mobileImage ? 'hidden sm:block' : ''}`}
-                            quality={100}
-                            sizes={slides[prevSlide].mobileImage
+                            // Only slide 0 is LCP — mark it priority; rest are lazy
+                            priority={index === 0}
+                            fetchPriority={index === 0 ? 'high' : 'low'}
+                            loading={index === 0 ? 'eager' : 'lazy'}
+                            className={`object-cover object-top ${slide.mobileImage ? 'hidden sm:block' : ''}`}
+                            quality={50}
+                            sizes={slide.mobileImage
                                 ? "(max-width: 640px) 1px, 100vw"
                                 : "100vw"}
                         />
-                        {slides[prevSlide].mobileImage && (
+                        {slide.mobileImage && (
                             <Image
-                                src={slides[prevSlide].mobileImage}
-                                alt={slides[prevSlide].title || "Garud Aqua"}
+                                src={slide.mobileImage}
+                                alt={slide.title || "Garud Aqua"}
                                 fill
+                                priority={index === 0}
+                                fetchPriority={index === 0 ? 'high' : 'low'}
+                                loading={index === 0 ? 'eager' : 'lazy'}
                                 className="sm:hidden object-cover object-center"
-                                quality={100}
+                                quality={50}
                                 sizes="(min-width: 641px) 1px, 100vw"
                             />
                         )}
                     </div>
-                )}
+                ))}
             </div>
 
             {/* Bottom gradient for indicators visibility */}
@@ -165,7 +185,7 @@ export default function Hero({ initialSlides }: HeroProps) {
                                 {/* Active fill with progress animation */}
                                 {index === currentSlide ? (
                                     <div
-                                        className="absolute inset-0 rounded-full bg-white hero-progress-bar"
+                                        className="absolute inset-0 rounded-full bg-white"
                                         style={{
                                             transformOrigin: "left",
                                             animation: `hero-progress ${isPaused ? 8 : 6}s linear forwards`,
@@ -178,24 +198,17 @@ export default function Hero({ initialSlides }: HeroProps) {
                 </div>
             )}
 
-            {/* CSS animations for first slide (no JS needed) */}
             <style>{`
-                /* No fade-in for current, only fade-out for previous */
-                .hero-fade-out {
-                    animation: hero-fadeout 1.8s cubic-bezier(0.4,0,0.2,1) both;
-                    z-index: 3;
-                }
-                @keyframes hero-fadein {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes hero-fadeout {
-                    from { opacity: 1; }
-                    to { opacity: 0; }
+                .hero-slide {
+                    position: absolute;
+                    inset: 0;
+                    transition: opacity 1.4s ease-in-out;
+                    backface-visibility: hidden;
+                    -webkit-backface-visibility: hidden;
                 }
                 @keyframes hero-progress {
                     from { transform: scaleX(0); }
-                    to { transform: scaleX(1); }
+                    to   { transform: scaleX(1); }
                 }
             `}</style>
         </div>

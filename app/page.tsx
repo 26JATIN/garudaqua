@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamicImports from "next/dynamic";
-import Hero from './components/hero';
+import { HeroStaticShell } from './components/hero';
+import HeroClient from './components/HeroClient';
 import Footer from './components/Footer';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema } from '@/lib/jsonld';
@@ -169,8 +170,21 @@ export default async function Home() {
       {/* Gradient Background */}
       <div className="fixed inset-0 bg-linear-to-br from-white via-[#FEFEFE] to-[#F3F8FE] dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] -z-10" />
 
-      {/* Hero Section */}
-      <Hero initialSlides={heroSlides} />
+      {/* Hero Section
+          Two-layer approach for best LCP:
+          1. HeroStaticShell — pure Server Component, renders the first slide as
+             a plain <img priority> in the SSR HTML stream. The browser preload
+             scanner discovers it instantly, before ANY JS downloads.
+          2. Hero (lazy, ssr:false) — mounts over the shell after hydration,
+             takes over with the full slideshow. Its JS chunk does not block LCP.
+      */}
+      <div className="relative">
+        {heroSlides.length > 0 && <HeroStaticShell slide={heroSlides[0]} />}
+        {/* Mounted client-side only — sits at the same position, replaces shell */}
+        <div className="absolute inset-0">
+          <HeroClient initialSlides={heroSlides} />
+        </div>
+      </div>
       {/*Category Showcase*/}
       <CategoryShowcase initialCategories={categoryData.categories} initialProducts={categoryData.products} />
       <Benefits/>
