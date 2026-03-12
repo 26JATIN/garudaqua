@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { revalidateAndWarm } from "@/lib/revalidate";
 
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export async function GET() {
   try {
     const categories = await prisma.category.findMany({
@@ -26,6 +30,7 @@ export async function POST(request: Request) {
     const category = await prisma.category.create({
       data: {
         name: body.name,
+        slug: slugify(body.name),
         description: body.description || "",
         image: body.image || "",
         sortOrder: body.sortOrder || 0,

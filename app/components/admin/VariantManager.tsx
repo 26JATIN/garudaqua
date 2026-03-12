@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 // ===== Types =====
 interface OptionValue {
@@ -8,6 +9,7 @@ interface OptionValue {
     displayName: string;
     colorCode: string | null;
     isAvailable: boolean;
+    imageUrl?: string | null;
 }
 
 interface VariantOption {
@@ -22,6 +24,7 @@ interface VariantManagerProps {
     onOptionsChange?: (hasVariants: boolean, options: VariantOption[]) => void;
     hasVariants?: boolean;
     variantOptions?: VariantOption[];
+    productImages?: string[];
 }
 
 // Common variant options for water tanks & pipes
@@ -62,6 +65,7 @@ export default function VariantManager({
     onOptionsChange,
     hasVariants = false,
     variantOptions = [],
+    productImages = [],
 }: VariantManagerProps) {
     const [localHasVariants, setLocalHasVariants] = useState(hasVariants);
     const [localOptions, setLocalOptions] = useState<VariantOption[]>(variantOptions);
@@ -142,11 +146,25 @@ export default function VariantManager({
             required: true,
             values: common.commonValues.map((val) =>
                 typeof val === "string"
-                    ? { name: val, displayName: val, colorCode: null, isAvailable: true }
-                    : { name: val.name, displayName: val.name, colorCode: val.colorCode, isAvailable: true }
+                    ? { name: val, displayName: val, colorCode: null, isAvailable: true, imageUrl: null }
+                    : { name: val.name, displayName: val.name, colorCode: val.colorCode, isAvailable: true, imageUrl: null }
             ),
         };
         setLocalOptions([...localOptions, newOption]);
+    };
+
+    // Image picker state: key = "optionIndex-valueIndex", value = open/closed
+    const [pickerOpen, setPickerOpen] = useState<string | null>(null);
+
+    const openPicker = (optionIndex: number, valueIndex: number) => {
+        setPickerOpen(`${optionIndex}-${valueIndex}`);
+    };
+
+    const closePicker = () => setPickerOpen(null);
+
+    const selectImageForColor = (optionIndex: number, valueIndex: number, url: string) => {
+        updateOptionValue(optionIndex, valueIndex, "imageUrl", url);
+        closePicker();
     };
 
     return (
@@ -277,7 +295,10 @@ export default function VariantManager({
                                             </button>
                                         </div>
                                         <div className="space-y-2">
-                                            {option.values.map((value, valueIndex) => (
+                                            {option.values.map((value, valueIndex) => {
+                                                const pickerKey = `${optionIndex}-${valueIndex}`;
+                                                const isPickerOpen = pickerOpen === pickerKey;
+                                                return (
                                                 <div key={valueIndex} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                                     <input
                                                         type="text"
@@ -295,12 +316,150 @@ export default function VariantManager({
                                                     />
                                                     <div className="flex items-center gap-2">
                                                         {option.type === "color" && (
-                                                            <input
-                                                                type="color"
-                                                                value={value.colorCode || "#000000"}
-                                                                onChange={(e) => updateOptionValue(optionIndex, valueIndex, "colorCode", e.target.value)}
-                                                                className="w-10 h-9 border border-gray-300 rounded"
-                                                            />
+                                                            <>
+                                                                <input
+                                                                    type="color"
+                                                                    value={value.colorCode || "#000000"}
+                                                                    onChange={(e) => updateOptionValue(optionIndex, valueIndex, "colorCode", e.target.value)}
+                                                                    className="w-10 h-9 border border-gray-300 rounded cursor-pointer"
+                                                                    title="Pick color"
+                                                                />
+                                                                {/* Color image link — pick from product images */}
+                                                                <div className="relative">
+                                                                    {value.imageUrl ? (
+                                                                        <div className="flex items-center gap-1">
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => openPicker(optionIndex, valueIndex)}
+                                                                                className="relative w-9 h-9 rounded border-2 border-[#0EA5E9] overflow-hidden shrink-0 hover:opacity-80 transition-opacity"
+                                                                                title="Change linked image"
+                                                                            >
+                                                                                <Image
+                                                                                    src={value.imageUrl}
+                                                                                    alt={value.displayName}
+                                                                                    fill
+                                                                                    className="object-cover"
+                                                                                    sizes="36px"
+                                                                                />
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => updateOptionValue(optionIndex, valueIndex, "imageUrl", null)}
+                                                                                className="w-5 h-5 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors shrink-0"
+                                                                                title="Unlink image"
+                                                                            >
+                                                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                                                                </svg>
+                                                                            </button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => productImages.length > 0 ? openPicker(optionIndex, valueIndex) : undefined}
+                                                                            disabled={productImages.length === 0}
+                                                                            className={`w-9 h-9 border border-dashed rounded flex items-center justify-center transition-colors shrink-0 ${
+                                                                                productImages.length > 0
+                                                                                    ? "border-gray-400 hover:border-[#0EA5E9] hover:bg-[#0EA5E9]/5 cursor-pointer"
+                                                                                    : "border-gray-200 cursor-not-allowed opacity-40"
+                                                                            }`}
+                                                                            title={productImages.length > 0 ? "Link a product image to this color" : "Upload product images first"}
+                                                                        >
+                                                                            <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    )}
+
+                                                                    {/* Image picker modal — rendered via portal-like fixed overlay */}
+                                                                    <AnimatePresence>
+                                                                        {isPickerOpen && (
+                                                                            <>
+                                                                                {/* Backdrop */}
+                                                                                <div
+                                                                                    className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
+                                                                                    onClick={closePicker}
+                                                                                />
+                                                                                {/* Modal — centered, responsive */}
+                                                                                <motion.div
+                                                                                    initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                                                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                                    exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                                                                                    transition={{ duration: 0.18 }}
+                                                                                    className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl w-[90vw] max-w-sm"
+                                                                                >
+                                                                                    {/* Header */}
+                                                                                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            {value.colorCode && (
+                                                                                                <span
+                                                                                                    className="w-4 h-4 rounded-full border border-gray-200 shrink-0"
+                                                                                                    style={{ backgroundColor: value.colorCode }}
+                                                                                                />
+                                                                                            )}
+                                                                                            <p className="text-sm font-semibold text-gray-800">
+                                                                                                Link image to{" "}
+                                                                                                <span className="text-[#0EA5E9]">{value.displayName || "this color"}</span>
+                                                                                            </p>
+                                                                                        </div>
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={closePicker}
+                                                                                            className="w-7 h-7 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700 flex items-center justify-center transition-colors"
+                                                                                        >
+                                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                                            </svg>
+                                                                                        </button>
+                                                                                    </div>
+
+                                                                                    {/* Image grid */}
+                                                                                    <div className="p-3 grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[55vh] overflow-y-auto">
+                                                                                        {productImages.map((imgUrl, imgIdx) => {
+                                                                                            const isSelected = value.imageUrl === imgUrl;
+                                                                                            return (
+                                                                                                <button
+                                                                                                    key={imgIdx}
+                                                                                                    type="button"
+                                                                                                    onClick={() => selectImageForColor(optionIndex, valueIndex, imgUrl)}
+                                                                                                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                                                                                                        isSelected
+                                                                                                            ? "border-[#0EA5E9] ring-2 ring-[#0EA5E9]/30"
+                                                                                                            : "border-gray-100 hover:border-[#0EA5E9]/60 hover:shadow-sm"
+                                                                                                    }`}
+                                                                                                    title={`Image ${imgIdx + 1}`}
+                                                                                                >
+                                                                                                    <Image
+                                                                                                        src={imgUrl}
+                                                                                                        alt={`Product image ${imgIdx + 1}`}
+                                                                                                        fill
+                                                                                                        className="object-cover"
+                                                                                                        sizes="(max-width: 640px) 28vw, 80px"
+                                                                                                    />
+                                                                                                    {isSelected && (
+                                                                                                        <div className="absolute inset-0 bg-[#0EA5E9]/20 flex items-center justify-center">
+                                                                                                            <div className="w-5 h-5 rounded-full bg-[#0EA5E9] shadow flex items-center justify-center">
+                                                                                                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                                                                                </svg>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    )}
+                                                                                                </button>
+                                                                                            );
+                                                                                        })}
+                                                                                    </div>
+
+                                                                                    {/* Footer hint */}
+                                                                                    <div className="px-4 py-2.5 border-t border-gray-100 text-center">
+                                                                                        <p className="text-xs text-gray-400">Tap an image to link it · tap again to change</p>
+                                                                                    </div>
+                                                                                </motion.div>
+                                                                            </>
+                                                                        )}
+                                                                    </AnimatePresence>
+                                                                </div>
+                                                            </>
                                                         )}
                                                         <button
                                                             type="button"
@@ -313,7 +472,8 @@ export default function VariantManager({
                                                         </button>
                                                     </div>
                                                 </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface DashboardStats {
     products: number;
@@ -115,6 +116,115 @@ export default function Dashboard() {
                     ))}
                 </div>
             </div>
+
+            {/* Maintenance */}
+            <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Maintenance</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <BackfillSlugsButton />
+                    <BackfillCategorySlugsButton />
+                    <BackfillSubcategorySlugsButton />
+                </div>
+            </div>
         </div>
+    );
+}
+
+function BackfillSlugsButton() {
+    const [status, setStatus] = useState<"idle" | "running" | "done">("idle");
+
+    async function run() {
+        setStatus("running");
+        try {
+            const res = await fetch("/api/admin/products/backfill-slugs", { method: "POST" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? "Failed");
+            toast.success(data.message);
+            setStatus("done");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Backfill failed");
+            setStatus("idle");
+        }
+    }
+
+    return (
+        <button
+            onClick={run}
+            disabled={status !== "idle"}
+            className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-400/50 transition-all text-left disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+            <h4 className="font-medium text-gray-900">
+                {status === "running" ? "Running…" : status === "done" ? "✓ Slugs backfilled" : "Backfill Product Slugs"}
+            </h4>
+            <p className="text-sm text-gray-500 mt-1">
+                One-time: assign URL slugs to products that only have an ID. Safe to run multiple times.
+            </p>
+        </button>
+    );
+}
+
+function BackfillCategorySlugsButton() {
+    const [status, setStatus] = useState<"idle" | "running" | "done">("idle");
+
+    async function run() {
+        setStatus("running");
+        try {
+            const res = await fetch("/api/admin/categories/backfill-slugs", { method: "POST" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? "Failed");
+            toast.success(data.message);
+            setStatus("done");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Backfill failed");
+            setStatus("idle");
+        }
+    }
+
+    return (
+        <button
+            onClick={run}
+            disabled={status !== "idle"}
+            className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-400/50 transition-all text-left disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+            <h4 className="font-medium text-gray-900">
+                {status === "running" ? "Running…" : status === "done" ? "✓ Slugs backfilled" : "Backfill Category Slugs"}
+            </h4>
+            <p className="text-sm text-gray-500 mt-1">
+                One-time: assign URL slugs to categories that only have an ID. Safe to run multiple times.
+            </p>
+        </button>
+    );
+}
+
+function BackfillSubcategorySlugsButton() {
+    const [status, setStatus] = useState<"idle" | "running" | "done">("idle");
+
+    async function run() {
+        setStatus("running");
+        try {
+            const res = await fetch("/api/admin/subcategories/backfill-slugs", { method: "POST" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? "Failed");
+            toast.success(data.message);
+            setStatus("done");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Backfill failed");
+            setStatus("idle");
+        }
+    }
+
+    return (
+        <button
+            onClick={run}
+            disabled={status !== "idle"}
+            className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-green-400/50 transition-all text-left disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+            <h4 className="font-medium text-gray-900">
+                {status === "running" ? "Running…" : status === "done" ? "✓ Slugs backfilled" : "Backfill Subcategory Slugs"}
+            </h4>
+            <p className="text-sm text-gray-500 mt-1">
+                One-time: assign URL slugs to subcategories that only have an ID. Safe to run multiple times.
+            </p>
+        </button>
     );
 }

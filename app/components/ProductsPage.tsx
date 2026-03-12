@@ -5,18 +5,31 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { cloudinaryUrl } from "@/lib/utils";
 
+/** Mirrors the server-side slugify so we never fall back to an ObjectId */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+function productPath(product: { slug?: string; name: string }): string {
+  return product.slug || slugify(product.name);
+}
+
 // ===== Type Definitions =====
 interface Category {
     id: string;
     name: string;
+    slug?: string;
     image?: string;
 }
 
 interface Subcategory {
     id: string;
     name: string;
+    slug?: string;
     image?: string;
-    category: { id: string; name: string };
+    category: { id: string; name: string; slug?: string };
 }
 
 interface Product {
@@ -232,12 +245,13 @@ export default function ProductsPage({
         return () => clearTimeout(timer);
     }, [selectedSubcategory, scrollSelectedToCenter]);
 
-    // Filtered subcategories based on selected category
+    // Filtered subcategories based on selected category (matched by slug)
     const visibleSubcategories = useMemo(() => {
         if (selectedCategory === "all") return subcategories;
-        return subcategories.filter(
-            (sub) => sub.category.id === selectedCategory
-        );
+        return subcategories.filter((sub) => {
+            const catSlug = sub.category.slug || slugify(sub.category.name);
+            return catSlug === selectedCategory;
+        });
     }, [selectedCategory, subcategories]);
 
     // Sync URL
@@ -255,20 +269,20 @@ export default function ProductsPage({
         }
     }, [selectedCategory, selectedSubcategory, searchTerm, sortBy]);
 
-    // Helper to get category name from ID
-    const getCategoryDisplayName = useCallback((catId: string) => {
-        if (catId === "all") return "All";
-        const cat = categories.find((c) => c.id === catId);
+    // Helper to get category display name from slug
+    const getCategoryDisplayName = useCallback((catSlug: string) => {
+        if (catSlug === "all") return "All";
+        const cat = categories.find((c) => (c.slug || slugify(c.name)) === catSlug);
         return cat?.name || "";
     }, [categories]);
 
-    const handleCategoryClick = useCallback((categoryId: string) => {
-        setSelectedCategory(categoryId);
+    const handleCategoryClick = useCallback((categorySlug: string) => {
+        setSelectedCategory(categorySlug);
         setSelectedSubcategory("All");
     }, []);
 
-    const handleSubcategoryClick = useCallback((subcategoryId: string) => {
-        setSelectedSubcategory(subcategoryId);
+    const handleSubcategoryClick = useCallback((subcategorySlug: string) => {
+        setSelectedSubcategory(subcategorySlug);
     }, []);
 
     const clearSearch = useCallback(() => {
@@ -366,16 +380,19 @@ export default function ProductsPage({
                             </button>
 
                             <div ref={categoryScrollRef} className="flex gap-3 md:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
-                                {categories.map((category) => (
+                                {categories.map((category) => {
+                                    const catSlug = category.slug || slugify(category.name);
+                                    const isSelected = selectedCategory === catSlug;
+                                    return (
                                     <button
                                         key={category.id}
-                                        data-category-selected={selectedCategory === category.id ? "true" : undefined}
-                                        onClick={() => handleCategoryClick(category.id)}
+                                        data-category-selected={isSelected ? "true" : undefined}
+                                        onClick={() => handleCategoryClick(catSlug)}
                                         className="flex flex-col items-center gap-1.5 md:gap-2 min-w-16 md:min-w-19 lg:min-w-20 group transition-transform duration-200 hover:scale-105 hover:-translate-y-0.5 active:scale-95"
                                     >
                                         <div
                                             className={`relative rounded-full p-0.75 transition-all duration-300 ${
-                                                selectedCategory === category.id
+                                                isSelected
                                                     ? "bg-linear-to-tr from-[#0EA5E9] via-[#38BDF8] to-[#0369A1]"
                                                     : "bg-linear-to-tr from-gray-200 to-gray-300 group-hover:from-[#0EA5E9]/50 group-hover:to-[#0369A1]/50"
                                             }`}
@@ -406,7 +423,7 @@ export default function ProductsPage({
 
                                         <span
                                             className={`text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center ${
-                                                selectedCategory === category.id
+                                                isSelected
                                                     ? "text-[#0EA5E9] font-medium"
                                                     : "text-[#2C2C2C] dark:text-gray-100 group-hover:text-[#0EA5E9]"
                                             }`}
@@ -414,7 +431,8 @@ export default function ProductsPage({
                                             {category.name}
                                         </span>
                                     </button>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {/* Right Arrow */}
@@ -513,16 +531,19 @@ export default function ProductsPage({
                                     </span>
                                 </button>
                                 {/* Subcategory badges */}
-                                {visibleSubcategories.map((subcategory) => (
+                                {visibleSubcategories.map((subcategory) => {
+                                    const subSlug = subcategory.slug || slugify(subcategory.name);
+                                    const isSubSelected = selectedSubcategory === subSlug;
+                                    return (
                                     <button
                                         key={subcategory.id}
-                                        data-subcategory-selected={selectedSubcategory === subcategory.id ? "true" : undefined}
-                                        onClick={() => handleSubcategoryClick(subcategory.id)}
+                                        data-subcategory-selected={isSubSelected ? "true" : undefined}
+                                        onClick={() => handleSubcategoryClick(subSlug)}
                                         className="flex flex-col items-center gap-1.5 md:gap-2 min-w-17.5 md:min-w-20 lg:min-w-22.5 group transition-transform duration-200 hover:scale-105 hover:-translate-y-0.5 active:scale-95"
                                     >
                                         <div
                                             className={`relative rounded-full p-0.75 transition-all duration-300 ${
-                                                selectedSubcategory === subcategory.id
+                                                isSubSelected
                                                     ? "bg-linear-to-tr from-[#0EA5E9] via-[#38BDF8] to-[#0369A1]"
                                                     : "bg-linear-to-tr from-gray-200 to-gray-300 group-hover:from-[#0EA5E9]/50 group-hover:to-[#0369A1]/50"
                                             }`}
@@ -538,7 +559,7 @@ export default function ProductsPage({
                                                     )}
                                                 </div>
                                             </div>
-                                            {selectedSubcategory === subcategory.id && (
+                                            {isSubSelected && (
                                                 <div
                                                     className="absolute -inset-0.5 rounded-full animate-pulse"
                                                     style={{ background: "linear-gradient(135deg, #0EA5E9, #0369A1)", filter: "blur(4px)", opacity: 0.4 }}
@@ -547,7 +568,7 @@ export default function ProductsPage({
                                         </div>
                                         <span
                                             className={`text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center line-clamp-2 leading-tight max-w-17.5 md:max-w-20 lg:max-w-22.5 ${
-                                                selectedSubcategory === subcategory.id
+                                                isSubSelected
                                                     ? "text-[#0EA5E9] font-medium"
                                                     : "text-[#2C2C2C] dark:text-gray-100 group-hover:text-[#0EA5E9]"
                                             }`}
@@ -555,7 +576,8 @@ export default function ProductsPage({
                                             {subcategory.name}
                                         </span>
                                     </button>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             <button
@@ -681,7 +703,7 @@ export default function ProductsPage({
 // ===== Grid Product Card =====
 function ProductCard({ product, index }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
-    const productHref = `/products/${product.id}`;
+    const productHref = `/products/${productPath(product)}`;
 
     return (
         <div
@@ -733,7 +755,7 @@ function ProductCard({ product, index }: ProductCardProps) {
 // ===== List Product Item =====
 function ProductListItem({ product, index }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
-    const productHref = `/products/${product.id}`;
+    const productHref = `/products/${productPath(product)}`;
 
     return (
         <div

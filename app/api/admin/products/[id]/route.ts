@@ -3,6 +3,24 @@ import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 import { revalidateAndWarm } from "@/lib/revalidate";
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+/** Generates a unique slug. If `base` is already taken by a different product (not `excludeId`), appends -2, -3 … */
+async function uniqueSlug(base: string, excludeId: string): Promise<string> {
+  let candidate = base;
+  let counter = 2;
+  while (true) {
+    const conflict = await prisma.product.findUnique({ where: { slug: candidate } });
+    if (!conflict || conflict.id === excludeId) return candidate;
+    candidate = `${base}-${counter++}`;
+  }
+}
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -11,16 +29,23 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    // Fetch existing product to compare images
+    // Fetch existing product to compare images and current slug
     const existing = await prisma.product.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    // Regenerate slug if name changed
+    const newSlug =
+      body.name !== existing.name
+        ? await uniqueSlug(slugify(body.name), id)
+        : existing.slug;
+
     const product = await prisma.product.update({
       where: { id },
       data: {
         name: body.name,
+        slug: newSlug,
         description: body.description,
         image: body.image,
         images: body.images,
@@ -52,7 +77,11 @@ export async function PUT(
     );
     await Promise.all(removedImages.map((img: string) => deleteCloudinaryByUrl(img)));
 
-    await revalidateAndWarm(["/products", `/products/${id}`]);
+    // Revalidate both old slug path and new slug path (in case name changed)
+    const pathsToRevalidate = ["/products", `/products/${newSlug}`];
+    if (existing.slug !== newSlug) pathsToRevalidate.push(`/products/${existing.slug}`);
+    await revalidateAndWarm(pathsToRevalidate);
+
     return NextResponse.json(product);
   } catch (error) {
     console.error("Error updating product:", error);
@@ -70,7 +99,7 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // Fetch product to get image URLs before deleting
+    // Fetch product to get image URLs and slug before deleting
     const product = await prisma.product.findUnique({ where: { id } });
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -84,7 +113,7 @@ export async function DELETE(
       (product.images || []).map((img: string) => deleteCloudinaryByUrl(img))
     );
 
-    await revalidateAndWarm(["/","/products", `/products/${id}`]);
+    await revalidateAndWarm(["/", "/products", `/products/${product.slug}`]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting product:", error);

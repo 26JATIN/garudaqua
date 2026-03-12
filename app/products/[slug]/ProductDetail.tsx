@@ -7,12 +7,21 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+/** Mirrors server slugify — ensures related product links never use an ObjectId */
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+function productPath(product: { slug?: string; name: string }): string {
+  return product.slug || slugify(product.name);
+}
+
 // ===== Type Definitions =====
 interface VariantOptionValue {
     name: string;
     displayName: string;
     colorCode: string | null;
     isAvailable: boolean;
+    imageUrl?: string | null;
 }
 
 interface VariantOption {
@@ -30,8 +39,8 @@ interface Product {
     image?: string;
     images?: string[];
     description?: string;
-    category: { id: string; name: string } | string;
-    subcategory?: { id: string; name: string };
+    category: { id: string; name: string; slug?: string } | string;
+    subcategory?: { id: string; name: string; slug?: string };
     specs?: { label: string; value: string }[];
     hasVariants?: boolean;
     variantOptions?: VariantOption[];
@@ -48,13 +57,21 @@ function getCategoryName(category: Product["category"]): string {
 
 
 // Mobile swipeable image gallery
-function MobileImageGallery({ images, productName }: { images: string[]; productName: string }) {
-    const [activeIndex, setActiveIndex] = useState(0);
+function MobileImageGallery({ images, productName, controlledIndex, onIndexChange }: { images: string[]; productName: string; controlledIndex?: number; onIndexChange?: (i: number) => void }) {
+    const [activeIndex, setActiveIndex] = useState(controlledIndex ?? 0);
     const [dragOffset, setDragOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
     const containerRef = useRef<HTMLDivElement>(null);
     const isHorizontalSwipeRef = useRef<boolean | null>(null);
+
+    // Sync when parent drives the index (e.g., color swatch clicked)
+    useEffect(() => {
+        if (controlledIndex !== undefined && controlledIndex !== activeIndex) {
+            setActiveIndex(controlledIndex);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [controlledIndex]);
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
         const touch = e.touches[0];
@@ -91,13 +108,21 @@ function MobileImageGallery({ images, productName }: { images: string[]; product
         const velocity = Math.abs(dragOffset) / timeDiff;
 
         if (dragOffset < -threshold || (dragOffset < -30 && velocity > 0.3)) {
-            if (activeIndex < images.length - 1) setActiveIndex((prev) => prev + 1);
+            if (activeIndex < images.length - 1) {
+                const next = activeIndex + 1;
+                setActiveIndex(next);
+                onIndexChange?.(next);
+            }
         } else if (dragOffset > threshold || (dragOffset > 30 && velocity > 0.3)) {
-            if (activeIndex > 0) setActiveIndex((prev) => prev - 1);
+            if (activeIndex > 0) {
+                const prev = activeIndex - 1;
+                setActiveIndex(prev);
+                onIndexChange?.(prev);
+            }
         }
         setDragOffset(0);
         isHorizontalSwipeRef.current = null;
-    }, [isDragging, dragOffset, activeIndex, images.length]);
+    }, [isDragging, dragOffset, activeIndex, images.length, onIndexChange]);
 
     return (
         <div className="relative">
@@ -140,7 +165,7 @@ function MobileImageGallery({ images, productName }: { images: string[]; product
                     {images.map((_, index) => (
                         <button
                             key={index}
-                            onClick={() => setActiveIndex(index)}
+                            onClick={() => { setActiveIndex(index); onIndexChange?.(index); }}
                             className={`rounded-full transition-all duration-300 ${
                                 activeIndex === index
                                     ? "w-6 h-2 bg-[#0EA5E9]"
@@ -222,7 +247,7 @@ function RelatedProductCard({ product: relatedProduct, index, categoryId }: { pr
     const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <Link href={`/products/${relatedProduct.id}`}>
+        <Link href={`/products/${productPath(relatedProduct)}`}>
             <div
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
@@ -289,15 +314,17 @@ function RelatedProductCard({ product: relatedProduct, index, categoryId }: { pr
 
 // ===== Main Component =====
 interface ProductDetailProps {
-    productId: string;
+    productSlug: string;
     initialProduct?: Product | null;
     initialRelated?: Product[];
 }
 
-export default function ProductDetail({ productId, initialProduct, initialRelated }: ProductDetailProps) {
+export default function ProductDetail({ productSlug, initialProduct, initialRelated }: ProductDetailProps) {
     const router = useRouter();
     const hasInitialData = !!(initialProduct);
     const [selectedImage, setSelectedImage] = useState(0);
+    const [mobileGalleryIndex, setMobileGalleryIndex] = useState(0);
+    const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
     const [relatedProducts, setRelatedProducts] = useState<Product[]>(initialRelated ?? []);
     const [loading, setLoading] = useState(!hasInitialData);
@@ -311,9 +338,11 @@ export default function ProductDetail({ productId, initialProduct, initialRelate
             setLoading(true);
             setNotFound(false);
             setSelectedImage(0);
+            setMobileGalleryIndex(0);
+            setSelectedColor(null);
 
             try {
-                const res = await fetch(`/api/products/${productId}`);
+                const res = await fetch(`/api/products/${productSlug}`);
                 if (!res.ok) {
                     setNotFound(true);
                     return;
@@ -337,7 +366,7 @@ export default function ProductDetail({ productId, initialProduct, initialRelate
         }
 
         fetchProduct();
-    }, [productId, hasInitialData]);
+    }, [productSlug, hasInitialData]);
 
     const handleShare = async () => {
         const url = window.location.href;
@@ -408,6 +437,9 @@ export default function ProductDetail({ productId, initialProduct, initialRelate
 
     const categoryName = getCategoryName(product.category);
     const categoryId = typeof product.category === "object" ? product.category.id : "";
+    const categorySlug = typeof product.category === "object"
+        ? (product.category.slug || slugify(product.category.name))
+        : slugify(categoryName);
     const displayImages = product.images && product.images.length > 0 ? product.images : product.image ? [product.image] : [];
 
     return (
@@ -437,7 +469,12 @@ export default function ProductDetail({ productId, initialProduct, initialRelate
                         {/* Mobile Swipeable Gallery */}
                         {displayImages.length > 0 && (
                             <div className="lg:hidden">
-                                <MobileImageGallery images={displayImages} productName={product.name} />
+                                <MobileImageGallery
+                                    images={displayImages}
+                                    productName={product.name}
+                                    controlledIndex={mobileGalleryIndex}
+                                    onIndexChange={setMobileGalleryIndex}
+                                />
                             </div>
                         )}
 
@@ -569,18 +606,38 @@ export default function ProductDetail({ productId, initialProduct, initialRelate
                                             </p>
                                             {option.type === "color" ? (
                                                 <div className="flex flex-wrap gap-4">
-                                                    {availableValues.map((value) => (
-                                                        <div key={value.name} className="flex flex-col items-center gap-1.5">
-                                                            <div
-                                                                className="w-8 h-8 rounded-full ring-2 ring-gray-200 dark:ring-white/10 hover:ring-[#0EA5E9] transition-all cursor-default"
-                                                                style={{ backgroundColor: value.colorCode || "#ccc" }}
-                                                                title={value.displayName}
-                                                            />
-                                                            <span className="text-xs text-gray-500 dark:text-gray-400 font-light">
-                                                                {value.displayName}
-                                                            </span>
-                                                        </div>
-                                                    ))}
+                                                    {availableValues.map((value) => {
+                                                        const isSelected = selectedColor === value.name;
+                                                        const hasImage = !!(value.imageUrl);
+                                                        const handleColorClick = () => {
+                                                            setSelectedColor(value.name);
+                                                            if (hasImage) {
+                                                                const imgIndex = displayImages.indexOf(value.imageUrl!);
+                                                                if (imgIndex !== -1) {
+                                                                    setSelectedImage(imgIndex);
+                                                                    setMobileGalleryIndex(imgIndex);
+                                                                }
+                                                            }
+                                                        };
+                                                        return (
+                                                            <div key={value.name} className="flex flex-col items-center gap-1.5">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={handleColorClick}
+                                                                    className={`w-8 h-8 rounded-full transition-all ${
+                                                                        isSelected
+                                                                            ? "ring-2 ring-offset-2 ring-[#0EA5E9] dark:ring-offset-[#111]"
+                                                                            : "ring-2 ring-gray-200 dark:ring-white/10 hover:ring-[#0EA5E9]"
+                                                                    } ${hasImage ? "cursor-pointer" : "cursor-default"}`}
+                                                                    style={{ backgroundColor: value.colorCode || "#ccc" }}
+                                                                    title={value.displayName}
+                                                                />
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 font-light">
+                                                                    {value.displayName}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             ) : (
                                                 <div className="flex flex-wrap gap-2">
@@ -683,7 +740,7 @@ export default function ProductDetail({ productId, initialProduct, initialRelate
                                 </p>
                             </div>
                             <Link
-                                href={`/products?category=${categoryId}`}
+                                href={`/products?category=${categorySlug}`}
                                 className="hidden md:flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
                                 View All
@@ -700,7 +757,7 @@ export default function ProductDetail({ productId, initialProduct, initialRelate
                         {/* Mobile View All Button */}
                         <div className="md:hidden mt-6 text-center">
                             <Link
-                                href={`/products?category=${categoryId}`}
+                                href={`/products?category=${categorySlug}`}
                                 className="inline-flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
                                 View All Similar Products

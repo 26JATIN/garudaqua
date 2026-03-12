@@ -42,6 +42,7 @@ interface Product {
             displayName: string;
             colorCode: string | null;
             isAvailable: boolean;
+            imageUrl?: string | null;
         }>;
     }>;
     variants: ProductVariant[];

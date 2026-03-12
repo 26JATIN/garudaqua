@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
 import { revalidateAndWarm } from "@/lib/revalidate";
 
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -17,6 +21,8 @@ export async function PUT(
       where: { id },
       data: {
         name: body.name,
+        // Regenerate slug when name changes; keep existing slug if name unchanged
+        slug: body.name !== existing?.name ? slugify(body.name) : undefined,
         description: body.description,
         image: body.image,
         sortOrder: body.sortOrder,

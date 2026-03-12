@@ -4,43 +4,41 @@ import { prisma } from "@/lib/prisma";
 const SITE_URL = "https://garudaqua.in";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-
-  // ── Static pages ──────────────────────────────────────────────────────────
+  // ── Static pages — use real known dates, not `new Date()` ──────────────────
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
-      lastModified: now,
+      lastModified: new Date("2025-01-01"),
       changeFrequency: "weekly",
       priority: 1.0,
     },
     {
       url: `${SITE_URL}/products`,
-      lastModified: now,
+      lastModified: new Date("2025-01-01"),
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/about`,
-      lastModified: now,
+      lastModified: new Date("2025-01-01"),
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/blogs`,
-      lastModified: now,
+      lastModified: new Date("2025-01-01"),
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/contact`,
-      lastModified: now,
+      lastModified: new Date("2025-01-01"),
       changeFrequency: "yearly",
       priority: 0.7,
     },
     {
       url: `${SITE_URL}/enquire`,
-      lastModified: now,
+      lastModified: new Date("2025-01-01"),
       changeFrequency: "yearly",
       priority: 0.6,
     },
@@ -51,11 +49,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const products = await prisma.product.findMany({
       where: { isActive: true },
-      select: { id: true, updatedAt: true },
+      select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: "desc" },
     });
     productRoutes = products.map((p) => ({
-      url: `${SITE_URL}/products/${p.id}`,
+      url: `${SITE_URL}/products/${p.slug}`,
       lastModified: p.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,

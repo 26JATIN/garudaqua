@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import BlogPostClient from "./BlogPostClient";
 import { articleSchema, breadcrumbSchema } from "@/lib/jsonld";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }

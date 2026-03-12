@@ -152,6 +152,7 @@ export function productSchema(product: {
   image?: string;
   images?: string[];
   id: string;
+  slug?: string;
   category?: { name: string } | null;
   guarantee?: string;
 }) {
@@ -159,6 +160,8 @@ export function productSchema(product: {
     ...(product.image ? [product.image] : []),
     ...(product.images || []),
   ];
+  // Prefer slug for the canonical URL — falls back to id for legacy records
+  const productPath = product.slug || product.id;
 
   return {
     "@context": "https://schema.org",
@@ -168,7 +171,7 @@ export function productSchema(product: {
       product.description ||
       `${product.name} from Garud Aqua Solutions — quality water management product.`,
     image: allImages.length > 0 ? allImages : undefined,
-    url: `${SITE_URL}/products/${product.id}`,
+    url: `${SITE_URL}/products/${productPath}`,
     brand: {
       "@type": "Brand",
       name: SITE_NAME,
@@ -190,7 +193,7 @@ export function productSchema(product: {
       "@type": "Offer",
       availability: "https://schema.org/InStock",
       seller: { "@id": `${SITE_URL}/#organization` },
-      url: `${SITE_URL}/products/${product.id}`,
+      url: `${SITE_URL}/products/${productPath}`,
       priceSpecification: {
         "@type": "PriceSpecification",
         priceCurrency: "INR",

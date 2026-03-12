@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import ProductDetail from "./ProductDetail";
@@ -6,15 +7,19 @@ import { productSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const revalidate = 60;
 
+/** 24-char hex string = MongoDB ObjectId */
+const isObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s);
+
 export async function generateMetadata(
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
   try {
-    const { id } = await params;
-    const product = await prisma.product.findUnique({
-      where: { id },
+    const { slug } = await params;
+    const product = await prisma.product.findFirst({
+      where: isObjectId(slug) ? { OR: [{ slug }, { id: slug }] } : { slug },
       select: {
         name: true,
+        slug: true,
         description: true,
         image: true,
         category: { select: { name: true } },
@@ -25,12 +30,14 @@ export async function generateMetadata(
       return { title: "Product Not Found" };
     }
 
+    // Use the canonical slug for all metadata URLs
+    const canonicalSlug = product.slug ?? slug;
     const title = product.name;
     const categoryName = product.category?.name ?? "Product";
     const description =
       product.description?.slice(0, 155) ||
       `Buy ${product.name} — ${categoryName} from Garud Aqua Solutions. Quality water management products in Rajasthan.`;
-    const url = `https://garudaqua.in/products/${id}`;
+    const url = `https://garudaqua.in/products/${canonicalSlug}`;
 
     return {
       title,
@@ -40,7 +47,9 @@ export async function generateMetadata(
         url,
         title: `${title} | Garud Aqua Solutions`,
         description,
-        images: product.image ? [{ url: product.image, alt: title }] : [],
+        images: product.image
+          ? [{ url: product.image, alt: title, width: 1200, height: 630 }]
+          : [],
       },
       twitter: {
         card: "summary_large_image",
@@ -54,17 +63,17 @@ export async function generateMetadata(
   }
 }
 
-async function getProductData(id: string) {
+async function getProductData(slug: string) {
   try {
-    const product = await prisma.product.findUnique({
-      where: { id },
+    const product = await prisma.product.findFirst({
+      where: isObjectId(slug) ? { OR: [{ slug }, { id: slug }] } : { slug },
       include: {
-        category: { select: { id: true, name: true } },
-        subcategory: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, slug: true } },
+        subcategory: { select: { id: true, name: true, slug: true } },
       },
     });
 
-    if (!product) return { product: null, related: [] };
+    if (!product) return { product: null, related: [], canonicalSlug: slug };
 
     const related = await prisma.product.findMany({
       where: {
@@ -73,24 +82,39 @@ async function getProductData(id: string) {
         id: { not: product.id },
       },
       take: 4,
-      include: {
-        category: { select: { id: true, name: true } },
-        subcategory: { select: { id: true, name: true } },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        image: true,
+        description: true,
+        isActive: true,
+        tags: true,
+        hasVariants: true,
+        guarantee: true,
+        category: { select: { id: true, name: true, slug: true } },
+        subcategory: { select: { id: true, name: true, slug: true } },
       },
     });
 
     return {
       product: JSON.parse(JSON.stringify(product)),
       related: JSON.parse(JSON.stringify(related)),
+      canonicalSlug: product.slug ?? slug,
     };
   } catch {
-    return { product: null, related: [] };
+    return { product: null, related: [], canonicalSlug: slug };
   }
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const { product, related } = await getProductData(id);
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const { product, related, canonicalSlug } = await getProductData(slug);
+
+  // If an ObjectId was used in the URL and the product has a slug, 301 redirect to the clean URL
+  if (product && canonicalSlug !== slug) {
+    redirect(`/products/${canonicalSlug}`);
+  }
 
   // Preload the main product image for LCP
   const preloadImage = product?.image?.includes('res.cloudinary.com')
@@ -105,7 +129,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
             { name: "Home", url: "https://garudaqua.in" },
             { name: "Products", url: "https://garudaqua.in/products" },
-            { name: product.name, url: `https://garudaqua.in/products/${id}` },
+            { name: product.name, url: `https://garudaqua.in/products/${canonicalSlug}` },
           ])) }} />
         </>
       )}
@@ -135,7 +159,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         }
       >
         <ProductDetail
-          productId={id}
+          productSlug={canonicalSlug}
           initialProduct={product}
           initialRelated={related}
         />

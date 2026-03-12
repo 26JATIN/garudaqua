@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -18,7 +22,7 @@ export async function GET(request: Request) {
           isActive: true,
           name: searchFilter,
         },
-        select: { id: true, name: true, image: true },
+        select: { id: true, name: true, slug: true, image: true },
         take: 3,
       }),
       prisma.subcategory.findMany({
@@ -29,8 +33,9 @@ export async function GET(request: Request) {
         select: {
           id: true,
           name: true,
+          slug: true,
           image: true,
-          category: { select: { id: true, name: true } },
+          category: { select: { id: true, name: true, slug: true } },
         },
         take: 3,
       }),
@@ -45,6 +50,7 @@ export async function GET(request: Request) {
         select: {
           id: true,
           name: true,
+          slug: true,
           image: true,
           category: { select: { id: true, name: true } },
           subcategory: { select: { id: true, name: true } },
@@ -59,7 +65,7 @@ export async function GET(request: Request) {
         text: c.name,
         type: "category" as const,
         image: c.image || null,
-        url: `/products?category=${c.id}`,
+        url: `/products?category=${c.slug || slugify(c.name)}`,
       })),
       ...subcategories.map((s) => ({
         id: s.id,
@@ -67,7 +73,7 @@ export async function GET(request: Request) {
         type: "subcategory" as const,
         image: s.image || null,
         category: s.category.name,
-        url: `/products?category=${s.category.id}&subcategory=${s.id}`,
+        url: `/products?category=${s.category.slug || slugify(s.category.name)}&subcategory=${s.slug || slugify(s.name)}`,
       })),
       ...products.map((p) => ({
         id: p.id,
@@ -76,7 +82,7 @@ export async function GET(request: Request) {
         image: p.image || null,
         category: p.category.name,
         subcategory: p.subcategory?.name || null,
-        url: `/products/${p.id}`,
+        url: `/products/${p.slug || slugify(p.name)}`,
       })),
     ];
 

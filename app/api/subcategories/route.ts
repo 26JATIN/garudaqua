@@ -16,7 +16,7 @@ export async function GET(request: Request) {
         { order: "asc" },
       ],
       include: {
-        category: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, slug: true } },
       },
     });
     return NextResponse.json(subcategories, {

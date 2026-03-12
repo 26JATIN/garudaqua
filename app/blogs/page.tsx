@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import BlogsClient from './BlogsClient';
 import { collectionPageSchema } from '@/lib/jsonld';
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Blog — Tips, Guides & Insights | Garud Aqua Solutions',

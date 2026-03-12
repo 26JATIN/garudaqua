@@ -5,6 +5,13 @@ import { collectionPageSchema } from '@/lib/jsonld';
 
 export const revalidate = 60;
 
+/** 24-char hex = MongoDB ObjectId */
+const isObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s);
+/** Convert name to slug */
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export const metadata: Metadata = {
   title: "Products — Water Tanks, Pipes & Fittings",
   description:
@@ -44,8 +51,51 @@ async function getInitialData(filters: {
 }) {
   const where: Record<string, unknown> = { isActive: true };
 
-  if (filters.category) where.categoryId = filters.category;
-  if (filters.subcategory) where.subcategoryId = filters.subcategory;
+  if (filters.category) {
+    if (isObjectId(filters.category)) {
+      where.categoryId = filters.category;
+    } else {
+      // Slug — try slug column, then name match, then slugify fallback
+      const cat = await prisma.category.findFirst({
+        where: {
+          OR: [
+            { slug: filters.category },
+            { name: { equals: filters.category.replace(/-/g, " "), mode: "insensitive" } },
+          ],
+        },
+        select: { id: true, name: true },
+      });
+      if (cat) {
+        where.categoryId = cat.id;
+      } else {
+        const allCats = await prisma.category.findMany({ select: { id: true, name: true } });
+        const match = allCats.find((c) => slugify(c.name) === filters.category);
+        where.categoryId = match ? match.id : "__no_match__";
+      }
+    }
+  }
+  if (filters.subcategory) {
+    if (isObjectId(filters.subcategory)) {
+      where.subcategoryId = filters.subcategory;
+    } else {
+      const sub = await prisma.subcategory.findFirst({
+        where: {
+          OR: [
+            { slug: filters.subcategory },
+            { name: { equals: filters.subcategory.replace(/-/g, " "), mode: "insensitive" } },
+          ],
+        },
+        select: { id: true, name: true },
+      });
+      if (sub) {
+        where.subcategoryId = sub.id;
+      } else {
+        const allSubs = await prisma.subcategory.findMany({ select: { id: true, name: true } });
+        const match = allSubs.find((s) => slugify(s.name) === filters.subcategory);
+        where.subcategoryId = match ? match.id : "__no_match__";
+      }
+    }
+  }
   if (filters.search) {
     where.OR = [
       { name: { contains: filters.search, mode: 'insensitive' } },
@@ -62,7 +112,7 @@ async function getInitialData(filters: {
     prisma.category.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: 'asc' },
-      select: { id: true, name: true, image: true },
+      select: { id: true, name: true, slug: true, image: true },
     }),
     prisma.subcategory.findMany({
       where: { isActive: true },
@@ -70,8 +120,9 @@ async function getInitialData(filters: {
       select: {
         id: true,
         name: true,
+        slug: true,
         image: true,
-        category: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, slug: true } },
       },
     }),
     prisma.product.findMany({

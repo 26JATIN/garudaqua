@@ -13,6 +13,17 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+/** Mirrors the server-side slugify so we never fall back to an ObjectId */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+function productPath(product: { slug?: string; name: string }): string {
+  return product.slug || slugify(product.name);
+}
+
 // Type definitions
 interface Category {
   id: string;
@@ -25,6 +36,7 @@ interface Category {
 interface Product {
   id: string;
   name: string;
+  slug?: string;
   isActive: boolean;
   image: string;
   description?: string;
@@ -414,7 +426,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
   }, []);
 
   const handleProductClick = useCallback((product: Product) => {
-    router.push(`/products/${product.id}`);
+    router.push(`/products/${productPath(product)}`);
   }, [router]);
 
   // Get unique categories for filter buttons
@@ -490,7 +502,16 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
 
   return (
     <section ref={sectionRef} className="bg-white dark:bg-black py-6 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-      {/* Mobile: Sticky filter bar — sits outside the flex layout so it can stick independently */}
+      {/* Mobile: "Explore Categories" heading — scrolls away naturally */}
+      <h2
+        className={`lg:hidden text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 hover:text-[#0EA5E9] transition-all duration-300 cursor-default leading-tight transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+      >
+        Explore
+        <br />
+        Categories
+      </h2>
+
+      {/* Mobile: Sticky filter bar — sticks below navbar as you scroll */}
       <div ref={mobileFilterRef} className="lg:hidden sticky top-15 z-30 -mx-3 sm:-mx-6 px-3 sm:px-6 py-3 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5">
         <div className="space-y-2">
           <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
@@ -535,13 +556,13 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
       </div>
 
       <div className="flex flex-col lg:flex-row min-h-[60vh] gap-6 lg:gap-0">
-        {/* Sidebar - Filter Section (Desktop: sticky, Mobile: just heading) */}
-        <div className="w-full lg:w-1/5 shrink-0 mb-4 sm:mb-6 lg:mb-0 lg:pr-6 xl:pr-8">
+        {/* Sidebar - Filter Section (Desktop only: sticky sidebar with heading + filters) */}
+        <div className="hidden lg:block lg:w-1/5 shrink-0 lg:pr-6 xl:pr-8">
           <div
             className={`lg:sticky lg:top-22 transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
               }`}
           >
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 lg:mb-8 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform leading-tight">
+            <h2 className="text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-8 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform leading-tight">
               Explore
               <br />
               Categories

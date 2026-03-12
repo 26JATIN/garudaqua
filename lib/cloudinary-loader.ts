@@ -4,12 +4,22 @@ type ImageLoaderParams = {
   quality?: number;
 };
 
+const ALLOWED_HOSTS = ["res.cloudinary.com"];
+
 export default function cloudinaryLoader({
   src,
   width,
   quality,
 }: ImageLoaderParams): string {
-  if (!src.includes("res.cloudinary.com")) {
+  // Block any src that isn't from an explicitly trusted host
+  try {
+    const url = new URL(src);
+    if (!ALLOWED_HOSTS.includes(url.hostname)) {
+      console.warn(`[cloudinary-loader] Blocked untrusted image host: ${url.hostname}`);
+      return "";
+    }
+  } catch {
+    // Relative path — allow through (local /public assets)
     return src;
   }
 

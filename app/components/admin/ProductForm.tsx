@@ -16,6 +16,7 @@ interface VariantOption {
         displayName: string;
         colorCode: string | null;
         isAvailable: boolean;
+        imageUrl?: string | null;
     }>;
 }
 
@@ -594,6 +595,7 @@ export default function ProductForm({
                 }}
                 hasVariants={formData.hasVariants}
                 variantOptions={formData.variantOptions}
+                productImages={formData.images}
             />
 
             {/* Actions */}
