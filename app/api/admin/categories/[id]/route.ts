@@ -20,14 +20,46 @@ export async function PUT(
 
     const existing = await prisma.category.findUnique({ where: { id } });
 
-    const newSlug = body.name !== existing?.name ? slugify(body.name) : (existing?.slug || slugify(body.name));
+    const newSlug = body.name !== existing?.name
+      ? slugify(body.name)
+      : (existing?.slug || slugify(body.name));
+
+    // formerSlugs — same invariant as products/blogs:
+    // never contain the new live slug, no duplicates, cap at 10.
+    const MAX_FORMER_SLUGS = 10;
+    const slugChanged = existing?.slug && newSlug !== existing.slug;
+    const updatedFormerSlugs = [
+      ...new Set([
+        ...(existing?.formerSlugs ?? []),
+        ...(slugChanged ? [existing!.slug] : []),
+      ]),
+    ]
+      .filter((s) => s !== newSlug)
+      .slice(-MAX_FORMER_SLUGS);
+
+    // If this category's new slug was a formerSlug on another category, strip it.
+    if (slugChanged) {
+      const staleHolders = await prisma.category.findMany({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        where: { id: { not: id }, formerSlugs: { has: newSlug } } as any,
+        select: { id: true, formerSlugs: true },
+      });
+      await Promise.all(
+        staleHolders.map((c) =>
+          prisma.category.update({
+            where: { id: c.id },
+            data: { formerSlugs: c.formerSlugs.filter((s) => s !== newSlug) },
+          })
+        )
+      );
+    }
 
     const category = await prisma.category.update({
       where: { id },
       data: {
         name: body.name,
-        // Regenerate slug when name changes; keep existing slug if name unchanged
         slug: newSlug,
+        formerSlugs: updatedFormerSlugs,
         description: body.description,
         image: body.image,
         sortOrder: body.sortOrder,
@@ -40,10 +72,14 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.image);
     }
 
-    // Purge listing page, new category filter URL, and old filter URL (if slug changed)
+    // Purge listing page, new + old category filter URLs
     const pathsToPurge = ["/", "/products", `/products?category=${newSlug}`];
     if (existing?.slug && existing.slug !== newSlug) {
       pathsToPurge.push(`/products?category=${existing.slug}`);
+      // Also purge all formerSlug filter URLs so stale CDN entries are cleared
+      (existing.formerSlugs ?? []).forEach((s) =>
+        pathsToPurge.push(`/products?category=${s}`)
+      );
     }
     await revalidateAndWarm(pathsToPurge);
     return NextResponse.json(category);
@@ -70,7 +106,14 @@ export async function DELETE(
 
     if (category?.image) await deleteCloudinaryByUrl(category.image);
 
-    await revalidateAndWarm(["/", "/products"]);
+    // Purge the listing page, the live category filter URL, and every former
+    // slug filter URL so no stale Cloudflare-cached page survives the deletion.
+    const pathsToPurge = ["/", "/products"];
+    if (category?.slug) pathsToPurge.push(`/products?category=${category.slug}`);
+    (category?.formerSlugs ?? []).forEach((s) =>
+      pathsToPurge.push(`/products?category=${s}`)
+    );
+    await revalidateAndWarm(pathsToPurge);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting category:", error);

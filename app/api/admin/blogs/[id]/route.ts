@@ -20,12 +20,19 @@ export async function PUT(
     }
 
     // When admin changes the slug, preserve the old one so old URLs 301-redirect.
-    // Cap at 10 entries (keep the most recent) so the array never grows unboundedly.
+    // Invariant: formerSlugs must never contain the new live slug, nor duplicates.
+    // This means A→B→A bounce-testing never inflates the array.
     const MAX_FORMER_SLUGS = 10;
-    const slugChanged = body.slug && body.slug !== existing.slug;
-    const updatedFormerSlugs = slugChanged
-      ? [...new Set([...(existing.formerSlugs ?? []), existing.slug])].slice(-MAX_FORMER_SLUGS)
-      : existing.formerSlugs;
+    const newBlogSlug = body.slug;
+    const slugChanged = newBlogSlug && newBlogSlug !== existing.slug;
+    const updatedFormerSlugs = [
+      ...new Set([
+        ...(existing.formerSlugs ?? []),
+        ...(slugChanged && existing.slug ? [existing.slug] : []),
+      ]),
+    ]
+      .filter((s) => s !== newBlogSlug)   // never keep the current live slug in history
+      .slice(-MAX_FORMER_SLUGS);
 
     // Sync the legacy category string field when categoryId changes, so
     // BlogPostClient's categoryName fallback stays accurate.
@@ -64,9 +71,11 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.featuredImage);
     }
 
-    // Purge new slug path + old slug path (if it changed)
+    // Purge new slug path, old slug path (if changed), and every previously-known
+    // formerSlug path so no stale Cloudflare-cached page survives a rename.
     const pathsToPurge = ["/blogs", ...(blog.slug ? [`/blogs/${blog.slug}`] : [])];
     if (slugChanged && existing.slug) pathsToPurge.push(`/blogs/${existing.slug}`);
+    (existing.formerSlugs ?? []).forEach((s) => pathsToPurge.push(`/blogs/${s}`));
     await revalidateAndWarm(pathsToPurge);
     return NextResponse.json(blog);
   } catch (error) {

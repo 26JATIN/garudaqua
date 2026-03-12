@@ -23,6 +23,7 @@ model Category {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   name          String        @unique
   slug          String        @default("")
+  formerSlugs   String[]      @default([])
   description   String        @default("")
   image         String        @default("")
   sortOrder     Int           @default(0)
@@ -41,6 +42,7 @@ model Subcategory {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   slug        String    @default("")
+  formerSlugs String[]  @default([])
   description String    @default("")
   image       String    @default("")
   order       Int       @default(0)

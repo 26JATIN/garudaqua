@@ -20,13 +20,46 @@ export async function PUT(
 
     const existing = await prisma.subcategory.findUnique({ where: { id } });
 
-    const newSlug = body.name !== existing?.name ? slugify(body.name) : (existing?.slug || slugify(body.name));
+    const newSlug = body.name !== existing?.name
+      ? slugify(body.name)
+      : (existing?.slug || slugify(body.name));
+
+    // formerSlugs — same invariant as products/blogs/categories:
+    // never contain the new live slug, no duplicates, cap at 10.
+    const MAX_FORMER_SLUGS = 10;
+    const slugChanged = existing?.slug && newSlug !== existing.slug;
+    const updatedFormerSlugs = [
+      ...new Set([
+        ...(existing?.formerSlugs ?? []),
+        ...(slugChanged ? [existing!.slug] : []),
+      ]),
+    ]
+      .filter((s) => s !== newSlug)
+      .slice(-MAX_FORMER_SLUGS);
+
+    // If this subcategory's new slug was a formerSlug on another subcategory, strip it.
+    if (slugChanged) {
+      const staleHolders = await prisma.subcategory.findMany({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        where: { id: { not: id }, formerSlugs: { has: newSlug } } as any,
+        select: { id: true, formerSlugs: true },
+      });
+      await Promise.all(
+        staleHolders.map((s) =>
+          prisma.subcategory.update({
+            where: { id: s.id },
+            data: { formerSlugs: s.formerSlugs.filter((slug) => slug !== newSlug) },
+          })
+        )
+      );
+    }
 
     const subcategory = await prisma.subcategory.update({
       where: { id },
       data: {
         name: body.name,
         slug: newSlug,
+        formerSlugs: updatedFormerSlugs,
         description: body.description,
         image: body.image,
         order: body.order,
@@ -42,10 +75,14 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.image);
     }
 
-    // Purge old subcategory filter URL if slug changed
+    // Purge listing page, new + old subcategory filter URLs
     const pathsToPurge = ["/", "/products", `/products?subcategory=${newSlug}`];
     if (existing?.slug && existing.slug !== newSlug) {
       pathsToPurge.push(`/products?subcategory=${existing.slug}`);
+      // Also purge all formerSlug filter URLs
+      (existing.formerSlugs ?? []).forEach((s) =>
+        pathsToPurge.push(`/products?subcategory=${s}`)
+      );
     }
     await revalidateAndWarm(pathsToPurge);
     return NextResponse.json(subcategory);
@@ -72,7 +109,14 @@ export async function DELETE(
 
     if (subcategory?.image) await deleteCloudinaryByUrl(subcategory.image);
 
-    await revalidateAndWarm(["/", "/products"]);
+    // Purge the listing page, the live subcategory filter URL, and every former
+    // slug filter URL so no stale Cloudflare-cached page survives the deletion.
+    const pathsToPurge = ["/", "/products"];
+    if (subcategory?.slug) pathsToPurge.push(`/products?subcategory=${subcategory.slug}`);
+    (subcategory?.formerSlugs ?? []).forEach((s) =>
+      pathsToPurge.push(`/products?subcategory=${s}`)
+    );
+    await revalidateAndWarm(pathsToPurge);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting subcategory:", error);

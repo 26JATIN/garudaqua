@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ProductsPage from "../components/ProductsPage";
 import { collectionPageSchema } from '@/lib/jsonld';
@@ -51,48 +52,83 @@ async function getInitialData(filters: {
 }) {
   const where: Record<string, unknown> = { isActive: true };
 
+  // Resolved canonical slugs — used to 301 redirect if a formerSlug was used in the URL
+  let canonicalCategory: string | undefined;
+  let canonicalSubcategory: string | undefined;
+
   if (filters.category) {
     if (isObjectId(filters.category)) {
       where.categoryId = filters.category;
     } else {
-      // Slug — try slug column, then name match, then slugify fallback
-      const cat = await prisma.category.findFirst({
-        where: {
-          OR: [
-            { slug: filters.category },
-            { name: { equals: filters.category.replace(/-/g, " "), mode: "insensitive" } },
-          ],
-        },
-        select: { id: true, name: true },
+      // 1. Try current slug
+      let cat = await prisma.category.findFirst({
+        where: { slug: filters.category },
+        select: { id: true, slug: true },
       });
+      // 2. Try formerSlugs (renamed category)
+      if (!cat) {
+        cat = await prisma.category.findFirst({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          where: { formerSlugs: { has: filters.category } } as any,
+          select: { id: true, slug: true },
+        });
+      }
+      // 3. Legacy: name match / slugify fallback
+      if (!cat) {
+        const allCats = await prisma.category.findMany({ select: { id: true, name: true, slug: true } });
+        const match = allCats.find(
+          (c) =>
+            c.name.toLowerCase() === filters.category!.replace(/-/g, " ").toLowerCase() ||
+            slugify(c.name) === filters.category
+        );
+        if (match) cat = match;
+      }
       if (cat) {
         where.categoryId = cat.id;
+        // If the URL used an old slug, record the canonical so the page can redirect
+        if (cat.slug && cat.slug !== filters.category) {
+          canonicalCategory = cat.slug;
+        }
       } else {
-        const allCats = await prisma.category.findMany({ select: { id: true, name: true } });
-        const match = allCats.find((c) => slugify(c.name) === filters.category);
-        where.categoryId = match ? match.id : "__no_match__";
+        where.categoryId = "__no_match__";
       }
     }
   }
+
   if (filters.subcategory) {
     if (isObjectId(filters.subcategory)) {
       where.subcategoryId = filters.subcategory;
     } else {
-      const sub = await prisma.subcategory.findFirst({
-        where: {
-          OR: [
-            { slug: filters.subcategory },
-            { name: { equals: filters.subcategory.replace(/-/g, " "), mode: "insensitive" } },
-          ],
-        },
-        select: { id: true, name: true },
+      // 1. Try current slug
+      let sub = await prisma.subcategory.findFirst({
+        where: { slug: filters.subcategory },
+        select: { id: true, slug: true },
       });
+      // 2. Try formerSlugs (renamed subcategory)
+      if (!sub) {
+        sub = await prisma.subcategory.findFirst({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          where: { formerSlugs: { has: filters.subcategory } } as any,
+          select: { id: true, slug: true },
+        });
+      }
+      // 3. Legacy: name match / slugify fallback
+      if (!sub) {
+        const allSubs = await prisma.subcategory.findMany({ select: { id: true, name: true, slug: true } });
+        const match = allSubs.find(
+          (s) =>
+            s.name.toLowerCase() === filters.subcategory!.replace(/-/g, " ").toLowerCase() ||
+            slugify(s.name) === filters.subcategory
+        );
+        if (match) sub = match;
+      }
       if (sub) {
         where.subcategoryId = sub.id;
+        if (sub.slug && sub.slug !== filters.subcategory) {
+          canonicalSubcategory = sub.slug;
+        }
       } else {
-        const allSubs = await prisma.subcategory.findMany({ select: { id: true, name: true } });
-        const match = allSubs.find((s) => slugify(s.name) === filters.subcategory);
-        where.subcategoryId = match ? match.id : "__no_match__";
+        where.subcategoryId = "__no_match__";
       }
     }
   }
@@ -146,6 +182,8 @@ async function getInitialData(filters: {
       ...p,
       subcategory: p.subcategory ?? undefined,
     })),
+    canonicalCategory,
+    canonicalSubcategory,
   };
 }
 
@@ -159,7 +197,20 @@ export default async function Page({
   const subcategory = typeof params.subcategory === 'string' ? params.subcategory : undefined;
   const search = typeof params.search === 'string' ? params.search : undefined;
   const sort = typeof params.sort === 'string' ? params.sort : undefined;
-  const { categories, subcategories, products } = await getInitialData({ category, subcategory, search, sort });
+  const { categories, subcategories, products, canonicalCategory, canonicalSubcategory } =
+    await getInitialData({ category, subcategory, search, sort });
+
+  // 301 redirect if a formerSlug was used in the URL
+  if (canonicalCategory || canonicalSubcategory) {
+    const newParams = new URLSearchParams();
+    const resolvedCategory = canonicalCategory ?? category;
+    const resolvedSubcategory = canonicalSubcategory ?? subcategory;
+    if (resolvedCategory) newParams.set("category", resolvedCategory);
+    if (resolvedSubcategory) newParams.set("subcategory", resolvedSubcategory);
+    if (search) newParams.set("search", search);
+    if (sort) newParams.set("sort", sort);
+    redirect(`/products?${newParams.toString()}`);
+  }
 
   return (
     <>

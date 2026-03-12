@@ -44,13 +44,19 @@ export async function PUT(
         ? await uniqueSlug(slugify(body.name), id)
         : existing.slug;
 
-    // Preserve old slug in formerSlugs so old URLs keep working via 301 redirect.
-    // Cap at 10 entries (keep the most recent) so the array never grows unboundedly.
+    // Preserve old slug in formerSlugs so old URLs 301-redirect to the new one.
+    // Invariant: formerSlugs must never contain the new live slug, nor duplicates.
+    // This means A→B→A bounce-testing never inflates the array.
     const MAX_FORMER_SLUGS = 10;
-    const updatedFormerSlugs =
-      newSlug !== existing.slug && existing.slug
-        ? [...new Set([...(existing.formerSlugs ?? []), existing.slug])].slice(-MAX_FORMER_SLUGS)
-        : existing.formerSlugs;
+    const slugChanged = newSlug !== existing.slug;
+    const updatedFormerSlugs = [
+      ...new Set([
+        ...(existing.formerSlugs ?? []),
+        ...(slugChanged && existing.slug ? [existing.slug] : []),
+      ]),
+    ]
+      .filter((s) => s !== newSlug)   // never keep the current live slug in history
+      .slice(-MAX_FORMER_SLUGS);
 
     // If this product's new slug was previously a formerSlug on another product,
     // remove it from that product so /products/<newSlug> resolves correctly here.
@@ -107,9 +113,16 @@ export async function PUT(
     );
     await Promise.all(removedImages.map((img: string) => deleteCloudinaryByUrl(img)));
 
-    // Revalidate both old slug path and new slug path (in case name changed)
-    const pathsToRevalidate = ["/products", `/products/${newSlug}`];
-    if (existing.slug !== newSlug) pathsToRevalidate.push(`/products/${existing.slug}`);
+    // Revalidate new slug, old slug (if changed), and every formerSlug so no
+    // stale Cloudflare-cached page can serve the wrong product.
+    const pathsToRevalidate = ["/", "/products", `/products/${newSlug}`];
+    if (existing.slug !== newSlug) {
+      pathsToRevalidate.push(`/products/${existing.slug}`);
+    }
+    // Purge all previously-known former slug paths (before this save)
+    (existing.formerSlugs ?? []).forEach((s) =>
+      pathsToRevalidate.push(`/products/${s}`)
+    );
     await revalidateAndWarm(pathsToRevalidate);
 
     return NextResponse.json(product);
@@ -145,7 +158,11 @@ export async function DELETE(
       (product.images || []).map((img: string) => deleteCloudinaryByUrl(img))
     );
 
-    await revalidateAndWarm(["/", "/products", `/products/${product.slug}`]);
+    // Purge current slug + all former slugs so no stale page remains in Cloudflare
+    const pathsToPurge = ["/", "/products"];
+    if (product.slug) pathsToPurge.push(`/products/${product.slug}`);
+    (product.formerSlugs ?? []).forEach((s) => pathsToPurge.push(`/products/${s}`));
+    await revalidateAndWarm(pathsToPurge);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting product:", error);
