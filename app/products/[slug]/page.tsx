@@ -143,8 +143,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const { product, related, canonicalSlug } = await getProductData(slug);
 
-  // No product or inactive product → proper 404 (Next.js adds X-Robots-Tag: noindex)
-  if (!product) notFound();
+  // No product or inactive product → proper 404 response
+  if (!product) {
+    notFound();
+  }
 
   // If an ObjectId was used in the URL and the product has a slug, 301 redirect to the clean URL
   if (canonicalSlug !== slug) {

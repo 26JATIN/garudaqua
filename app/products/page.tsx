@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ProductsPage from "../components/ProductsPage";
 import { collectionPageSchema } from '@/lib/jsonld';
@@ -57,11 +57,14 @@ async function getInitialData(filters: {
   let canonicalSubcategory: string | undefined;
 
   if (filters.category) {
+    let cat;
     if (isObjectId(filters.category)) {
+      cat = await prisma.category.findUnique({ where: { id: filters.category }, select: { id: true } });
+      if (!cat) notFound();
       where.categoryId = filters.category;
     } else {
       // 1. Try current slug
-      let cat = await prisma.category.findFirst({
+      cat = await prisma.category.findFirst({
         where: { slug: filters.category },
         select: { id: true, slug: true },
       });
@@ -90,17 +93,20 @@ async function getInitialData(filters: {
           canonicalCategory = cat.slug;
         }
       } else {
-        where.categoryId = "__no_match__";
+        notFound();
       }
     }
   }
 
   if (filters.subcategory) {
+    let sub;
     if (isObjectId(filters.subcategory)) {
+      sub = await prisma.subcategory.findUnique({ where: { id: filters.subcategory }, select: { id: true } });
+      if (!sub) notFound();
       where.subcategoryId = filters.subcategory;
     } else {
       // 1. Try current slug
-      let sub = await prisma.subcategory.findFirst({
+      sub = await prisma.subcategory.findFirst({
         where: { slug: filters.subcategory },
         select: { id: true, slug: true },
       });
@@ -128,7 +134,7 @@ async function getInitialData(filters: {
           canonicalSubcategory = sub.slug;
         }
       } else {
-        where.subcategoryId = "__no_match__";
+        notFound();
       }
     }
   }

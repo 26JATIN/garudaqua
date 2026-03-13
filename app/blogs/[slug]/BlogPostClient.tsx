@@ -3,6 +3,7 @@
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -29,7 +30,7 @@ export default function BlogPostClient({ params }: { params: Promise<{ slug: str
     const [blog, setBlog] = useState<Blog | null>(null);
     const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
-    const [notFound, setNotFound] = useState(false);
+    const [isNotFound, setNotFound] = useState(false);
 
     useEffect(() => {
         async function fetchBlog() {
@@ -97,25 +98,12 @@ export default function BlogPostClient({ params }: { params: Promise<{ slug: str
         );
     }
 
-    if (notFound || !blog) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-b from-gray-50 to-white dark:from-black dark:to-[#0A0A0A]">
-                <svg className="w-24 h-24 text-gray-300 dark:text-gray-600 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <h1 className="text-4xl font-light text-gray-800 dark:text-gray-100 mb-4">Article Not Found</h1>
-                <p className="text-gray-500 dark:text-gray-400 mb-8 font-light">The article you&apos;re looking for doesn&apos;t exist</p>
-                <Link href="/blogs">
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="bg-[#0EA5E9] hover:bg-[#0369A1] text-white rounded-full px-8 py-3 font-light transition-colors"
-                    >
-                        Back to Blog
-                    </motion.button>
-                </Link>
-            </div>
-        );
+    if (isNotFound) {
+        notFound();
+    }
+
+    if (!blog) {
+        return null;
     }
 
     return (

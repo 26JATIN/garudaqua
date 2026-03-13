@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import BlogPostClient from "./BlogPostClient";
 import { articleSchema, breadcrumbSchema } from "@/lib/jsonld";
@@ -99,6 +99,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // 301 redirect if slug is an old formerSlug
   if (blog && blog.slug !== slug) {
     redirect(`/blogs/${blog.slug}`);
+  }
+
+  if (!blog) {
+    notFound();
   }
 
   return (
