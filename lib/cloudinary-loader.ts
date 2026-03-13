@@ -27,7 +27,6 @@ export default function cloudinaryLoader({
   const params = [
     "f_auto",          // automatic format (webp/avif)
     `q_${quality || "auto"}`, // automatic quality
-    "dpr_auto",        // retina optimization
     `w_${width}`,      // responsive width
     "c_limit",         // don't upscale
   ].join(",");

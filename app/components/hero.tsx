@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import Image from 'next/image';
+import Image, { getImageProps } from 'next/image';
 
 interface HeroSlide {
     id: string;
@@ -14,6 +14,55 @@ interface HeroSlide {
 interface HeroProps {
     initialSlides?: HeroSlide[];
 }
+
+const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
+    const common = {
+        alt: slide.title || "Garud Aqua",
+        fill: true,
+        priority: index === 0,
+        fetchPriority: index === 0 ? 'high' as const : 'low' as const,
+        loading: index === 0 ? 'eager' as const : 'lazy' as const,
+        quality: 50,
+    };
+
+    if (!slide.mobileImage) {
+        return (
+            <Image
+                src={slide.image}
+                {...common}
+                sizes="100vw"
+                className="object-cover object-top"
+            />
+        );
+    }
+
+    const {
+        props: { srcSet: desktopSrcSet },
+    } = getImageProps({
+        ...common,
+        src: slide.image,
+        sizes: "100vw",
+    });
+
+    const {
+        props: { srcSet: mobileSrcSet, ...rest },
+    } = getImageProps({
+        ...common,
+        src: slide.mobileImage,
+        sizes: "100vw",
+    });
+
+    return (
+        <picture>
+            <source media="(min-width: 641px)" srcSet={desktopSrcSet} />
+            <source media="(max-width: 640px)" srcSet={mobileSrcSet} />
+            <img
+                {...rest}
+                className="w-full h-full object-cover object-top"
+            />
+        </picture>
+    );
+};
 
 export default function Hero({ initialSlides }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -92,33 +141,7 @@ export default function Hero({ initialSlides }: HeroProps) {
                             willChange: index === 0 ? 'auto' : 'opacity',
                         }}
                     >
-                        <Image
-                            src={slide.image}
-                            alt={slide.title || "Garud Aqua"}
-                            fill
-                            // Only slide 0 is LCP — mark it priority; rest are lazy
-                            priority={index === 0}
-                            fetchPriority={index === 0 ? 'high' : 'low'}
-                            loading={index === 0 ? 'eager' : 'lazy'}
-                            className={`object-cover object-top ${slide.mobileImage ? 'hidden sm:block' : ''}`}
-                            quality={50}
-                            sizes={slide.mobileImage
-                                ? "(max-width: 640px) 1px, 100vw"
-                                : "100vw"}
-                        />
-                        {slide.mobileImage && (
-                            <Image
-                                src={slide.mobileImage}
-                                alt={slide.title || "Garud Aqua"}
-                                fill
-                                priority={index === 0}
-                                fetchPriority={index === 0 ? 'high' : 'low'}
-                                loading={index === 0 ? 'eager' : 'lazy'}
-                                className="sm:hidden object-cover object-center"
-                                quality={50}
-                                sizes="(min-width: 641px) 1px, 100vw"
-                            />
-                        )}
+                        <SlideImage slide={slide} index={index} />
                     </div>
                 ))}
             </div>

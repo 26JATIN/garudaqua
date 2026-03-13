@@ -7,7 +7,6 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Droplets } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -134,14 +133,9 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
-      whileHover={{ scale: 1.05, y: -4 }}
-      whileTap={{ scale: 0.95 }}
+    <div
       onClick={onClick}
-      className="cursor-pointer group/sub"
+      className={`cursor-pointer group/sub transition-all duration-300 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} hover:scale-105 hover:-translate-y-1 active:scale-95`}
     >
       {/* Subcategory Badge */}
       <div className="relative aspect-square rounded-lg overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#0A0A0A] dark:to-black border border-gray-200 dark:border-white/10 group-hover/sub:border-[#0EA5E9] transition-all duration-300">
@@ -177,7 +171,7 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
           </p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
 
@@ -223,30 +217,22 @@ export const Card = React.memo(({
   };
 
   return (
-    <motion.div
-      layoutId={layout ? `card-${card.id || card.name}` : undefined}
-      whileTap={{ scale: 0.98 }}
+    <div
       onClick={handleOpen}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm transition-shadow duration-300",
+        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm transition-all duration-300 md:active:scale-95",
         isHovered && "shadow-lg"
       )}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}>
-
+    >
       {/* Hover spotlight background */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.span
-            className="absolute inset-0 h-full w-full bg-neutral-100 dark:bg-slate-800/70 block rounded-2xl sm:rounded-3xl"
-            layoutId={`hoverBg-${card.id || card.name}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.15 } }}
-            exit={{ opacity: 0, transition: { duration: 0.15, delay: 0.1 } }}
-          />
+      <div 
+        className={cn(
+          "absolute inset-0 h-full w-full bg-neutral-100 dark:bg-slate-800/70 block rounded-2xl sm:rounded-3xl transition-opacity duration-150",
+          isHovered ? "opacity-100" : "opacity-0"
         )}
-      </AnimatePresence>
+      />
 
       {/* Card content — above the spotlight */}
       <div className="relative z-10 flex flex-col flex-1 h-full">
@@ -254,13 +240,12 @@ export const Card = React.memo(({
         <div className="space-y-2 sm:space-y-3 md:space-y-4 mt-2 sm:mt-3 md:mt-4 flex-1 flex flex-col">
           <div className="flex flex-col gap-1 sm:gap-2 flex-1">
             <div className="flex justify-between items-start gap-2">
-              <motion.h3
-                layoutId={layout ? `title-${card.id || card.name}` : undefined}
+              <h3
                 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1 truncate"
                 title={card.name}
               >
                 {card.name}
-              </motion.h3>
+              </h3>
             </div>
           </div>
 
@@ -295,7 +280,7 @@ export const Card = React.memo(({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
 
@@ -466,27 +451,10 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
   // Memoize rendered products as cards
   const renderedProducts = useMemo(() => {
     return displayedProducts.map((product, index) => (
-      <motion.div
+      <div
         key={`${selectedCategory}-${product.id}`}
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          transition: {
-            duration: 0.6,
-            delay: index * 0.1,
-            ease: "easeOut"
-          }
-        }}
-        exit={{
-          opacity: 0,
-          y: -20,
-          scale: 0.95,
-          transition: { duration: 0.3 }
-        }}
-        layout
-        className="h-full"
+        className="h-full transform transition-all duration-500 ease-out animate-on-view is-visible"
+        style={{ animationDelay: `${index * 0.1}s` }}
       >
         <Card
           card={product}
@@ -496,7 +464,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
           subcategories={[]}
           onSubcategoryClick={() => { }}
         />
-      </motion.div>
+      </div>
     ));
   }, [displayedProducts, selectedCategory, handleProductClick]);
 
@@ -623,11 +591,8 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
         <div ref={contentRef} className="w-full lg:w-4/5 flex-1">
           <div className="space-y-8 sm:space-y-12">
             {/* Filter Status Indicator */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-              className="flex items-center justify-between border-b border-gray-200 dark:border-white/10 pb-4"
+            <div
+              className={`flex items-center justify-between border-b border-gray-200 dark:border-white/10 pb-4 transition-all duration-500 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} delay-300`}
             >
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -649,7 +614,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                   <span className="text-lg">×</span>
                 </button>
               )}
-            </motion.div>
+            </div>
 
             {/* Categories Grid */}
             {isLoading ? (
@@ -666,26 +631,18 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
               </div>
             ) : filteredProducts.length > 0 ? (
               <>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={selectedCategory}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
-                  >
-                    {renderedProducts}
-                  </motion.div>
-                </AnimatePresence>
+                <div
+                  key={selectedCategory}
+                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 animate-fade-in"
+                >
+                  {renderedProducts}
+                </div>
 
                 {/* Show More / Explore All Button */}
                 {hasMore && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="flex justify-center pt-8"
+                  <div
+                    className="flex justify-center pt-8 animate-fade-in"
+                    style={{ animationDelay: '300ms' }}
                   >
                     <button
                       onClick={() => {
@@ -706,7 +663,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                       </span>
                       <div className="absolute inset-0 bg-linear-to-r from-[#0369A1] to-[#0EA5E9] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </button>
-                  </motion.div>
+                  </div>
                 )}
               </>
             ) : (

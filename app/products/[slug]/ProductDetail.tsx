@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -243,7 +242,7 @@ function ProductDetailSkeleton() {
 }
 
 // ===== Related Product Card with hover spotlight =====
-function RelatedProductCard({ product: relatedProduct, index, categoryId }: { product: Product; index: number; categoryId: string }) {
+function RelatedProductCard({ product: relatedProduct }: { product: Product; index: number; categoryId: string }) {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
@@ -254,17 +253,11 @@ function RelatedProductCard({ product: relatedProduct, index, categoryId }: { pr
                 className="relative group cursor-pointer p-2 rounded-2xl md:rounded-3xl"
             >
                 {/* Hover spotlight background */}
-                <AnimatePresence>
-                    {isHovered && (
-                        <motion.span
-                            className="absolute inset-0 h-full w-full bg-neutral-100 dark:bg-slate-800/70 block rounded-2xl md:rounded-3xl"
-                            layoutId={`relatedHoverBg-${relatedProduct.id}`}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1, transition: { duration: 0.15 } }}
-                            exit={{ opacity: 0, transition: { duration: 0.15, delay: 0.1 } }}
-                        />
-                    )}
-                </AnimatePresence>
+                {isHovered && (
+                    <span
+                        className="absolute inset-0 h-full w-full bg-neutral-100 dark:bg-slate-800/70 block rounded-2xl md:rounded-3xl transition-opacity duration-150 opacity-100"
+                    />
+                )}
 
                 {/* Card content */}
                 <div className={cn(
@@ -320,7 +313,6 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ productSlug, initialProduct, initialRelated }: ProductDetailProps) {
-    const router = useRouter();
     const hasInitialData = !!(initialProduct);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -419,13 +411,11 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                             The product you&apos;re looking for doesn&apos;t exist or has been removed.
                         </p>
                         <Link href="/products">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="px-6 py-3 bg-[#0EA5E9] text-white rounded-full hover:bg-[#0369A1] transition-colors font-light shadow-lg"
+                            <button
+                                className="px-6 py-3 bg-[#0EA5E9] text-white rounded-full hover:bg-[#0369A1] hover:scale-105 active:scale-95 transition-all duration-200 font-light shadow-lg"
                             >
                                 Browse Products
-                            </motion.button>
+                            </button>
                         </Link>
                     </div>
                 </div>
@@ -482,12 +472,10 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         {displayImages.length > 1 && (
                             <div className="hidden lg:grid grid-cols-4 gap-4">
                                 {displayImages.map((img, index) => (
-                                    <motion.button
+                                    <button
                                         key={index}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
                                         onClick={() => setActiveImageIndex(index)}
-                                        className={`aspect-square rounded-2xl overflow-hidden transition-all ${
+                                        className={`aspect-square rounded-2xl overflow-hidden transition-all duration-200 hover:scale-105 active:scale-95 ${
                                             activeImageIndex === index
                                                 ? "ring-4 ring-[#0EA5E9] shadow-lg"
                                                 : "ring-2 ring-gray-200 dark:ring-white/6 hover:ring-[#0EA5E9]/50"
@@ -501,7 +489,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                             className="object-cover w-full h-full"
                                             quality={60}
                                         />
-                                    </motion.button>
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -637,16 +625,14 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
 
                         {/* Enquire Button */}
                         <Link href={`/enquire?product=${encodeURIComponent(product.name)}`}>
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="w-full py-4 px-8 rounded-full font-light text-lg flex items-center justify-center gap-3 transition-all shadow-lg bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white hover:shadow-xl"
+                            <button
+                                className="w-full py-4 px-8 rounded-full font-light text-lg flex items-center justify-center gap-3 transition-all duration-200 shadow-lg bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white hover:shadow-xl hover:scale-105 active:scale-95"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
                                 Enquire Now
-                            </motion.button>
+                            </button>
                         </Link>
 
                         {/* Features */}
