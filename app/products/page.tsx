@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import ProductsPage from "../components/ProductsPage";
 import { collectionPageSchema } from '@/lib/jsonld';
 
-export const revalidate = 60;
+export const dynamic = "force-static";
 
 /** 24-char hex = MongoDB ObjectId */
 const isObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s);

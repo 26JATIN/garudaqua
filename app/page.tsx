@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema } from '@/lib/jsonld';
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 // Lazy load below-the-fold components to reduce initial JS bundle
 const CategoryShowcase = dynamicImports(() => import('./components/CategoryShowcase'));

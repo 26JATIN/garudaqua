@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import BlogPostClient from "./BlogPostClient";
 import { articleSchema, breadcrumbSchema } from "@/lib/jsonld";
 
-export const revalidate = 60;
+export const dynamic = "force-static";
 
 /** Pre-build all published blog pages at deploy time (ISR refreshes them every 60s). */
 export async function generateStaticParams() {
