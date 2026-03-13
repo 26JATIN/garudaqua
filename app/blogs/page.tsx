@@ -55,13 +55,6 @@ async function getInitialData() {
 export default async function Page() {
   const { categories, blogs, totalPages } = await getInitialData();
 
-  const preloadImages = blogs
-    .filter((b: { featuredImage?: string }) => b.featuredImage?.includes('res.cloudinary.com'))
-    .slice(0, 1)
-    .map((b: { featuredImage: string }) =>
-      b.featuredImage.replace('/upload/', '/upload/w_640,q_75,f_auto,c_limit/')
-    );
-
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema({
@@ -69,9 +62,6 @@ export default async function Page() {
         description: "Expert tips, guides, and insights on water tanks, pipes & plumbing solutions from Garud Aqua Solutions.",
         url: "https://garudaqua.in/blogs",
       })) }} />
-      {preloadImages.map((src: string) => (
-        <link key={src} rel="preload" as="image" href={src} fetchPriority="high" />
-      ))}
       <Suspense fallback={
         <div className="min-h-screen bg-gray-50 dark:bg-black">
           <div className="bg-[#2C2C2C] py-24">

@@ -322,8 +322,7 @@ interface ProductDetailProps {
 export default function ProductDetail({ productSlug, initialProduct, initialRelated }: ProductDetailProps) {
     const router = useRouter();
     const hasInitialData = !!(initialProduct);
-    const [selectedImage, setSelectedImage] = useState(0);
-    const [mobileGalleryIndex, setMobileGalleryIndex] = useState(0);
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
     const [relatedProducts, setRelatedProducts] = useState<Product[]>(initialRelated ?? []);
@@ -337,8 +336,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
         async function fetchProduct() {
             setLoading(true);
             setNotFound(false);
-            setSelectedImage(0);
-            setMobileGalleryIndex(0);
+            setActiveImageIndex(0);
             setSelectedColor(null);
 
             try {
@@ -466,51 +464,19 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                     <div
                         className="space-y-4"
                     >
-                        {/* Mobile Swipeable Gallery */}
+                        {/* Unified Image Gallery */}
                         {displayImages.length > 0 && (
-                            <div className="lg:hidden">
+                            <div className="w-full">
                                 <MobileImageGallery
                                     images={displayImages}
                                     productName={product.name}
-                                    controlledIndex={mobileGalleryIndex}
-                                    onIndexChange={setMobileGalleryIndex}
+                                    controlledIndex={activeImageIndex}
+                                    onIndexChange={setActiveImageIndex}
                                 />
                             </div>
                         )}
 
-                        {/* Desktop Main Image */}
-                        <div className="hidden lg:block bg-white dark:bg-[#0A0A0A] rounded-3xl shadow-lg dark:shadow-none dark:border dark:border-white/6 overflow-hidden">
-                            <div className="aspect-square relative">
-                                {displayImages.length > 0 ? (
-                                    <AnimatePresence mode="wait">
-                                        <motion.div
-                                            key={selectedImage}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.3 }}
-                                            className="w-full h-full"
-                                        >
-                                            <Image
-                                                src={displayImages[selectedImage] || displayImages[0]}
-                                                alt={product.name}
-                                                fill
-                                                className="object-cover"
-                                                priority
-                                                sizes="50vw"
-                                                quality={85}
-                                            />
-                                        </motion.div>
-                                    </AnimatePresence>
-                                ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                                        <svg className="w-20 h-20 text-[#0EA5E9] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                        </svg>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+
 
                         {/* Desktop Thumbnail Images */}
                         {displayImages.length > 1 && (
@@ -520,9 +486,9 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                         key={index}
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        onClick={() => setSelectedImage(index)}
+                                        onClick={() => setActiveImageIndex(index)}
                                         className={`aspect-square rounded-2xl overflow-hidden transition-all ${
-                                            selectedImage === index
+                                            activeImageIndex === index
                                                 ? "ring-4 ring-[#0EA5E9] shadow-lg"
                                                 : "ring-2 ring-gray-200 dark:ring-white/6 hover:ring-[#0EA5E9]/50"
                                         }`}
@@ -614,8 +580,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                                             if (hasImage) {
                                                                 const imgIndex = displayImages.indexOf(value.imageUrl!);
                                                                 if (imgIndex !== -1) {
-                                                                    setSelectedImage(imgIndex);
-                                                                    setMobileGalleryIndex(imgIndex);
+                                                                    setActiveImageIndex(imgIndex);
                                                                 }
                                                             }
                                                         };

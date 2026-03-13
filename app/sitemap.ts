@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
-const SITE_URL = "https://garudaqua.in";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://garudaqua.in";
 
 // Use the deploy date env var if set (set it in your CI/CD), otherwise fall back to build time.
 // This means static pages always report an accurate lastModified to Google.

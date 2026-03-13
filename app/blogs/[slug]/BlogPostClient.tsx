@@ -1,11 +1,8 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 
 // ===== Type Definitions =====
 interface Blog {
@@ -24,84 +21,13 @@ interface Blog {
     isPublished: boolean;
 }
 
-export default function BlogPostClient({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = use(params);
-
-    const [blog, setBlog] = useState<Blog | null>(null);
-    const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [isNotFound, setNotFound] = useState(false);
-
-    useEffect(() => {
-        async function fetchBlog() {
-            setLoading(true);
-            setNotFound(false);
-            try {
-                const res = await fetch(`/api/blogs/${slug}`);
-                if (res.status === 404) {
-                    setNotFound(true);
-                    return;
-                }
-                if (!res.ok) throw new Error("Failed to fetch blog");
-
-                const data = await res.json();
-                setBlog(data.blog);
-                setRelatedBlogs(data.related || []);
-            } catch {
-                toast.error("Failed to load article.");
-                setNotFound(true);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchBlog();
-    }, [slug]);
-
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A]">
-                {/* Back Button */}
-                <div className="border-b border-gray-100 dark:border-white/6 sticky top-0 z-50 backdrop-blur-sm bg-white/90 dark:bg-black/90">
-                    <div className="container mx-auto px-4 py-4">
-                        <Link href="/blogs" className="inline-flex items-center text-[#0369A1] hover:text-[#0EA5E9] transition-colors font-light">
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Back to Blog
-                        </Link>
-                    </div>
-                </div>
-
-                <article className="container mx-auto px-4 py-12 max-w-5xl">
-                    <div className="bg-white dark:bg-[#0A0A0A] rounded-3xl shadow-xl dark:shadow-none dark:border dark:border-white/6 overflow-hidden animate-pulse">
-                        <div className="h-64 sm:h-80 md:h-125 bg-gray-200 dark:bg-white/10" />
-                        <div className="p-8 md:p-12 space-y-6">
-                            <div className="h-8 bg-gray-200 dark:bg-white/10 rounded-full w-32" />
-                            <div className="h-12 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
-                            <div className="flex gap-6">
-                                <div className="h-5 bg-gray-200 dark:bg-white/10 rounded w-28" />
-                                <div className="h-5 bg-gray-200 dark:bg-white/10 rounded w-28" />
-                                <div className="h-5 bg-gray-200 dark:bg-white/10 rounded w-24" />
-                            </div>
-                            <div className="h-24 bg-gray-200 dark:bg-white/10 rounded-2xl" />
-                            <div className="space-y-3">
-                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-full" />
-                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-full" />
-                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-5/6" />
-                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-full" />
-                                <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-3/4" />
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            </div>
-        );
-    }
-
-    if (isNotFound) {
-        notFound();
-    }
-
+export default function BlogPostClient({
+    blog,
+    relatedBlogs = []
+}: {
+    blog: Blog;
+    relatedBlogs?: Blog[];
+}) {
     if (!blog) {
         return null;
     }

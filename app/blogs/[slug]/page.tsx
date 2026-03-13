@@ -79,10 +79,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
 
   // Try current slug first, then formerSlugs fallback
-  const blog = await prisma.blogPost.findFirst({
+  const blogData = await prisma.blogPost.findFirst({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     where: { isPublished: true, OR: [{ slug }, { formerSlugs: { has: slug } } as any] },
     select: {
+      id: true,
       title: true,
       excerpt: true,
       content: true,
@@ -93,36 +94,71 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       updatedAt: true,
       tags: true,
       readTime: true,
+      isPublished: true,
+      categoryId: true,
+      blogCategory: { select: { name: true, slug: true } }
     },
   }).catch(() => null);
 
   // 301 redirect if slug is an old formerSlug
-  if (blog && blog.slug !== slug) {
-    redirect(`/blogs/${blog.slug}`);
+  if (blogData && blogData.slug !== slug) {
+    redirect(`/blogs/${blogData.slug}`);
   }
 
-  if (!blog) {
+  if (!blogData) {
     notFound();
   }
 
+  // Fetch related blogs
+  let relatedBlogsData: any[] = [];
+  if (blogData.categoryId) {
+    relatedBlogsData = await prisma.blogPost.findMany({
+      where: { isPublished: true, categoryId: blogData.categoryId, id: { not: blogData.id } },
+      take: 3,
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        featuredImage: true,
+        readTime: true,
+        tags: true,
+        publishedAt: true,
+        author: true,
+        isPublished: true,
+      }
+    });
+  }
+
+  // Format for client
+  const blog = {
+    ...blogData,
+    category: blogData.blogCategory?.slug || "uncategorized",
+    categoryName: blogData.blogCategory?.name || "Uncategorized",
+    tags: Array.isArray(blogData.tags) ? (blogData.tags as string[]) : [],
+    publishedAt: blogData.publishedAt?.toISOString() || new Date().toISOString(),
+  };
+
+  const relatedBlogs = relatedBlogsData.map(rb => ({
+    ...rb,
+    category: "",
+    tags: Array.isArray(rb.tags) ? (rb.tags as string[]) : [],
+    publishedAt: rb.publishedAt?.toISOString() || new Date().toISOString(),
+  }));
+
   return (
     <>
-      {blog && (
-        <>
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema({
-            ...blog,
-            tags: Array.isArray(blog.tags) ? (blog.tags as string[]) : [],
-            publishedAt: blog.publishedAt?.toISOString() ?? null,
-            updatedAt: blog.updatedAt?.toISOString() ?? null,
-          })) }} />
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
-            { name: "Home", url: "https://garudaqua.in" },
-            { name: "Blog", url: "https://garudaqua.in/blogs" },
-            { name: blog.title, url: `https://garudaqua.in/blogs/${blog.slug}` },
-          ])) }} />
-        </>
-      )}
-      <BlogPostClient params={params} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema({
+        ...blog,
+        publishedAt: blogData.publishedAt?.toISOString() ?? null,
+        updatedAt: blogData.updatedAt?.toISOString() ?? null,
+      })) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
+        { name: "Home", url: "https://garudaqua.in" },
+        { name: "Blog", url: "https://garudaqua.in/blogs" },
+        { name: blog.title, url: `https://garudaqua.in/blogs/${blog.slug}` },
+      ])) }} />
+      <BlogPostClient blog={blog} relatedBlogs={relatedBlogs} />
     </>
   );
 }

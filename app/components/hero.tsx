@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from 'next/image';
 
-
 interface HeroSlide {
     id: string;
     image: string;
@@ -12,45 +11,8 @@ interface HeroSlide {
     isActive: boolean;
 }
 
-
 interface HeroProps {
     initialSlides?: HeroSlide[];
-}
-
-// ─── Static first-slide shell ─────────────────────────────────────────────────
-// Rendered server-side (no JS dependency). The LCP image is an ordinary <img>
-// with fetchpriority="high" that the browser preload-scanner can discover
-// immediately from the HTML stream — before any JS downloads or hydrates.
-// Once the client component mounts it takes over and this shell is replaced.
-export function HeroStaticShell({ slide }: { slide: HeroSlide }) {
-    return (
-        <div className="relative w-full h-[80vh] sm:h-[70vh] md:h-[70vh] lg:h-screen overflow-hidden bg-black">
-            <div className="absolute inset-0">
-                {/* Desktop image — hidden on mobile if mobileImage exists */}
-                <Image
-                    src={slide.image}
-                    alt={slide.title || "Garud Aqua"}
-                    fill
-                    priority
-                    className={`object-cover object-top ${slide.mobileImage ? 'hidden sm:block' : ''}`}
-                    quality={50}
-                    sizes={slide.mobileImage ? "(max-width: 640px) 1px, 100vw" : "100vw"}
-                />
-                {/* Mobile image */}
-                {slide.mobileImage && (
-                    <Image
-                        src={slide.mobileImage}
-                        alt={slide.title || "Garud Aqua"}
-                        fill
-                        priority
-                        className="sm:hidden object-cover object-center"
-                        quality={50}
-                        sizes="(min-width: 641px) 1px, 100vw"
-                    />
-                )}
-            </div>
-        </div>
-    );
 }
 
 export default function Hero({ initialSlides }: HeroProps) {

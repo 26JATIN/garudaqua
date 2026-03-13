@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import dynamicImports from "next/dynamic";
-import { HeroStaticShell } from './components/hero';
-import HeroClient from './components/HeroClient';
+import Hero from './components/hero';
 import Footer from './components/Footer';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema } from '@/lib/jsonld';
@@ -32,18 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Build a Cloudinary URL for preloading
-function buildPreloadUrl(src: string, width: number, quality: number) {
-  if (!src.includes('res.cloudinary.com')) return src;
-  const params = `w_${width},q_${quality},f_webp,c_limit`;
-  return src.replace('/upload/', `/upload/${params}/`);
-}
 
-function buildPreloadSrcSet(src: string, quality: number, widths: number[]) {
-  return widths
-    .map(w => `${buildPreloadUrl(src, w, quality)} ${w}w`)
-    .join(', ');
-}
 
 async function getHeroSlides() {
   try {
@@ -146,45 +134,12 @@ export default async function Home() {
         description: "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes, fittings & agricultural water management products.",
         url: "https://garudaqua.in",
       })) }} />
-      {/* Preload first hero slide mobile image — use 100vw for full-width hero */}
-      {heroSlides.length > 0 && heroSlides[0].mobileImage && (
-        <link
-          rel="preload"
-          as="image"
-          type="image/webp"
-          imageSrcSet={buildPreloadSrcSet(heroSlides[0].mobileImage, 50, [384, 640, 750])}
-          imageSizes="(min-width: 641px) 1px, 100vw"
-          fetchPriority="high"
-        />
-      )}
-      {heroSlides.length > 0 && heroSlides[0].image && (
-        <link
-          rel="preload"
-          as="image"
-          type="image/webp"
-          imageSrcSet={buildPreloadSrcSet(heroSlides[0].image, 50, [828, 1080, 1200])}
-          imageSizes="(max-width: 640px) 1px, 100vw"
-          fetchPriority="high"
-        />
-      )}
+
       {/* Gradient Background */}
       <div className="fixed inset-0 bg-linear-to-br from-white via-[#FEFEFE] to-[#F3F8FE] dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] -z-10" />
 
-      {/* Hero Section
-          Two-layer approach for best LCP:
-          1. HeroStaticShell — pure Server Component, renders the first slide as
-             a plain <img priority> in the SSR HTML stream. The browser preload
-             scanner discovers it instantly, before ANY JS downloads.
-          2. Hero (lazy, ssr:false) — mounts over the shell after hydration,
-             takes over with the full slideshow. Its JS chunk does not block LCP.
-      */}
-      <div className="relative">
-        {heroSlides.length > 0 && <HeroStaticShell slide={heroSlides[0]} />}
-        {/* Mounted client-side only — sits at the same position, replaces shell */}
-        <div className="absolute inset-0">
-          <HeroClient initialSlides={heroSlides} />
-        </div>
-      </div>
+      {/* Hero Section */}
+      <Hero initialSlides={heroSlides} />
       {/*Category Showcase*/}
       <CategoryShowcase initialCategories={categoryData.categories} initialProducts={categoryData.products} />
       <Benefits/>

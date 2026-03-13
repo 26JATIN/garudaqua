@@ -153,11 +153,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     redirect(`/products/${canonicalSlug}`);
   }
 
-  // Preload the main product image for LCP
-  const preloadImage = product.image?.includes('res.cloudinary.com')
-    ? product.image.replace('/upload/', '/upload/w_800,q_85,f_auto,c_limit/')
-    : null;
-
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(product)) }} />
@@ -166,9 +161,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         { name: "Products", url: "https://garudaqua.in/products" },
         { name: product.name, url: `https://garudaqua.in/products/${canonicalSlug}` },
       ])) }} />
-      {preloadImage && (
-        <link rel="preload" as="image" href={preloadImage} fetchPriority="high" />
-      )}
       <Suspense
         fallback={
           <div className="min-h-screen pt-4 md:pt-6 lg:pt-8 bg-linear-to-b from-white to-[#FAFAFA] dark:from-black dark:to-[#0A0A0A]">
