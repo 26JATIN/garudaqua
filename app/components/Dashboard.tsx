@@ -120,13 +120,61 @@ export default function Dashboard() {
             {/* Maintenance */}
             <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Maintenance</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <BackfillSlugsButton />
                     <BackfillCategorySlugsButton />
                     <BackfillSubcategorySlugsButton />
                 </div>
+                
+                <h3 className="text-lg font-semibold text-red-600 mb-4">Danger Zone (System)</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <PurgeCacheButton />
+                </div>
             </div>
         </div>
+    );
+}
+
+function PurgeCacheButton() {
+    const [status, setStatus] = useState<"idle" | "running" | "done">("idle");
+
+    async function run() {
+        if (!confirm("Are you sure you want to purge ALL cache globally? This will clear Next.js and Cloudflare caches for all URLs. It may temporarily slow down the site for the first few visitors while cache is rebuilt.")) {
+            return;
+        }
+
+        setStatus("running");
+        try {
+            const res = await fetch("/api/admin/system/purge-cache", { method: "POST" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? "Failed to purge cache");
+            toast.success(data.message);
+            setStatus("done");
+            setTimeout(() => setStatus("idle"), 3000); // Reset button after 3s
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Cache purge failed");
+            setStatus("idle");
+        }
+    }
+
+    return (
+        <button
+            onClick={run}
+            disabled={status === "running"}
+            className="bg-white rounded-xl p-5 shadow-sm border border-red-100 hover:shadow-md hover:border-red-400 transition-all text-left disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+            <div className="flex items-center gap-2 mb-1">
+                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <h4 className="font-medium text-red-600">
+                    {status === "running" ? "Purging Cache…" : status === "done" ? "✓ Cache Purged" : "Purge Global Cache"}
+                </h4>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+                Clears entire Next.js static cache and Cloudflare edge cache worldwide. Use if changes are not showing up.
+            </p>
+        </button>
     );
 }
 

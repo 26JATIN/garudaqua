@@ -3,11 +3,14 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   poweredByHeader: false,
+
   experimental: {
+    optimizePackageImports: ["lucide-react"],
     serverActions: {
       bodySizeLimit: "10mb",
     },
   },
+
   images: {
     loader: "custom",
     loaderFile: "./lib/cloudinary-loader.ts",
@@ -21,33 +24,58 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
   headers: async () => [
+    // ⭐ Cache all HTML pages aggressively for CDN
     {
-      // Global security header
+      source: "/((?!api).*)",
+      headers: [
+        {
+          key: "Cache-Control",
+          value: "public, s-maxage=31536000, stale-while-revalidate=86400",
+        },
+      ],
+    },
+
+    // Security header
+    {
       source: "/(.*)",
       headers: [
         { key: "X-Content-Type-Options", value: "nosniff" },
       ],
     },
+
+    // Static assets cache
     {
-      // Public folder assets — immutable, long-lived cache
       source: "/:path*\\.(woff2|woff|ttf|ico|png|jpg|jpeg|webp|svg|avif)",
       headers: [
-        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        {
+          key: "Cache-Control",
+          value: "public, max-age=31536000, immutable",
+        },
       ],
     },
+
+    // Public API caching
     {
-      // Public read-only API routes — cache at CDN for 60s, stale-while-revalidate for 5min
-      source: "/api/(hero-slides|hero-videos|gallery|categories|subcategories|blog-categories|products|blogs)",
+      source:
+        "/api/(hero-slides|hero-videos|gallery|categories|subcategories|blog-categories|products|blogs)",
       headers: [
-        { key: "Cache-Control", value: "public, s-maxage=60, stale-while-revalidate=300" },
+        {
+          key: "Cache-Control",
+          value: "public, s-maxage=60, stale-while-revalidate=300",
+        },
       ],
     },
+
+    // Search suggestions cache
     {
-      // Search suggestions — short cache
       source: "/api/search/suggestions",
       headers: [
-        { key: "Cache-Control", value: "public, s-maxage=30, stale-while-revalidate=120" },
+        {
+          key: "Cache-Control",
+          value: "public, s-maxage=30, stale-while-revalidate=120",
+        },
       ],
     },
   ],
