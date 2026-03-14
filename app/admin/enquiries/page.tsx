@@ -23,10 +23,6 @@ const statusToDisplay = (status: Enquiry["status"]): string => {
     return status.toLowerCase();
 };
 
-// Map lowercase display value to API uppercase status
-const displayToStatus = (display: string): Enquiry["status"] => {
-    return display.toUpperCase() as Enquiry["status"];
-};
 
 const STATUS_COLORS: Record<string, string> = {
     new: "bg-blue-100 text-blue-800",

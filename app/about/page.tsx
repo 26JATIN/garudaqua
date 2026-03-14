@@ -79,7 +79,7 @@ export default function AboutPage() {
                         {/* Middle row — two stat cards */}
                         <div className="grid grid-cols-2 gap-3">
                             <WobbleCard containerClassName="bg-[#1b5e20]">
-                                <p className="text-white font-bold text-4xl mb-1">55+</p>
+                                <p className="text-white font-bold text-4xl mb-1">25+</p>
                                 <p className="text-white/70 text-sm">Years of experience</p>
                             </WobbleCard>
 
@@ -225,7 +225,7 @@ export default function AboutPage() {
             {/* Founder — Mr. Rajesh Gupta */}
             <Timeline
                 heading="Meet Our Founder"
-                subheading="The driving force behind Garud Aqua Solutions — 55+ years of expertise in water management."
+                subheading="The driving force behind Garud Aqua Solutions — 25+ years of expertise in water management."
                 data={[
                     {
                         title: "Vision & Leadership",
@@ -244,12 +244,12 @@ export default function AboutPage() {
                         ),
                     },
                     {
-                        title: "55+ Years",
+                        title: "25+ Years",
                         content: (
                             <div>
                                 <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Unmatched Industry Expertise</p>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
-                                    With over 55 years of experience in pipe fitting and water tank retail, Mr. Gupta has a unique understanding of both customer needs and manufacturer capabilities. This depth of knowledge allows Garud Aqua Solutions to bridge the gap with innovative, market-ready solutions that truly serve the industry.
+                                    With over 25 years of experience in pipe fitting and water tank retail, Mr. Gupta has a unique understanding of both customer needs and manufacturer capabilities. This depth of knowledge allows Garud Aqua Solutions to bridge the gap with innovative, market-ready solutions that truly serve the industry.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Pipe fittings", "Water tanks", "Retail expertise", "Manufacturer insight"].map(t => (
@@ -265,7 +265,7 @@ export default function AboutPage() {
                             <div>
                                 <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Commitment to Excellence & Environment</p>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
-                                    Mr. Gupta's relentless pursuit of excellence is matched by his commitment to sustainable practices. Under his guidance, Garud Aqua Solutions continuously pushes the boundaries of innovation — making a positive impact on communities and the environment across Rajasthan and beyond.
+                                    Mr. Gupta&apos;s relentless pursuit of excellence is matched by his commitment to sustainable practices. Under his guidance, Garud Aqua Solutions continuously pushes the boundaries of innovation — making a positive impact on communities and the environment across Rajasthan and beyond.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["Eco-friendly", "Innovation-driven", "Community impact", "Sustainable ops"].map(t => (
@@ -281,7 +281,7 @@ export default function AboutPage() {
                             <div>
                                 <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">10,000+ Customers. One Vision.</p>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
-                                    From a single retail outlet in Sriganganagar to a pan-Rajasthan operation serving over 10,000 customers — Mr. Gupta's vision has been the constant driving force. His mission: to provide reliable and sustainable water management solutions for generations to come.
+                                    From a single retail outlet in Sriganganagar to a pan-Rajasthan operation serving over 10,000 customers — Mr. Gupta&apos;s vision has been the constant driving force. His mission: to provide reliable and sustainable water management solutions for generations to come.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {["10,000+ customers", "Pan-Rajasthan", "Wholesale & retail", "15+ years"].map(t => (

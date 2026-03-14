@@ -71,12 +71,16 @@ export default function VariantManager({
     const [localOptions, setLocalOptions] = useState<VariantOption[]>(variantOptions);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalHasVariants(hasVariants);
         setLocalOptions(variantOptions || []);
     }, [hasVariants, variantOptions]);
 
     const onOptionsChangeRef = useRef(onOptionsChange);
-    onOptionsChangeRef.current = onOptionsChange;
+
+    useEffect(() => {
+        onOptionsChangeRef.current = onOptionsChange;
+    }, [onOptionsChange]);
 
     useEffect(() => {
         onOptionsChangeRef.current?.(localHasVariants, localOptions);

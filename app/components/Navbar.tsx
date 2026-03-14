@@ -50,6 +50,8 @@ export default function Navbar() {
                                         height={80}
                                         className="h-20 w-auto"
                                         priority
+                                        fetchPriority="high"
+                                        decoding="sync"
                                     />
                                 </Link>
                             </div>
@@ -115,6 +117,8 @@ export default function Navbar() {
                             height={48}
                             className="h-12 w-12 object-contain scale-200"
                             priority
+                            fetchPriority="high"
+                            decoding="sync"
                         />
                     </Link>
                     {/* Search Bar */}

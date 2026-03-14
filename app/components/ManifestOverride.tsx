@@ -48,7 +48,7 @@ export default function ManifestOverride({
       }
 
       // Also swap application-name
-      let metaAppName = document.querySelector('meta[name="application-name"]');
+      const metaAppName = document.querySelector('meta[name="application-name"]');
       if (metaAppName) {
         metaAppName.setAttribute("content", appName);
       }

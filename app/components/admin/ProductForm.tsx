@@ -147,7 +147,6 @@ export default function ProductForm({
                     .catch(() => setSubcategories([]));
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product, categories]);
 
     // Fetch subcategories when category changes

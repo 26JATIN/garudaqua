@@ -1,0 +1,198 @@
+"use client";
+import React, { useState, useEffect, useCallback } from "react";
+import Image, { getImageProps } from 'next/image';
+
+interface HeroSlide {
+    id: string;
+    image: string;
+    mobileImage: string;
+    title: string;
+    order: number;
+    isActive: boolean;
+}
+
+interface HeroProps {
+    initialSlides?: HeroSlide[];
+}
+
+const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
+    const common = {
+        fill: true,
+        priority: index === 0,
+        fetchPriority: index === 0 ? 'high' as const : 'low' as const,
+        loading: index === 0 ? 'eager' as const : 'lazy' as const,
+        quality: 50,
+    };
+
+    if (!slide.mobileImage) {
+        return (
+            <Image
+                src={slide.image}
+                alt={slide.title || "Garud Aqua"}
+                {...common}
+                sizes="100vw"
+                decoding={index === 0 ? "sync" : "async"}
+                className="object-cover object-top"
+            />
+        );
+    }
+
+    const {
+        props: { srcSet: desktopSrcSet },
+    } = getImageProps({
+        ...common,
+        alt: slide.title || "Garud Aqua",
+        src: slide.image,
+        sizes: "100vw",
+    });
+
+    const {
+        props: { srcSet: mobileSrcSet, ...rest },
+    } = getImageProps({
+        ...common,
+        alt: slide.title || "Garud Aqua",
+        src: slide.mobileImage,
+        sizes: "100vw",
+    });
+
+    return (
+        <picture>
+            <source media="(min-width: 641px)" srcSet={desktopSrcSet} />
+            <source media="(max-width: 640px)" srcSet={mobileSrcSet} />
+            <img
+                {...rest}
+                alt={slide.title || "Garud Aqua"}
+                decoding={index === 0 ? "sync" : "async"}
+                className="w-full h-full object-cover object-top"
+            />
+        </picture>
+    );
+};
+
+export default function HeroClient({ initialSlides }: HeroProps) {
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [slides, setSlides] = useState<HeroSlide[]>(initialSlides || []);
+    const [loading, setLoading] = useState(!initialSlides || initialSlides.length === 0);
+    const [isPaused, setIsPaused] = useState(false);
+
+    const fetchSlides = useCallback(async () => {
+        try {
+            const res = await fetch("/api/hero-slides");
+            if (!res.ok) throw new Error("Failed to fetch slides");
+            const data: HeroSlide[] = await res.json();
+            setSlides(data);
+        } catch {
+            // API failed
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Only fetch client-side if no initial slides were provided
+    useEffect(() => {
+        if (!initialSlides || initialSlides.length === 0) {
+            fetchSlides();
+        }
+    }, [fetchSlides, initialSlides]);
+
+    // Auto-advance slides
+    useEffect(() => {
+        if (slides.length <= 1 || isPaused) return;
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % slides.length);
+        }, 6000);
+        return () => clearInterval(timer);
+    }, [slides.length, isPaused]);
+
+    const goToSlide = (index: number) => {
+        setCurrentSlide(index);
+        setIsPaused(true);
+        setTimeout(() => setIsPaused(false), 8000);
+    };
+
+    if (loading) {
+        return null; // The server component placeholder handles this now
+    }
+
+    if (slides.length === 0) return null;
+
+    return (
+        <div className="absolute inset-0 w-full h-full pointer-events-none">
+            {/* ── Image layers ──────────────────────────────────────────────────────
+                All slides are ALWAYS in the DOM.
+                Slide 0 gets priority + no will-change (already the LCP element,
+                promoting it before paint would delay it).
+                Slides 1-N get will-change:opacity only after hydration so they
+                are ready for the first transition without impacting LCP.
+            ─────────────────────────────────────────────────────────────────────── */}
+            <div className="absolute inset-0">
+                {slides.map((slide, index) => (
+                    <div
+                        key={slide.id}
+                        className="hero-slide"
+                        aria-hidden={index !== currentSlide}
+                        style={{
+                            opacity: index === currentSlide ? 1 : 0,
+                            // Defer GPU layer promotion for non-LCP slides so the
+                            // compositor does not compete with the LCP image decode.
+                            willChange: index === 0 ? 'auto' : 'opacity',
+                        }}
+                    >
+                        <SlideImage slide={slide} index={index} />
+                    </div>
+                ))}
+            </div>
+
+            {/* Bottom gradient for indicators visibility */}
+            {slides.length > 1 && (
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-black/40 to-transparent pointer-events-none" />
+            )}
+
+            {/* Slide Indicators */}
+            {slides.length > 1 && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5 pointer-events-auto">
+                    {slides.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => goToSlide(index)}
+                            className="group relative p-1"
+                            aria-label={`Go to slide ${index + 1}`}
+                        >
+                            <div className="relative h-1 overflow-hidden rounded-full transition-all duration-500"
+                                style={{ width: index === currentSlide ? 32 : 8 }}
+                            >
+                                {/* Background track */}
+                                <div className="absolute inset-0 rounded-full bg-white/40" />
+
+                                {/* Active fill with progress animation */}
+                                {index === currentSlide ? (
+                                    <div
+                                        className="absolute inset-0 rounded-full bg-white"
+                                        style={{
+                                            transformOrigin: "left",
+                                            animation: `hero-progress ${isPaused ? 8 : 6}s linear forwards`,
+                                        }}
+                                    />
+                                ) : null}
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            <style>{`
+                .hero-slide {
+                    position: absolute;
+                    inset: 0;
+                    transition: opacity 1.4s ease-in-out;
+                    backface-visibility: hidden;
+                    -webkit-backface-visibility: hidden;
+                }
+                @keyframes hero-progress {
+                    from { transform: scaleX(0); }
+                    to   { transform: scaleX(1); }
+                }
+            `}</style>
+        </div>
+    );
+}

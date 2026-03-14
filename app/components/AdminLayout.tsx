@@ -98,6 +98,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
     const wasDarkRef = useRef(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
         const html = document.documentElement;
         wasDarkRef.current = html.classList.contains("dark");

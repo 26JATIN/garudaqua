@@ -49,6 +49,7 @@ export default function SafeImage({
     // Fallback
     if (!normalizedSrc || error) {
         return (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
                 src={fallbackSrc}
                 alt={alt}

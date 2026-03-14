@@ -1,9 +1,4 @@
 "use client";
-import {
-  useScroll,
-  useTransform,
-  motion,
-} from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 
 interface TimelineEntry {
@@ -23,6 +18,7 @@ export const Timeline = ({ data, heading, subheading }: TimelineProps) => {
   const dotRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
   const [beamLeft, setBeamLeft] = useState(0);
+  const [scrollYProgress, setScrollYProgress] = useState(0);
 
   useEffect(() => {
     const update = () => {
@@ -35,24 +31,40 @@ export const Timeline = ({ data, heading, subheading }: TimelineProps) => {
         setBeamLeft(dotRect.left - refRect.left + dotRect.width / 2);
       }
     };
-
     update();
-    const observer = new ResizeObserver(update);
-    if (ref.current) observer.observe(ref.current);
     window.addEventListener("resize", update);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [data]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      // Calculate how far the container is scrolled relative to viewport
+      const start = rect.top - windowHeight;
+      const distance = rect.height + windowHeight;
+
+      if (start < 0) {
+        let progress = Math.abs(start) / distance;
+        // Apply easing curve similar to framer-motion defaults
+        progress = Math.min(Math.max(progress, 0), 1);
+        setScrollYProgress(progress);
+      } else {
+        setScrollYProgress(0);
+      }
     };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start 10%", "end 50%"],
-  });
-
-  const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);
-  const opacityTransform = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
+  // Map progress to height (0 to height)
+  const heightTransform = scrollYProgress * height;
+  // Map progress to opacity (0 to 1 with quick fade-in at 10%)
+  const opacityTransform = scrollYProgress <= 0 ? 0 : Math.min(scrollYProgress * 10, 1);
 
   return (
     <div
@@ -103,9 +115,9 @@ export const Timeline = ({ data, heading, subheading }: TimelineProps) => {
           style={{ height: height + "px", left: `${beamLeft}px` }}
           className="absolute top-0 w-0.5 overflow-hidden bg-[linear-gradient(to_bottom,transparent_0%,rgb(212,212,212)_10%,rgb(212,212,212)_90%,transparent_100%)] dark:bg-[linear-gradient(to_bottom,transparent_0%,rgb(64,64,64)_10%,rgb(64,64,64)_90%,transparent_100%)] -translate-x-1/2"
         >
-          <motion.div
-            style={{ height: heightTransform, opacity: opacityTransform }}
-            className="absolute inset-x-0 top-0 w-0.5 bg-linear-to-t from-purple-500 via-blue-500 to-transparent from-0% via-10% rounded-full"
+          <div
+            style={{ height: `${heightTransform}px`, opacity: opacityTransform }}
+            className="absolute inset-x-0 top-0 w-0.5 bg-linear-to-t from-purple-500 via-blue-500 to-transparent from-0% via-10% rounded-full transition-[height,opacity] duration-100 ease-out"
           />
         </div>
       </div>

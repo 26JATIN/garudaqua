@@ -91,7 +91,7 @@ export default function ProductsPage({
     const [products, setProducts] = useState<Product[]>(initialProducts || []);
     const [totalProducts, setTotalProducts] = useState(initialTotal || 0);
     const [loadingCategories, setLoadingCategories] = useState(!hasInitialData);
-    const [loadingSubcategories, setLoadingSubcategories] = useState(!hasInitialData);
+    const [, setLoadingSubcategories] = useState(!hasInitialData);
     const [loadingProducts, setLoadingProducts] = useState(!hasInitialData);
 
     const productsGridRef = useRef<HTMLDivElement>(null);
@@ -125,7 +125,7 @@ export default function ProductsPage({
             }
         }
         fetchCategories();
-    }, []);
+    }, [hasInitialData]);
 
     // Fetch subcategories on mount (skip if server-provided)
     useEffect(() => {
@@ -145,7 +145,7 @@ export default function ProductsPage({
             }
         }
         fetchSubcategories();
-    }, []);
+    }, [hasInitialData]);
 
     // Sync state when URL params change (e.g. browser back/forward)
     useEffect(() => {
@@ -203,7 +203,7 @@ export default function ProductsPage({
         }
 
         fetchProducts();
-    }, [selectedCategory, selectedSubcategory, searchTerm, sortBy]);
+    }, [selectedCategory, selectedSubcategory, searchTerm, sortBy, hasInitialData]);
 
     // Scroll a container left or right
     const scrollByAmount = useCallback((ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
@@ -288,10 +288,6 @@ export default function ProductsPage({
     const clearSearch = useCallback(() => {
         setSearchTerm("");
     }, []);
-
-    const scrollToProducts = () => {
-        productsGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
 
     // Loading skeleton for products grid
     const ProductsLoadingSkeleton = () => (
@@ -400,6 +396,7 @@ export default function ProductsPage({
                                             <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
                                                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
                                                     {category.image ? (
+                                                        // eslint-disable-next-line @next/next/no-img-element
                                                         <img src={cloudinaryUrl(category.image, 128)} alt="" className="w-full h-full object-cover" loading="lazy" width={64} height={64} />
                                                     ) : (
                                                         <svg className="w-6 h-6 md:w-7 md:h-7 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -551,6 +548,7 @@ export default function ProductsPage({
                                             <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
                                                 <div className="w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
                                                     {subcategory.image ? (
+                                                        // eslint-disable-next-line @next/next/no-img-element
                                                         <img src={cloudinaryUrl(subcategory.image, 160)} alt="" className="w-full h-full object-cover" loading="lazy" width={80} height={80} />
                                                     ) : (
                                                         <svg className="w-7 h-7 md:w-8 md:h-8 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -721,7 +719,8 @@ function ProductCard({ product, index }: ProductCardProps) {
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                 quality={50}
                                 priority={index < 4}
-                                loading={index < 4 ? "eager" : "lazy"}
+                                fetchPriority={index < 4 ? "high" : "auto"}
+                                decoding={index < 4 ? "sync" : "async"}
                             />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center">
@@ -753,7 +752,7 @@ function ProductCard({ product, index }: ProductCardProps) {
 }
 
 // ===== List Product Item =====
-function ProductListItem({ product, index }: ProductCardProps) {
+function ProductListItem({ product, index = 0 }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
     const productHref = `/products/${productPath(product)}`;
 
@@ -773,6 +772,9 @@ function ProductListItem({ product, index }: ProductCardProps) {
                                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     sizes="(max-width: 640px) 64px, 192px"
                                     quality={70}
+                                    priority={index < 4}
+                                    fetchPriority={index < 4 ? "high" : "auto"}
+                                    decoding={index < 4 ? "sync" : "async"}
                                 />
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center">

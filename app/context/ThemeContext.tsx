@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 interface ThemeContextType {
     theme: string;
@@ -22,20 +22,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const [theme, setTheme] = useState('light');
     const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-        // Read from localStorage — default to light if no preference stored
-        const stored = localStorage.getItem('theme');
-        if (stored === 'dark') {
-            setTheme('dark');
-            applyTheme('dark');
-        } else {
-            setTheme('light');
-            applyTheme('light');
-        }
-    }, []);
-
-    const applyTheme = (newTheme: string, animate = false) => {
+    const applyTheme = useCallback((newTheme: string, animate = false) => {
         const root = document.documentElement;
 
         if (animate) {
@@ -61,7 +48,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                 root.classList.remove('theme-transitioning');
             }, 350);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMounted(true);
+        // Read from localStorage — default to light if no preference stored
+        const stored = localStorage.getItem('theme');
+        if (stored === 'dark') {
+            setTheme('dark');
+            applyTheme('dark');
+        } else {
+            setTheme('light');
+            applyTheme('light');
+        }
+    }, [applyTheme]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'dark' ? 'light' : 'dark';

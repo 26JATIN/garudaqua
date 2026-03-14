@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import { useAnimateOnView } from "@/lib/useAnimateOnView";
 
 interface HeroVideo {
@@ -69,8 +70,9 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
             if (video) observer.observe(video);
         });
 
+        const elements = videoElementRefs.current;
         return () => {
-            videoElementRefs.current.forEach((video) => {
+            elements.forEach((video) => {
                 if (video) observer.unobserve(video);
             });
         };
@@ -222,7 +224,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
 
                 {/* CTA */}
                 <div className="animate-on-view text-center mt-16" style={{ animationDelay: '0.3s' }}>
-                    <a
+                    <Link
                         href="/products"
                         className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 group"
                     >
@@ -230,7 +232,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                         <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
-                    </a>
+                    </Link>
                 </div>
             </div>
         </section>

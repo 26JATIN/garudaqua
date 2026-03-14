@@ -45,6 +45,7 @@ interface Product {
 interface CategoryPreviewProps {
   category: { name: string; image?: string };
   className?: string;
+  priority?: boolean;
 }
 
 interface SubcategoryBadgeProps {
@@ -69,7 +70,7 @@ interface CardProps {
 
 
 // Category Preview Component
-const CategoryPreview = React.memo(({ category, className }: CategoryPreviewProps) => {
+const CategoryPreview = React.memo(({ category, className, priority = false }: CategoryPreviewProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -95,7 +96,10 @@ const CategoryPreview = React.memo(({ category, className }: CategoryPreviewProp
               } ${hasError ? 'hidden' : 'block'}`}
             onLoad={handleLoad}
             onError={handleError}
-            loading="lazy"
+            priority={priority}
+            fetchPriority={priority ? "high" : "auto"}
+            loading={priority ? undefined : "lazy"}
+            decoding={priority ? "sync" : "async"}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             quality={70}
           />
@@ -147,7 +151,10 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
               fill={true}
               className={`object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setIsLoaded(true)}
-              loading="lazy"
+              priority={index !== undefined && index < 4}
+              fetchPriority={(index !== undefined && index < 4) ? "high" : "auto"}
+              loading={(index !== undefined && index < 4) ? undefined : "lazy"}
+              decoding={(index !== undefined && index < 4) ? "sync" : "async"}
               sizes="80px"
               quality={60}
             />
@@ -181,7 +188,6 @@ SubcategoryBadge.displayName = 'SubcategoryBadge';
 export const Card = React.memo(({
   card,
   index,
-  layout = false,
   onClick,
   subcategories = [],
   onSubcategoryClick
@@ -200,10 +206,11 @@ export const Card = React.memo(({
         <CategoryPreview
           category={card}
           className="w-full h-full"
+          priority={index !== undefined && index < 4}
         />
       </div>
     </div>
-  ), [card]);
+  ), [card, index]);
 
   const handleOpen = () => {
     if (onClick) onClick(card);
@@ -487,7 +494,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
           </h3>
           <div className="overflow-x-auto scrollbar-hide -mx-3 sm:-mx-6 px-3 sm:px-6">
             <div className="flex gap-2 pb-1 min-w-max">
-              {categoryFilters.map((filter, index) => {
+              {categoryFilters.map((filter) => {
                 const count = filter === 'ALL'
                   ? products.length
                   : products.filter(prod => {

@@ -110,6 +110,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
 
   // Fetch related blogs
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let relatedBlogsData: any[] = [];
   if (blogData.categoryId) {
     relatedBlogsData = await prisma.blogPost.findMany({

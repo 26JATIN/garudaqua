@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidateAndWarm } from "@/lib/revalidate";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
-export async function POST(req: Request) {
+export async function POST() {
     const session = await requireAdmin();
     if (!session) return unauthorizedResponse();
 
@@ -13,8 +13,8 @@ export async function POST(req: Request) {
         await revalidateAndWarm();
 
         return NextResponse.json({ message: "Global cache purged successfully from Next.js and Cloudflare" });
-    } catch (error: any) {
+    } catch (error) {
         console.error("Cache purge failed:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
     }
 }

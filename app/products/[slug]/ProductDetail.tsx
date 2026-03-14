@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -149,7 +148,8 @@ function MobileImageGallery({ images, productName, controlledIndex, onIndexChang
                                     fill
                                     className="object-cover"
                                     priority={index === 0}
-                                    sizes="100vw"
+                                    fetchPriority={index === 0 ? "high" : "auto"}
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     quality={80}
                                 />
                             </div>

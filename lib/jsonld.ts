@@ -25,7 +25,7 @@ export function organizationSchema() {
       name: "Mr. Rajesh Gupta",
       jobTitle: "Founder & Managing Director",
       description:
-        "55+ years of expertise in pipe fitting and water tank retail. Pioneer in water management solutions across Rajasthan.",
+        "25+ years of expertise in pipe fitting and water tank retail. Pioneer in water management solutions across Rajasthan.",
     },
     numberOfEmployees: { "@type": "QuantitativeValue", minValue: 10 },
     priceRange: "₹₹",
@@ -271,7 +271,7 @@ export function aboutPageSchema() {
     "@type": "AboutPage",
     name: "About Garud Aqua Solutions",
     description:
-      "Learn about Garud Aqua Solutions — founded by Mr. Rajesh Gupta with 55+ years of water management expertise. Trusted supplier since 2014.",
+      "Learn about Garud Aqua Solutions — founded by Mr. Rajesh Gupta with 25+ years of water management expertise. Trusted supplier since 2014.",
     url: `${SITE_URL}/about`,
     mainEntity: { "@id": `${SITE_URL}/#organization` },
   };

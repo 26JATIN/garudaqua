@@ -38,7 +38,6 @@ interface BlogsClientProps {
 export default function BlogsClient({
     initialCategories,
     initialBlogs,
-    initialTotal,
     initialTotalPages,
 }: BlogsClientProps) {
     const hasInitialData = !!(initialBlogs && initialCategories);
@@ -217,9 +216,11 @@ export default function BlogsClient({
                                                 fill
                                                 className="object-cover group-hover:scale-110 transition-transform duration-700"
                                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                                quality={75}
-                                                priority={index === 0}
-                                                loading={index === 0 ? undefined : "lazy"}
+                                                quality={50}
+                                                priority={index < 4}
+                                                fetchPriority={index < 4 ? "high" : "auto"}
+                                                decoding={index < 4 ? "sync" : "async"}
+                                                loading={index < 4 ? undefined : "lazy"}
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         </div>

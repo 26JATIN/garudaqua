@@ -30,6 +30,7 @@ interface ImageGalleryProps {
 export default function ImageGallery({ initialItems }: ImageGalleryProps) {
     const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(initialItems || []);
     const [isLoading, setIsLoading] = useState(!initialItems || initialItems.length === 0);
+    const [isInView, setIsInView] = useState(false);
     const ref = useAnimateOnView();
 
     const fetchGallery = useCallback(async () => {
@@ -62,6 +63,22 @@ export default function ImageGallery({ initialItems }: ImageGalleryProps) {
             loadData();
         }
     }, [fetchGallery, initialItems]);
+
+    // Lazy load the WebGL canvas when it gets close to the viewport
+    useEffect(() => {
+        if (!ref.current) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    setIsInView(true);
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: "0px 0px 600px 0px" } // Load 600px before it scrolls into view
+        );
+        observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, [ref]);
 
     if (galleryItems.length === 0) {
         return null;
@@ -97,7 +114,7 @@ export default function ImageGallery({ initialItems }: ImageGalleryProps) {
 
                 {/* Circular Gallery */}
                 <div className="h-100 sm:h-125 md:h-150 lg:h-175 xl:h-200 w-full">
-                    {isLoading ? (
+                    {(isLoading || !isInView) ? (
                         <div className="flex items-center justify-center h-full">
                             <div className="w-12 h-12 border-2 border-[#0EA5E9]/30 border-t-[#0EA5E9] rounded-full animate-spin" />
                         </div>

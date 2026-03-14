@@ -351,6 +351,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                                             {/* Thumbnail */}
                                             <div className="shrink-0 w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
                                                 {suggestion.image ? (
+                                                    // eslint-disable-next-line @next/next/no-img-element
                                                     <img
                                                         src={cloudinaryUrl(suggestion.image, 80)}
                                                         alt={suggestion.text}

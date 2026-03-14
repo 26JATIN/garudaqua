@@ -62,6 +62,7 @@ export default function ImageCarousel({
     }, [isPlaying, imageArray.length, autoPlayInterval]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentIndex(0);
         setImageLoaded(false);
     }, [images]);
