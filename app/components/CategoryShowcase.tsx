@@ -151,10 +151,8 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
               fill={true}
               className={`object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setIsLoaded(true)}
-              priority={index !== undefined && index < 4}
-              fetchPriority={(index !== undefined && index < 4) ? "high" : "auto"}
-              loading={(index !== undefined && index < 4) ? undefined : "lazy"}
-              decoding={(index !== undefined && index < 4) ? "sync" : "async"}
+              loading="lazy"
+              decoding="async"
               sizes="80px"
               quality={60}
             />
@@ -197,20 +195,15 @@ export const Card = React.memo(({
   // Memoize the card preview to prevent unnecessary re-renders
   const cardPreview = useMemo(() => (
     <div
-      className={`rounded-xl sm:rounded-2xl transition-all duration-700 ease-out hover:scale-105 p-0.5 sm:p-1 md:p-2 aspect-square overflow-hidden relative group`}
-      style={{
-        borderRadius: '24px 24px 4px 24px'
-      }}
+      className="bg-white dark:bg-[#0A0A0A] shadow-lg relative overflow-hidden transition-all duration-700 ease-out group-hover:scale-[1.03] aspect-square rounded-[16px_16px_2px_16px] sm:rounded-[24px_24px_4px_24px]"
     >
-      <div className="bg-white dark:bg-[#0A0A0A] h-full shadow-lg relative overflow-hidden" style={{ borderRadius: '16px 16px 2px 16px' }}>
         <CategoryPreview
           category={card}
           className="w-full h-full"
-          priority={index !== undefined && index < 4}
+          priority={false}
         />
-      </div>
     </div>
-  ), [card, index]);
+  ), [card]);
 
   const handleOpen = () => {
     if (onClick) onClick(card);
@@ -229,7 +222,7 @@ export const Card = React.memo(({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm transition-all duration-300 md:active:scale-95",
+        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm transition-all duration-300 md:active:scale-95 group",
         isHovered && "shadow-lg"
       )}
     >

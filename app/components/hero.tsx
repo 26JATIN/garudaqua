@@ -1,4 +1,3 @@
-import React from "react";
 import Image, { getImageProps } from "next/image";
 import HeroClient from "./HeroClient";
 
