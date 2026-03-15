@@ -523,7 +523,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row min-h-[60vh] gap-6 lg:gap-0">
+      <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-[60vh] gap-6 lg:gap-0">
         {/* Sidebar - Filter Section (Desktop only: sticky sidebar with heading + filters) */}
         <div className="hidden lg:block lg:w-1/5 shrink-0 lg:pr-6 xl:pr-8">
           <div

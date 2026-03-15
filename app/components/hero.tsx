@@ -77,7 +77,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
     }
 
     return (
-        <section className="relative w-full h-[80vh] sm:h-[70vh] md:h-[70vh] lg:h-screen overflow-hidden bg-black text-white">
+        <section className="relative w-full h-[80vh] min-h-100 max-h-200 lg:h-screen lg:max-h-none overflow-hidden bg-black text-white">
             {/* STAGE 1: Guaranteed Static LCP Image. Renders instantly without React JS */}
             <div className="absolute inset-0 z-0 select-none pointer-events-none">
                 {LCPImage}
