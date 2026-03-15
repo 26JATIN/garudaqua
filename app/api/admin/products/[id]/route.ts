@@ -94,6 +94,8 @@ export async function PUT(
         guarantee: body.guarantee ?? "",
         categoryId: body.categoryId,
         subcategoryId: body.subcategoryId || null,
+        metaTitle: body.metaTitle || "",
+        metaDesc: body.metaDesc || "",
       },
       include: {
         category: { select: { id: true, name: true } },

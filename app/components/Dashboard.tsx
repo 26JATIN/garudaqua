@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
+import SeoMetaGeneratorButton from './admin/SeoMetaGeneratorButton';
 
 interface DashboardStats {
     products: number;
@@ -122,6 +123,7 @@ export default function Dashboard() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Maintenance</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <AutoRenameImagesButton />
+                    <SeoMetaGeneratorButton />
                     <BackfillSlugsButton />
                     <BackfillCategorySlugsButton />
                     <BackfillSubcategorySlugsButton />

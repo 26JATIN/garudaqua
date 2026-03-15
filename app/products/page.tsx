@@ -13,18 +13,56 @@ function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-export const metadata: Metadata = {
-  title: "Products — Water Tanks, Pipes & Fittings",
-  description:
-    "Browse Garud Aqua Solutions' full range of HDPE water tanks, PVC & CPVC pipes, pipe fittings, agricultural sprayers and water management products available in Rajasthan.",
-  alternates: { canonical: "https://garudaqua.in/products" },
-  openGraph: {
-    url: "https://garudaqua.in/products",
-    title: "Products — Water Tanks, Pipes & Fittings | Garud Aqua Solutions",
-    description:
-      "Browse our full range of HDPE water tanks, PVC pipes, pipe fittings & agricultural water products.",
-  },
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const categoryParam = typeof params.category === "string" ? params.category : undefined;
+  const subcategoryParam = typeof params.subcategory === "string" ? params.subcategory : undefined;
+
+  let title = "Products — Water Tanks, Pipes & Fittings | Garud Aqua Solutions";
+  let description = "Browse Garud Aqua Solutions' full range of HDPE water tanks, PVC pipes, pipe fittings & water management products.";
+  let url = "https://garudaqua.in/products";
+
+  try {
+    if (subcategoryParam) {
+      const subcategory = await prisma.subcategory.findFirst({
+        where: isObjectId(subcategoryParam) ? { OR: [{ slug: subcategoryParam }, { id: subcategoryParam }] } : { slug: subcategoryParam },
+        select: { name: true, metaTitle: true, metaDesc: true, category: { select: { slug: true } } }
+      });
+      if (subcategory) {
+        title = subcategory.metaTitle && subcategory.metaTitle.trim() !== "" ? subcategory.metaTitle : `Buy ${subcategory.name} Online | Best Price - Garud Aqua`;
+        description = subcategory.metaDesc && subcategory.metaDesc.trim() !== "" ? subcategory.metaDesc : `Shop the best quality ${subcategory.name} in Rajasthan. Browse top-rated products at Garud Aqua Solutions.`;
+        url = `https://garudaqua.in/products?category=${subcategory.category?.slug}&subcategory=${subcategoryParam}`;
+      }
+    } else if (categoryParam) {
+      const category = await prisma.category.findFirst({
+        where: isObjectId(categoryParam) ? { OR: [{ slug: categoryParam }, { id: categoryParam }] } : { slug: categoryParam },
+        select: { name: true, metaTitle: true, metaDesc: true, slug: true }
+      });
+      if (category) {
+        title = category.metaTitle && category.metaTitle.trim() !== "" ? category.metaTitle : `Buy ${category.name} Online | Top Quality - Garud Aqua`;
+        description = category.metaDesc && category.metaDesc.trim() !== "" ? category.metaDesc : `Explore our premium range of ${category.name}. Guaranteed quality & best prices at Garud Aqua Solutions.`;
+        url = `https://garudaqua.in/products?category=${category.slug}`;
+      }
+    }
+  } catch (e) {
+    // Fail silently back to defaults
+  }
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      url,
+      title,
+      description,
+    },
+  };
+}
 
 
 

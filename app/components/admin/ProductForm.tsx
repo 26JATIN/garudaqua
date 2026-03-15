@@ -39,6 +39,8 @@ interface ProductData {
     guarantee?: string;
     hasVariants: boolean;
     variantOptions: VariantOption[];
+    metaTitle?: string;
+    metaDesc?: string;
 }
 
 interface Category {
@@ -64,6 +66,8 @@ interface FormState {
     guarantee: string;
     hasVariants: boolean;
     variantOptions: VariantOption[];
+    metaTitle: string;
+    metaDesc: string;
 }
 
 interface ProductFormProps {
@@ -92,6 +96,8 @@ export default function ProductForm({
         guarantee: "",
         hasVariants: false,
         variantOptions: [],
+        metaTitle: "",
+        metaDesc: "",
     });
 
     const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
@@ -132,6 +138,8 @@ export default function ProductForm({
                 guarantee: product.guarantee || "",
                 hasVariants: product.hasVariants || false,
                 variantOptions: product.variantOptions || [],
+                metaTitle: product.metaTitle || "",
+                metaDesc: product.metaDesc || "",
             });
             setImagePreview(product.image || "");
 
@@ -313,6 +321,8 @@ export default function ProductForm({
             guarantee: formData.guarantee,
             hasVariants: formData.hasVariants,
             variantOptions: formData.variantOptions,
+            metaTitle: formData.metaTitle,
+            metaDesc: formData.metaDesc,
         });
         setLoading(false);
     };
@@ -346,6 +356,43 @@ export default function ProductForm({
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
                         placeholder="Describe your product features, material, certifications..."
                     />
+                </div>
+
+                <div className="md:col-span-2 bg-gray-50 dark:bg-gray-800/30 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+                        <svg className="w-4 h-4 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        Search Engine Optimization (SEO)
+                    </h4>
+                    <p className="text-xs text-gray-500 mb-4">Leave empty for Garud Aqua AI to automatically generate perfect tags.</p>
+                    
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                Meta Title
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.metaTitle}
+                                onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
+                                maxLength={60}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent text-sm"
+                                placeholder={`e.g. Buy ${formData.name || 'Product'} Online | Top Quality...`}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                Meta Description
+                            </label>
+                            <textarea
+                                value={formData.metaDesc}
+                                onChange={(e) => setFormData({ ...formData, metaDesc: e.target.value })}
+                                maxLength={160}
+                                rows={2}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent text-sm"
+                                placeholder="Describe the product specifically for Google Search results..."
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <div>
