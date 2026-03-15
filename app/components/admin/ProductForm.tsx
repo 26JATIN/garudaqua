@@ -162,6 +162,15 @@ export default function ProductForm({
     }, [formData.categoryId]);
 
     const handleImageSelect = () => {
+        if (!formData.categoryId) {
+            toast.error("Please select a category first to name the image correctly");
+            return;
+        }
+        if (!formData.name.trim()) {
+            toast.error("Please enter a product name first to name the image correctly");
+            return;
+        }
+
         const input = document.createElement("input");
         input.type = "file";
         input.accept = "image/jpeg,image/jpg,image/png,image/webp";
@@ -175,10 +184,17 @@ export default function ProductForm({
             const localPreview = URL.createObjectURL(file);
             setImagePreview(localPreview);
 
-            // Upload to Cloudinary
+            // Build publicId based on category and name, plus a short timestamp
+            const catName = categories.find((c) => c.id === formData.categoryId)?.name || "";
+            const subName = formData.subcategoryId ? subcategories.find((s) => s.id === formData.subcategoryId)?.name || "" : "";
+            const baseStr = [catName, subName, formData.name].filter(Boolean).join(" ");
+            const slugifiedStr = baseStr.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+            const shortTimestamp = Math.floor(Date.now() / 1000).toString(36);
+            const publicId = `${slugifiedStr}-${shortTimestamp}`;
+
             setUploading(true);
             try {
-                const { url } = await uploadDirect(file, "garudaqua/products");
+                const { url } = await uploadDirect(file, "garudaqua/products", publicId);
                 setImagePreview(url);
                 setFormData((prev) => ({ ...prev, image: url }));
                 toast.success("Image uploaded successfully");
@@ -195,6 +211,15 @@ export default function ProductForm({
     };
 
     const handleMultipleImageSelect = () => {
+        if (!formData.categoryId) {
+            toast.error("Please select a category first to name the images correctly");
+            return;
+        }
+        if (!formData.name.trim()) {
+            toast.error("Please enter a product name first to name the images correctly");
+            return;
+        }
+
         const input = document.createElement("input");
         input.type = "file";
         input.accept = "image/jpeg,image/jpg,image/png,image/webp";
@@ -209,8 +234,16 @@ export default function ProductForm({
             const newUrls: string[] = [];
 
             try {
-                const uploadPromises = Array.from(files).map(async (file) => {
-                    const { url } = await uploadDirect(file, "garudaqua/products");
+                // Pre-compute naming base
+                const catName = categories.find((c) => c.id === formData.categoryId)?.name || "";
+                const subName = formData.subcategoryId ? subcategories.find((s) => s.id === formData.subcategoryId)?.name || "" : "";
+                const baseStr = [catName, subName, formData.name].filter(Boolean).join(" ");
+                const slugifiedStr = baseStr.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+                
+                const uploadPromises = Array.from(files).map(async (file, idx) => {
+                    const shortTimestamp = Math.floor(Date.now() / 1000).toString(36);
+                    const publicId = `${slugifiedStr}-${shortTimestamp}-${idx + 1}`;
+                    const { url } = await uploadDirect(file, "garudaqua/products", publicId);
                     return url as string;
                 });
 

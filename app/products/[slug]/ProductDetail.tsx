@@ -55,7 +55,7 @@ function getCategoryName(category: Product["category"]): string {
 
 
 // Mobile swipeable image gallery
-function MobileImageGallery({ images, productName, controlledIndex, onIndexChange }: { images: string[]; productName: string; controlledIndex?: number; onIndexChange?: (i: number) => void }) {
+function MobileImageGallery({ images, imageAlts = [], productName, controlledIndex, onIndexChange }: { images: string[]; imageAlts?: string[]; productName: string; controlledIndex?: number; onIndexChange?: (i: number) => void }) {
     const [activeIndex, setActiveIndex] = useState(controlledIndex ?? 0);
     const [dragOffset, setDragOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -144,7 +144,7 @@ function MobileImageGallery({ images, productName, controlledIndex, onIndexChang
                             <div className="aspect-square relative bg-white dark:bg-[#0A0A0A]">
                                 <Image
                                     src={img}
-                                    alt={`${productName} ${index + 1}`}
+                                    alt={imageAlts !== undefined && imageAlts[index] ? imageAlts[index] : `${productName} ${index + 1}`}
                                     fill
                                     className="object-cover"
                                     priority={index === 0}
@@ -430,6 +430,22 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
         : slugify(categoryName);
     const displayImages = product.images && product.images.length > 0 ? product.images : product.image ? [product.image] : [];
 
+    // Pre-calculate image alt tags based on variant mapping
+    const imageAlts = displayImages.map((img, idx) => {
+        let variantHint = "";
+        if (product.hasVariants && product.variantOptions) {
+            for (const option of product.variantOptions) {
+                // Find if any value explicitly links to this image URL
+                const matchedValue = option.values?.find(v => v.imageUrl === img);
+                if (matchedValue) {
+                    variantHint = ` in ${matchedValue.displayName || matchedValue.name} color`;
+                    break; // Use the first matching variant hint
+                }
+            }
+        }
+        return `${product.name}${variantHint} - Image ${idx + 1}`;
+    });
+
     return (
         <div className="min-h-screen bg-linear-to-b from-white via-[#FAFAFA] to-white dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] pt-4 md:pt-6 lg:pt-8 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -459,6 +475,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                             <div className="w-full">
                                 <MobileImageGallery
                                     images={displayImages}
+                                    imageAlts={imageAlts}
                                     productName={product.name}
                                     controlledIndex={activeImageIndex}
                                     onIndexChange={setActiveImageIndex}
@@ -483,7 +500,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                     >
                                         <Image
                                             src={img}
-                                            alt={`${product.name} ${index + 1}`}
+                                            alt={imageAlts[index] || `${product.name} ${index + 1}`}
                                             width={200}
                                             height={200}
                                             className="object-cover w-full h-full"

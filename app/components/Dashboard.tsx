@@ -121,6 +121,7 @@ export default function Dashboard() {
             <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Maintenance</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    <AutoRenameImagesButton />
                     <BackfillSlugsButton />
                     <BackfillCategorySlugsButton />
                     <BackfillSubcategorySlugsButton />
@@ -132,6 +133,45 @@ export default function Dashboard() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function AutoRenameImagesButton() {
+    const [status, setStatus] = useState<"idle" | "running" | "done">("idle");
+
+    async function run() {
+        if (!confirm("Are you sure you want to auto-rename existing product images? This works in the background and might take some time for many products. Existing variants mapped to these images will be updated.")) {
+            return;
+        }
+
+        setStatus("running");
+        toast.info("Auto-renaming started. This might take a while...", { duration: 5000 });
+        try {
+            const res = await fetch("/api/admin/products/rename-images", { method: "POST" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? "Failed to rename images");
+            
+            toast.success(data.message, { duration: 8000 });
+            setStatus("done");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Image renaming failed");
+            setStatus("idle");
+        }
+    }
+
+    return (
+        <button
+            onClick={run}
+            disabled={status === "running"}
+            className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#0EA5E9]/50 transition-all text-left disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+            <h4 className="font-medium text-gray-900">
+                {status === "running" ? "Renaming Images…" : status === "done" ? "✓ Images Renamed" : "Auto-Rename Product Images"}
+            </h4>
+            <p className="text-sm text-gray-500 mt-1">
+                Retroactively names your product images in Cloudinary based on category and product names for SEO.
+            </p>
+        </button>
     );
 }
 

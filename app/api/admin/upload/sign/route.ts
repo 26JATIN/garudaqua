@@ -17,13 +17,17 @@ export async function POST(request: Request) {
   const session = await requireAdmin();
   if (!session) return unauthorizedResponse();
   try {
-    const { folder = "garudaqua", resourceType = "auto" } = await request.json();
+    const { folder = "garudaqua", resourceType = "auto", publicId } = await request.json();
 
     const timestamp = Math.round(Date.now() / 1000);
-    const params = { timestamp, folder, resource_type: resourceType };
+    const paramsToSign: Record<string, string | number> = { timestamp, folder };
+    
+    if (publicId) {
+      paramsToSign.public_id = publicId;
+    }
 
     const signature = cloudinary.utils.api_sign_request(
-      { timestamp, folder },
+      paramsToSign,
       process.env.CLOUDINARY_API_SECRET!
     );
 
@@ -33,7 +37,8 @@ export async function POST(request: Request) {
       folder,
       cloudName: process.env.CLOUDINARY_CLOUD_NAME,
       apiKey: process.env.CLOUDINARY_API_KEY,
-      resourceType: params.resource_type,
+      resourceType,
+      publicId,
     });
   } catch (error) {
     console.error("Error generating Cloudinary signature:", error);

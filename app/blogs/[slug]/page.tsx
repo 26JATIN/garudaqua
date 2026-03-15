@@ -32,6 +32,9 @@ export async function generateMetadata(
         slug: true,
         excerpt: true,
         featuredImage: true,
+        metaTitle: true,
+        metaDesc: true,
+        metaUrl: true,
         author: true,
         publishedAt: true,
         tags: true,
@@ -42,13 +45,14 @@ export async function generateMetadata(
 
     // Always use canonical (current) slug for metadata URL
     const canonicalSlug = blog.slug;
-    const url = `https://garudaqua.in/blogs/${canonicalSlug}`;
+    const url = blog.metaUrl || `https://garudaqua.in/blogs/${canonicalSlug}`;
     const description =
+      blog.metaDesc ||
       blog.excerpt?.slice(0, 155) ||
       `Read "${blog.title}" on the Garud Aqua Solutions blog — water management tips and industry insights.`;
 
     return {
-      title: blog.title,
+      title: blog.metaTitle || blog.title,
       description,
       keywords: Array.isArray(blog.tags) ? (blog.tags as string[]) : [],
       alternates: { canonical: url },
@@ -88,6 +92,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       excerpt: true,
       content: true,
       featuredImage: true,
+      metaTitle: true,
+      metaDesc: true,
+      metaUrl: true,
       author: true,
       slug: true,
       publishedAt: true,

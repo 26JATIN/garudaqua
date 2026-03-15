@@ -17,6 +17,9 @@ interface BlogPost {
     tags: string[];
     featuredImage: string;
     featuredAlt: string;
+    metaTitle: string;
+    metaDesc: string;
+    metaUrl: string;
     isPublished: boolean;
     readTime: number;
     author: string;
@@ -55,6 +58,9 @@ export default function BlogManagement() {
         tags: "",
         featuredImage: "",
         featuredAlt: "",
+        metaTitle: "",
+        metaDesc: "",
+        metaUrl: "",
         isPublished: false,
         readTime: 5,
         author: "Garud Aqua Team",
@@ -189,6 +195,9 @@ export default function BlogManagement() {
                 tags,
                 featuredImage: formData.featuredImage,
                 featuredAlt: formData.featuredAlt,
+                metaTitle: formData.metaTitle,
+                metaDesc: formData.metaDesc,
+                metaUrl: formData.metaUrl,
                 isPublished: formData.isPublished,
                 readTime: formData.readTime,
                 author: formData.author,
@@ -233,6 +242,9 @@ export default function BlogManagement() {
             tags: blog.tags?.join(", ") || "",
             featuredImage: blog.featuredImage || "",
             featuredAlt: blog.featuredAlt || "",
+            metaTitle: blog.metaTitle || "",
+            metaDesc: blog.metaDesc || "",
+            metaUrl: blog.metaUrl || "",
             isPublished: blog.isPublished,
             readTime: blog.readTime || 5,
             author: blog.author || "Garud Aqua Team",
@@ -268,6 +280,9 @@ export default function BlogManagement() {
             tags: "",
             featuredImage: "",
             featuredAlt: "",
+            metaTitle: "",
+            metaDesc: "",
+            metaUrl: "",
             isPublished: false,
             readTime: 5,
             author: "Garud Aqua Team",
@@ -477,6 +492,42 @@ export default function BlogManagement() {
                                 />
                             </div>
                         )}
+                    </div>
+
+                    {/* SEO Fields */}
+                    <div className="grid grid-cols-1 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">SEO Metadata</h3>
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-gray-700">Meta Title</label>
+                            <input
+                                type="text"
+                                value={formData.metaTitle}
+                                onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
+                                placeholder="Water Tank Quality Guide: How Garud Aqua Ensures Reliable Water Storage"
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-gray-700">Meta Description</label>
+                            <textarea
+                                value={formData.metaDesc}
+                                onChange={(e) => setFormData({ ...formData, metaDesc: e.target.value })}
+                                placeholder="Learn how Garud Aqua ensures water tank quality using food-grade materials..."
+                                rows={2}
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-gray-700">Meta URL / Canonical URL (Optional)</label>
+                            <input
+                                type="text"
+                                value={formData.metaUrl}
+                                onChange={(e) => setFormData({ ...formData, metaUrl: e.target.value })}
+                                placeholder="e.g. /blogs/water-tank-quality-reliability"
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Leave blank to use the default generated URL based on the slug.</p>
+                        </div>
                     </div>
 
                     {/* Publish toggle */}

@@ -9,7 +9,8 @@
  */
 export async function uploadDirect(
   file: File,
-  folder: string = "garudaqua"
+  folder: string = "garudaqua",
+  publicId?: string
 ): Promise<{ url: string; publicId: string; duration?: number }> {
   const resourceType = file.type.startsWith("video/") ? "video" : "image";
 
@@ -17,7 +18,7 @@ export async function uploadDirect(
   const signRes = await fetch("/api/admin/upload/sign", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ folder, resourceType }),
+    body: JSON.stringify({ folder, resourceType, publicId }),
   });
 
   if (!signRes.ok) {
@@ -33,6 +34,9 @@ export async function uploadDirect(
   fd.append("timestamp", String(timestamp));
   fd.append("signature", signature);
   fd.append("folder", folder);
+  if (publicId) {
+    fd.append("public_id", publicId);
+  }
 
   const uploadRes = await fetch(
     `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
