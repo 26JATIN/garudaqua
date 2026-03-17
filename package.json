@@ -17,6 +17,8 @@
     "cloudinary": "^2.9.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.3",
+    "jodit": "^4.11.14",
+    "jodit-react": "^5.3.21",
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.30",

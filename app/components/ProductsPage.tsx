@@ -22,6 +22,7 @@ interface Category {
     name: string;
     slug?: string;
     image?: string;
+    hasSeoPage?: boolean;
 }
 
 interface Subcategory {
@@ -596,7 +597,7 @@ export default function ProductsPage({
                     ref={productsGridRef}
                     className="mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100 dark:border-white/6"
                 >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3">
                         <svg className="w-4 h-4 md:w-5 md:h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
@@ -606,6 +607,30 @@ export default function ProductsPage({
                                 <span className="hidden sm:inline"> in {getCategoryDisplayName(selectedCategory)}</span>
                             )}
                         </span>
+                        
+                        {/* Info Button - Show only when category is selected and has SEO page */}
+                        {selectedCategory !== "all" && (
+                            (() => {
+                                const selectedCat = categories.find(
+                                    c => (c.slug || slugify(c.name)) === selectedCategory
+                                );
+                                if (selectedCat && selectedCat.hasSeoPage) {
+                                    return (
+                                        <Link
+                                            href={`/categories/${selectedCat.slug || slugify(selectedCat.name)}`}
+                                            className="ml-2 inline-flex items-center justify-center w-6 h-6 md:w-7 md:h-7 rounded-full bg-[#0EA5E9]/10 hover:bg-[#0EA5E9]/20 text-[#0EA5E9] transition-colors duration-200"
+                                            title={`View ${selectedCat.name} category details`}
+                                            aria-label={`View ${selectedCat.name} details`}
+                                        >
+                                            <svg className="w-4 h-4 md:w-4.5 md:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </Link>
+                                    );
+                                }
+                                return null;
+                            })()
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2 md:gap-3 w-full sm:w-auto">

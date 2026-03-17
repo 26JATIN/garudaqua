@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       },
     });
     
-    const pathsToPurge = ["/", "/products"];
+    const pathsToPurge = ["/", "/products", "/categories"];
     if (category.slug) {
       pathsToPurge.push(`/categories/${category.slug}`);
     }

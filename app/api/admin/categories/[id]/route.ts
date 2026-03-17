@@ -84,6 +84,7 @@ export async function PUT(
     const pathsToPurge = [
       "/", 
       "/products", 
+      "/categories",
       `/products?category=${newSlug}`,
       `/categories/${newSlug}`
     ];
@@ -124,7 +125,7 @@ export async function DELETE(
 
     // Purge the listing page, the live category filter URL, and every former
     // slug filter URL so no stale Cloudflare-cached page survives the deletion.
-    const pathsToPurge = ["/", "/products"];
+    const pathsToPurge = ["/", "/products", "/categories"];
     if (category?.slug) {
       pathsToPurge.push(`/products?category=${category.slug}`);
       pathsToPurge.push(`/categories/${category.slug}`);

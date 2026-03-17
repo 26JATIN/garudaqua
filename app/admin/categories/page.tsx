@@ -49,6 +49,35 @@ export default function CategoriesAdmin() {
     const [editingSub, setEditingSub] = useState<Subcategory | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
+    const joditConfig = useMemo(() => ({
+        readonly: false, 
+        height: 400, 
+        uploader: { insertImageAsBase64URI: true },
+        askBeforePasteHTML: false,
+        askBeforePasteFromWord: false,
+        defaultActionOnPaste: 'insert_as_html' as const,
+        image: {
+            editSrc: true,
+            editTitle: true,
+            editAlt: true,
+            editLink: true,
+            editSize: true,
+            editMargins: true,
+            editAlign: true
+        },
+        buttons: [
+            'source', '|',
+            'bold', 'strikethrough', 'underline', 'italic', '|',
+            'ul', 'ol', '|',
+            'outdent', 'indent',  '|',
+            'font', 'fontsize', 'brush', 'paragraph', '|',
+            'image', 'link', 'video', 'table', '|',
+            'align', 'undo', 'redo', '|',
+            'hr', 'eraser', 'copyformat', '|',
+            'symbol', 'fullsize'
+        ]
+    }), []);
+
     const [catForm, setCatForm] = useState({ name: "", description: "", image: "", sortOrder: 0, isActive: true, hasSeoPage: false, seoContent: "", seoHeroImage: "", metaTitle: "", metaDesc: "" });
     const [subForm, setSubForm] = useState({ name: "", description: "", image: "", categoryId: "", order: 0, isActive: true });
 
@@ -331,118 +360,147 @@ export default function CategoriesAdmin() {
 
                 {/* ===== Category Form ===== */}
                 {showForm && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">{editingCat ? "Edit Category" : "New Category"}</h2>
-                        <form onSubmit={handleCatSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                                    <input type="text" required value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" placeholder="e.g., Water Tanks" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
-                                    <input type="number" value={catForm.sortOrder} onChange={(e) => setCatForm({ ...catForm, sortOrder: parseInt(e.target.value) || 0 })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                    <textarea value={catForm.description} onChange={(e) => setCatForm({ ...catForm, description: e.target.value })} rows={2}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" placeholder="Brief description..." />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="flex items-center gap-2 mb-4">
-                                        <input type="checkbox" checked={catForm.hasSeoPage} onChange={(e) => setCatForm({ ...catForm, hasSeoPage: e.target.checked })}
-                                            className="w-4 h-4 text-[#0EA5E9] border-gray-300 rounded focus:ring-[#0EA5E9]" />
-                                        <span className="text-sm font-medium text-gray-900">Has Dedicated SEO Page</span>
-                                    </label>
+                    <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 sm:p-8 transition-all duration-300">
+                        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
+                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                <span className="w-8 h-8 rounded-lg bg-[#0EA5E9]/10 flex items-center justify-center text-[#0EA5E9]">
+                                    {editingCat ? (
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                    ) : (
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                                    )}
+                                </span>
+                                {editingCat ? "Edit Category Configuration" : "New Category Setup"}
+                            </h2>
+                            <button type="button" onClick={resetCatForm} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleCatSubmit} className="space-y-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                                {/* Left Side: Basic Info */}
+                                <div className="space-y-5">
+                                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">Basic Information</h3>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Category Name *</label>
+                                        <input type="text" required value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
+                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all" placeholder="e.g., Water Tanks" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Sort Order</label>
+                                        <input type="number" value={catForm.sortOrder} onChange={(e) => setCatForm({ ...catForm, sortOrder: parseInt(e.target.value) || 0 })}
+                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Short Description</label>
+                                        <textarea value={catForm.description} onChange={(e) => setCatForm({ ...catForm, description: e.target.value })} rows={3}
+                                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all resize-none" placeholder="Brief overview for internal use..." />
+                                    </div>
                                     
-                                    {catForm.hasSeoPage && (
-                                        <div className="space-y-4 border border-gray-200 rounded-lg p-4 bg-gray-50">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
-                                                <input type="text" value={catForm.metaTitle} onChange={(e) => setCatForm({ ...catForm, metaTitle: e.target.value })}
-                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" placeholder="SEO Title" />
+                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">Category Catalog Image</p>
+                                            <p className="text-xs text-gray-500 mt-0.5">Used in standard grid views</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            {catForm.image && (
+                                                <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                                                    <Image src={catForm.image} alt="Preview" fill className="object-cover" />
+                                                </div>
+                                            )}
+                                            <button type="button" disabled={uploading} onClick={() => pickImage((url) => setCatForm((prev) => ({ ...prev, image: url })))}
+                                                className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                                {uploading ? "Uploading..." : "Upload Cover"}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center p-4 border border-gray-100 rounded-xl bg-gray-50/50">
+                                        <label className="flex items-center gap-3 w-full cursor-pointer">
+                                            <div className="relative flex items-center">
+                                                <input type="checkbox" checked={catForm.isActive} onChange={(e) => setCatForm({ ...catForm, isActive: e.target.checked })}
+                                                    className="sr-only peer" />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0EA5E9]"></div>
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
-                                                <textarea value={catForm.metaDesc} onChange={(e) => setCatForm({ ...catForm, metaDesc: e.target.value })} rows={2}
-                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" placeholder="SEO Meta Description" />
+                                                <span className="text-sm font-medium text-gray-900 block">Active Status</span>
+                                                <span className="text-xs text-gray-500">Enable to make category visible</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {/* Right Side: SEO Configuration */}
+                                <div className="space-y-5">
+                                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                        SEO & Marketing
+                                        <label className="flex items-center gap-2 cursor-pointer bg-[#0EA5E9]/5 px-3 py-1.5 rounded-lg border border-[#0EA5E9]/10">
+                                            <input type="checkbox" checked={catForm.hasSeoPage} onChange={(e) => setCatForm({ ...catForm, hasSeoPage: e.target.checked })}
+                                                className="w-4 h-4 text-[#0EA5E9] border-gray-300 rounded focus:ring-[#0EA5E9]" />
+                                            <span className="text-xs font-bold text-[#0EA5E9]">Enable SEO Page</span>
+                                        </label>
+                                    </h3>
+                                    
+                                    <div className={`transition-all duration-300 ${catForm.hasSeoPage ? 'opacity-100' : 'opacity-50 pointer-events-none grayscale-50'}`}>
+                                        <div className="space-y-4 p-5 rounded-2xl border border-[#0EA5E9]/20 bg-linear-to-br from-[#0EA5E9]/2 to-transparent">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Meta Title</label>
+                                                <input type="text" value={catForm.metaTitle} onChange={(e) => setCatForm({ ...catForm, metaTitle: e.target.value })} disabled={!catForm.hasSeoPage}
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all disabled:bg-gray-100" placeholder="Optimized Page Title" />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">SEO Hero Image</label>
-                                                <div className="flex items-center gap-4">
-                                                    <button type="button" disabled={uploading} onClick={() => pickImage((url) => setCatForm((prev) => ({ ...prev, seoHeroImage: url })))}
-                                                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                                                        {uploading ? "Uploading..." : "Upload SEO Hero Image"}
-                                                    </button>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Meta Description (150 chars)</label>
+                                                <textarea value={catForm.metaDesc} onChange={(e) => setCatForm({ ...catForm, metaDesc: e.target.value })} rows={2} disabled={!catForm.hasSeoPage}
+                                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all resize-none disabled:bg-gray-100" placeholder="Captivating search engine summary..." />
+                                            </div>
+                                            <div className="p-4 bg-white rounded-xl border border-gray-100 flex flex-col gap-3">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Dedicated SEO Hero Image</label>
+                                                    <p className="text-xs text-gray-500 mt-0.5">High-quality full-width banner for the SEO page header.</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
                                                     {catForm.seoHeroImage && (
-                                                        <div className="relative w-24 h-12 rounded-lg overflow-hidden bg-gray-100">
+                                                        <div className="relative w-20 h-10 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
                                                             <Image src={catForm.seoHeroImage} alt="SEO Hero" fill className="object-cover" />
                                                         </div>
                                                     )}
-                                                </div>
-                                                <p className="text-xs text-gray-500 mt-1">Leave empty to fallback to standard category image.</p>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">SEO Content (WYSIWYG)</label>
-                                                <div className="bg-white">
-                                                    <JoditEditor
-                                                        value={catForm.seoContent}
-                                                        config={{ 
-                                                            readonly: false, 
-                                                            height: 400, 
-                                                            uploader: { insertImageAsBase64URI: true },
-                                                            askBeforePasteHTML: false,
-                                                            askBeforePasteFromWord: false,
-                                                            defaultActionOnPaste: 'insert_as_html',
-                                                            image: {
-                                                                editSrc: true,
-                                                                editTitle: true,
-                                                                editAlt: true,
-                                                                editLink: true,
-                                                                editSize: true,
-                                                                editMargins: true,
-                                                                editAlign: true
-                                                            },
-                                                            buttons: [
-                                                                'source', '|',
-                                                                'bold', 'strikethrough', 'underline', 'italic', '|',
-                                                                'ul', 'ol', '|',
-                                                                'outdent', 'indent',  '|',
-                                                                'font', 'fontsize', 'brush', 'paragraph', '|',
-                                                                'image', 'link', 'video', 'table', '|',
-                                                                'align', 'undo', 'redo', '|',
-                                                                'hr', 'eraser', 'copyformat', '|',
-                                                                'symbol', 'fullsize'
-                                                            ]
-                                                        }}
-                                                        onBlur={(newContent) => setCatForm({ ...catForm, seoContent: newContent })}
-                                                        onChange={() => {}}
-                                                    />
+                                                    <button type="button" disabled={uploading || !catForm.hasSeoPage} onClick={() => pickImage((url) => setCatForm((prev) => ({ ...prev, seoHeroImage: url })))}
+                                                        className="px-4 py-2 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-100 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                                                        {uploading ? "Uploading..." : "Upload Hero Banner"}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4 mt-4">
-                                <button type="button" disabled={uploading} onClick={() => pickImage((url) => setCatForm((prev) => ({ ...prev, image: url })))}
-                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {uploading ? "Uploading..." : "Upload Image"}
+                            
+                            {/* Full Width SEO Content Editor */}
+                            {catForm.hasSeoPage && (
+                                <div className="mt-8 pt-6 border-t border-gray-100 fade-in animate-in">
+                                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <svg className="w-4 h-4 text-[#0EA5E9]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                        Rich SEO Content Editor
+                                    </h3>
+                                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm lg:col-span-2">
+                                        <JoditEditor
+                                            value={catForm.seoContent}
+                                            config={joditConfig}
+                                            onBlur={(newContent) => setCatForm(prev => ({ ...prev, seoContent: newContent }))}
+                                            onChange={(newContent) => setCatForm(prev => ({ ...prev, seoContent: newContent }))}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex gap-3 pt-6 border-t border-gray-100 mt-6 justify-end">
+                                <button type="button" onClick={resetCatForm} className="px-6 py-2.5 bg-gray-50 text-gray-700 font-medium rounded-xl hover:bg-gray-100 border border-gray-200 transition">
+                                    Cancel
                                 </button>
-                                {catForm.image && <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100"><Image src={catForm.image} alt="Preview" fill className="object-cover" /></div>}
-                                <label className="flex items-center gap-2 ml-auto">
-                                    <input type="checkbox" checked={catForm.isActive} onChange={(e) => setCatForm({ ...catForm, isActive: e.target.checked })}
-                                        className="w-4 h-4 text-[#0EA5E9] border-gray-300 rounded focus:ring-[#0EA5E9]" />
-                                    <span className="text-sm text-gray-700">Active</span>
-                                </label>
-                            </div>
-                            <div className="flex gap-3 pt-2">
-                                <button type="submit" disabled={saving || uploading} className="px-5 py-2 bg-[#0EA5E9] text-white rounded-lg hover:bg-[#0369A1] transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {saving ? "Saving..." : editingCat ? "Update" : "Create"}
+                                <button type="submit" disabled={saving || uploading} className="px-8 py-2.5 bg-[#0EA5E9] text-white font-medium rounded-xl hover:bg-[#0369A1] shadow-lg shadow-[#0EA5E9]/20 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {saving ? "Saving..." : editingCat ? "Save Changes" : "Publish Category"}
                                 </button>
-                                <button type="button" onClick={resetCatForm} className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -450,51 +508,91 @@ export default function CategoriesAdmin() {
 
                 {/* ===== Subcategory Form ===== */}
                 {showSubForm && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">{editingSub ? "Edit Subcategory" : "New Subcategory"}</h2>
-                        <form onSubmit={handleSubSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 sm:p-8 transition-all duration-300">
+                        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
+                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                <span className="w-8 h-8 rounded-lg bg-[#0EA5E9]/10 flex items-center justify-center text-[#0EA5E9]">
+                                    {editingSub ? (
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                    ) : (
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                                    )}
+                                </span>
+                                {editingSub ? "Edit Subcategory Configuration" : "New Subcategory Setup"}
+                            </h2>
+                            <button type="button" onClick={resetSubForm} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleSubSubmit} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Subcategory Name *</label>
                                     <input type="text" required value={subForm.name} onChange={(e) => setSubForm({ ...subForm, name: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" placeholder="e.g., Overhead Tanks" />
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all" placeholder="e.g., Overhead Tanks" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Parent Category *</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Parent Category *</label>
                                     <select required value={subForm.categoryId} onChange={(e) => setSubForm({ ...subForm, categoryId: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent">
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all">
                                         <option value="">Select Category</option>
                                         {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                    <textarea value={subForm.description} onChange={(e) => setSubForm({ ...subForm, description: e.target.value })} rows={2}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" />
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                                    <textarea value={subForm.description} onChange={(e) => setSubForm({ ...subForm, description: e.target.value })} rows={3}
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all resize-none" placeholder="Brief overview for internal use..." />
                                 </div>
+                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Sort Order</label>
                                     <input type="number" value={subForm.order} onChange={(e) => setSubForm({ ...subForm, order: parseInt(e.target.value) || 0 })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" />
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9] transition-all" />
                                 </div>
+
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between col-span-1 md:col-span-2">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-900">Subcategory Image</p>
+                                        <p className="text-xs text-gray-500 mt-0.5">Used in standard grid views</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        {subForm.image && (
+                                            <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                                                <Image src={subForm.image} alt="Preview" fill className="object-cover" />
+                                            </div>
+                                        )}
+                                        <button type="button" disabled={uploading} onClick={() => pickImage((url) => setSubForm((prev) => ({ ...prev, image: url })))}
+                                            className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                            {uploading ? "Uploading..." : "Upload Cover"}
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex items-center p-4 border border-gray-100 rounded-xl bg-gray-50/50 col-span-1 md:col-span-2">
+                                    <label className="flex items-center gap-3 w-full cursor-pointer">
+                                        <div className="relative flex items-center">
+                                            <input type="checkbox" checked={subForm.isActive} onChange={(e) => setSubForm({ ...subForm, isActive: e.target.checked })}
+                                                className="sr-only peer" />
+                                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0EA5E9]"></div>
+                                        </div>
+                                        <div>
+                                            <span className="text-sm font-medium text-gray-900 block">Active Status</span>
+                                            <span className="text-xs text-gray-500">Enable to make subcategory visible</span>
+                                        </div>
+                                    </label>
+                                </div>
+
                             </div>
-                            <div className="flex items-center gap-4">
-                                <button type="button" disabled={uploading} onClick={() => pickImage((url) => setSubForm((prev) => ({ ...prev, image: url })))}
-                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {uploading ? "Uploading..." : "Upload Image"}
+                            
+                            <div className="flex gap-3 pt-6 border-t border-gray-100 mt-6 justify-end">
+                                <button type="button" onClick={resetSubForm} className="px-6 py-2.5 bg-gray-50 text-gray-700 font-medium rounded-xl hover:bg-gray-100 border border-gray-200 transition">
+                                    Cancel
                                 </button>
-                                {subForm.image && <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100"><Image src={subForm.image} alt="Preview" fill className="object-cover" /></div>}
-                                <label className="flex items-center gap-2 ml-auto">
-                                    <input type="checkbox" checked={subForm.isActive} onChange={(e) => setSubForm({ ...subForm, isActive: e.target.checked })}
-                                        className="w-4 h-4 text-[#0EA5E9] border-gray-300 rounded focus:ring-[#0EA5E9]" />
-                                    <span className="text-sm text-gray-700">Active</span>
-                                </label>
-                            </div>
-                            <div className="flex gap-3 pt-2">
-                                <button type="submit" disabled={saving || uploading} className="px-5 py-2 bg-[#0EA5E9] text-white rounded-lg hover:bg-[#0369A1] transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {saving ? "Saving..." : editingSub ? "Update" : "Create"}
+                                <button type="submit" disabled={saving || uploading} className="px-8 py-2.5 bg-[#0EA5E9] text-white font-medium rounded-xl hover:bg-[#0369A1] shadow-lg shadow-[#0EA5E9]/20 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {saving ? "Saving..." : editingSub ? "Save Changes" : "Publish Subcategory"}
                                 </button>
-                                <button type="button" onClick={resetSubForm} className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -514,7 +612,7 @@ export default function CategoriesAdmin() {
                                                 <Image src={cat.image} alt={cat.name} width={56} height={56} className="object-cover w-full h-full" />
                                             ) : (
                                                 <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 002-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
                                                 </svg>
                                             )}
                                         </div>

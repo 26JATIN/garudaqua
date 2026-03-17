@@ -14,13 +14,23 @@ export async function generateMetadata(
         where: { slug }
     });
 
-    if (!category || !category.hasSeoPage) {
+    if (!category) {
         return {};
     }
 
+    const canonicalUrl = `https://garudaqua.in/categories/${slug}`;
+
     return {
         title: category.metaTitle || `${category.name} | Garud Aqua Solutions`,
-        description: category.metaDesc || category.description || `Explore ${category.name} at Garud Aqua Solutions.`
+        description: category.metaDesc || category.description || `Explore ${category.name} at Garud Aqua Solutions.`,
+        alternates: {
+            canonical: canonicalUrl,
+        },
+        openGraph: {
+            url: canonicalUrl,
+            title: category.metaTitle || `${category.name} | Garud Aqua Solutions`,
+            description: category.metaDesc || category.description || `Explore ${category.name} at Garud Aqua Solutions.`,
+        },
     };
 }
 
@@ -48,10 +58,6 @@ export default async function CategorySeoPage(
 
     if (!categoryFull) {
         notFound();
-    }
-
-    if (!categoryFull.hasSeoPage) {
-        redirect(`/products?category=${categoryFull.slug}`);
     }
 
     // A helper for robust slug paths similar to ProductsPage
@@ -95,39 +101,53 @@ export default async function CategorySeoPage(
             </div>
 
             {/* Main Content & Products */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-16">
-                <div className="grid grid-cols-1 lg:grid-cols-10 gap-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-16 relative">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
                     {/* LEFT COLUMN: SEO Rich Content */}
-                    <div className="lg:col-span-6 space-y-12">
-                        {categoryFull.seoContent && (
-                            <div className="blog-content w-full">
-                                <div dangerouslySetInnerHTML={{ __html: categoryFull.seoContent }} />
+                    <div className="order-2 lg:order-1 lg:col-span-8 space-y-12">
+                        {categoryFull.seoContent ? (
+                            <div className="bg-white dark:bg-[#0A0A0A] rounded-[2rem] p-8 sm:p-12 shadow-sm border border-gray-100 dark:border-gray-800/50">
+                                <div className="blog-content w-full">
+                                    <div dangerouslySetInnerHTML={{ __html: categoryFull.seoContent }} />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-white dark:bg-[#0A0A0A] rounded-[2rem] p-8 sm:p-12 shadow-sm border border-gray-100 dark:border-gray-800/50 flex flex-col items-center justify-center text-center">
+                                <div className="w-16 h-16 bg-[#0EA5E9]/10 text-[#0EA5E9] rounded-2xl flex items-center justify-center mb-4">
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Explore {categoryFull.name}</h3>
+                                <p className="text-gray-500 dark:text-gray-400">Discover our complete range of premium quality products in this category.</p>
                             </div>
                         )}
                     </div>
 
-                    {/* RIGHT COLUMN: The Products grid list */}
-                    <div className="lg:col-span-4 space-y-8">
-                        <div>
-                            <h2 className="text-2xl font-black text-[#2C2C2C] dark:text-white tracking-tight mb-6 flex items-center gap-3">
-                                <svg className="w-6 h-6 text-[#0EA5E9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                </svg>
-                                Available Products
+                    {/* RIGHT COLUMN: The Products grid list (Sticky) */}
+                    <div className="order-1 lg:order-2 lg:col-span-4">
+                        <div className="sticky top-28 bg-gray-50 dark:bg-[#111111] p-6 sm:p-8 rounded-[2rem] border border-gray-200/60 dark:border-gray-800/60">
+                            <h2 className="text-2xl font-black text-[#2C2C2C] dark:text-white tracking-tight mb-8 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                    </svg>
+                                </div>
+                                Top Products
                             </h2>
-                            <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-5">
                                 {categoryFull.products.map((product, index) => (
-                                    <div key={product.id} className="group">
+                                    <div key={product.id} className="group relative">
                                         <Link href={`/products/${productPath(product)}`} className="block">
-                                            <div className="bg-white dark:bg-[#0A0A0A] rounded-xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
-                                                <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                            <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-none dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-300 group-hover:-translate-y-1.5 border border-gray-100 dark:border-gray-800/80">
+                                                <div className="relative aspect-4/3 overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
                                                     {product.image ? (
                                                         <Image
                                                             src={product.image}
                                                             alt={product.name}
                                                             fill
-                                                            className="object-cover transform group-hover:scale-110 transition-transform duration-500"
-                                                            sizes="(max-width: 640px) 50vw, 25vw"
+                                                            className="object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+                                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                                                         />
                                                     ) : (
                                                         <div className="absolute inset-0 flex items-center justify-center">
@@ -136,9 +156,14 @@ export default async function CategorySeoPage(
                                                             </svg>
                                                         </div>
                                                     )}
+                                                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                                                        <span className="text-white text-xs font-semibold px-4 py-1.5 bg-[#0EA5E9]/90 backdrop-blur-sm rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                                            View Details
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="p-3">
-                                                    <h3 className="text-[#2C2C2C] dark:text-gray-100 font-medium text-sm line-clamp-2 group-hover:text-[#0EA5E9] transition-colors">
+                                                <div className="p-3 sm:p-4 border-t border-gray-50 dark:border-gray-800/50">
+                                                    <h3 className="text-[#2C2C2C] dark:text-gray-100 font-bold text-xs sm:text-sm leading-snug line-clamp-2 group-hover:text-[#0EA5E9] transition-colors">
                                                         {product.name}
                                                     </h3>
                                                 </div>
@@ -148,7 +173,10 @@ export default async function CategorySeoPage(
                                 ))}
                             </div>
                             {categoryFull.products.length === 0 && (
-                                <p className="text-gray-500 italic">No products available in this category yet.</p>
+                                <div className="text-center py-10 bg-white dark:bg-gray-900/50 rounded-2xl border border-dashed border-gray-200 dark:border-gray-800">
+                                    <p className="text-gray-500 font-medium">Coming Soon</p>
+                                    <p className="text-sm text-gray-400 mt-1">Products are being added.</p>
+                                </div>
                             )}
                         </div>
                     </div>

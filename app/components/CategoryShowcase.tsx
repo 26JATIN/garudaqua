@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { Droplets } from "lucide-react";
+import { Droplets, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -30,6 +30,8 @@ interface Category {
   isActive: boolean;
   image: string;
   description?: string;
+  slug?: string;
+  hasSeoPage?: boolean;
 }
 
 interface Product {
@@ -414,6 +416,13 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
     router.push(`/products/${productPath(product)}`);
   }, [router]);
 
+  const getCategoryInfoLink = useCallback(() => {
+    if (selectedCategory === 'ALL') return '/categories';
+    const cat = categories.find(c => c.name === selectedCategory);
+    if (!cat) return '/categories';
+    return `/categories/${cat.slug || slugify(cat.name)}`;
+  }, [selectedCategory, categories]);
+
   // Get unique categories for filter buttons
   const categoryFilters = useMemo(() => {
     const filters = ['ALL'];
@@ -471,13 +480,20 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
   return (
     <section ref={sectionRef} className="bg-white dark:bg-black py-6 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16">
       {/* Mobile: "Explore Categories" heading — scrolls away naturally */}
-      <h2
-        className={`lg:hidden text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 hover:text-[#0EA5E9] transition-all duration-300 cursor-default leading-tight transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
-      >
-        Explore
-        <br />
-        Categories
-      </h2>
+      <div className={`lg:hidden flex items-end justify-between mb-4 transform transition-all duration-300 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 hover:text-[#0EA5E9] transition-colors cursor-default leading-tight">
+          Explore
+          <br />
+          Categories
+        </h2>
+        <button
+          onClick={() => router.push(getCategoryInfoLink())}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all mb-1"
+        >
+          <Info className="w-4 h-4" />
+          <span>{selectedCategory === 'ALL' ? 'All Categories' : 'Category Info'}</span>
+        </button>      
+      </div>
 
       {/* Mobile: Sticky filter bar — sticks below navbar as you scroll */}
       <div ref={mobileFilterRef} className="lg:hidden sticky top-15 z-30 -mx-3 sm:-mx-6 px-3 sm:px-6 py-3 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5">
@@ -530,11 +546,20 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
             className={`lg:sticky lg:top-22 transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
               }`}
           >
-            <h2 className="text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-8 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform leading-tight">
-              Explore
-              <br />
-              Categories
-            </h2>
+            <div className="mb-8">
+              <h2 className="text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform leading-tight">
+                Explore
+                <br />
+                Categories
+              </h2>
+              <button
+                onClick={() => router.push(getCategoryInfoLink())}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all w-fit group"
+              >
+                <Info className="w-4 h-4" />
+                <span>{selectedCategory === 'ALL' ? 'All Categories Info' : 'Category Info'}</span>
+              </button>
+            </div>
 
             <div
               className={`transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"

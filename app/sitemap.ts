@@ -48,6 +48,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.6,
     },
+    {
+      url: `${SITE_URL}/categories`,
+      lastModified: DEPLOY_DATE,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
   ];
 
   // ── Product pages ─────────────────────────────────────────────────────────
