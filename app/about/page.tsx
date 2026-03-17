@@ -61,6 +61,7 @@ export default function AboutPage() {
                                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                                         </svg>
                                         Sriganganagar, Rajasthan, India
+                                        <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener" className="ml-2 text-[#38BDF8] hover:underline font-medium">View on Google Maps</a>
                                     </p>
                                 </div>
                                 <span className="w-2.5 h-2.5 rounded-full bg-green-400 mt-1.5 shrink-0" />

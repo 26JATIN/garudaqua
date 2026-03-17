@@ -65,7 +65,8 @@ export default function ContactPage() {
                     <p className="text-gray-600 dark:text-gray-400 mb-6">
                         Thank you for reaching out. Our team will get back to you within 24 hours.
                     </p>
-                    <div className="flex gap-3 justify-center">
+                    <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener" className="inline-block mt-2 text-[#0EA5E9] hover:underline font-medium">View Our Location on Google Maps</a>
+                    <div className="flex gap-3 justify-center mt-6">
                         <Link href="/" className="px-6 py-2.5 bg-[#0EA5E9] text-white rounded-full hover:bg-[#0369A1] transition text-sm font-medium">
                             Back to Home
                         </Link>

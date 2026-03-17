@@ -59,8 +59,9 @@ export default function Footer() {
                                 <span className="leading-relaxed">
                                     Ground, Murraba No. 62, Killa No. 2,<br />
                                     Sihagawali To Akkawali Road, 23 SDS,<br />
-                                    Sadulshahar, Ganganagar – 335062<br />
-                                    Rajasthan, India
+                                    Sadulshahar, Ganganagar  335062<br />
+                                    Rajasthan, India<br />
+                                    <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener" className="inline-block mt-2 text-[#0EA5E9] hover:underline font-medium">View on Google Maps</a>
                                 </span>
                             </li>
                         </ul>
