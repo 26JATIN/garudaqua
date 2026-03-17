@@ -38,9 +38,20 @@ export async function POST(request: Request) {
         image: body.image || "",
         sortOrder: body.sortOrder || 0,
         isActive: body.isActive ?? true,
+        hasSeoPage: body.hasSeoPage ?? false,
+        seoContent: body.seoContent || "",
+        seoHeroImage: body.seoHeroImage || "",
+        metaTitle: body.metaTitle || "",
+        metaDesc: body.metaDesc || "",
       },
     });
-    await revalidateAndWarm(["/", "/products"]);
+    
+    const pathsToPurge = ["/", "/products"];
+    if (category.slug) {
+      pathsToPurge.push(`/categories/${category.slug}`);
+    }
+    await revalidateAndWarm(pathsToPurge);
+    
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
     console.error("Error creating category:", error);

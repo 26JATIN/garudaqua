@@ -79,7 +79,7 @@ export async function generateMetadata(
 
 async function findProduct(slug: string) {
   const include = {
-    category: { select: { id: true, name: true, slug: true } },
+    category: { select: { id: true, name: true, slug: true, hasSeoPage: true } },
     subcategory: { select: { id: true, name: true, slug: true } },
   } as const;
 
@@ -119,12 +119,7 @@ async function getProductData(slug: string) {
         name: true,
         slug: true,
         image: true,
-        description: true,
-        isActive: true,
-        tags: true,
-        hasVariants: true,
-        guarantee: true,
-        category: { select: { id: true, name: true, slug: true } },
+        category: { select: { id: true, name: true, slug: true, hasSeoPage: true } },
         subcategory: { select: { id: true, name: true, slug: true } },
       },
     });

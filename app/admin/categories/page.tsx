@@ -1,18 +1,27 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
 import { uploadDirect } from "@/lib/upload-direct";
+import dynamic from 'next/dynamic';
+
+const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
 // ===== Types =====
 interface Category {
     id: string;
     name: string;
+    slug?: string;
     description: string;
     image: string;
     sortOrder: number;
     isActive: boolean;
+    hasSeoPage?: boolean;
+    seoContent?: string;
+    seoHeroImage?: string;
+    metaTitle?: string;
+    metaDesc?: string;
     _count?: { subcategories: number; products: number };
 }
 
@@ -40,7 +49,7 @@ export default function CategoriesAdmin() {
     const [editingSub, setEditingSub] = useState<Subcategory | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
-    const [catForm, setCatForm] = useState({ name: "", description: "", image: "", sortOrder: 0, isActive: true });
+    const [catForm, setCatForm] = useState({ name: "", description: "", image: "", sortOrder: 0, isActive: true, hasSeoPage: false, seoContent: "", seoHeroImage: "", metaTitle: "", metaDesc: "" });
     const [subForm, setSubForm] = useState({ name: "", description: "", image: "", categoryId: "", order: 0, isActive: true });
 
     // ===== Fetch Categories =====
@@ -169,12 +178,23 @@ export default function CategoriesAdmin() {
 
     const startEditCat = (cat: Category) => {
         setEditingCat(cat);
-        setCatForm({ name: cat.name, description: cat.description, image: cat.image, sortOrder: cat.sortOrder, isActive: cat.isActive });
+        setCatForm({ 
+            name: cat.name, 
+            description: cat.description, 
+            image: cat.image, 
+            sortOrder: cat.sortOrder, 
+            isActive: cat.isActive,
+            hasSeoPage: cat.hasSeoPage ?? false,
+            seoContent: cat.seoContent || "",
+            seoHeroImage: cat.seoHeroImage || "",
+            metaTitle: cat.metaTitle || "",
+            metaDesc: cat.metaDesc || ""
+        });
         setShowForm(true);
     };
 
     const resetCatForm = () => {
-        setCatForm({ name: "", description: "", image: "", sortOrder: 0, isActive: true });
+        setCatForm({ name: "", description: "", image: "", sortOrder: 0, isActive: true, hasSeoPage: false, seoContent: "", seoHeroImage: "", metaTitle: "", metaDesc: "" });
         setEditingCat(null);
         setShowForm(false);
     };
@@ -330,8 +350,83 @@ export default function CategoriesAdmin() {
                                     <textarea value={catForm.description} onChange={(e) => setCatForm({ ...catForm, description: e.target.value })} rows={2}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" placeholder="Brief description..." />
                                 </div>
+                                <div className="md:col-span-2">
+                                    <label className="flex items-center gap-2 mb-4">
+                                        <input type="checkbox" checked={catForm.hasSeoPage} onChange={(e) => setCatForm({ ...catForm, hasSeoPage: e.target.checked })}
+                                            className="w-4 h-4 text-[#0EA5E9] border-gray-300 rounded focus:ring-[#0EA5E9]" />
+                                        <span className="text-sm font-medium text-gray-900">Has Dedicated SEO Page</span>
+                                    </label>
+                                    
+                                    {catForm.hasSeoPage && (
+                                        <div className="space-y-4 border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+                                                <input type="text" value={catForm.metaTitle} onChange={(e) => setCatForm({ ...catForm, metaTitle: e.target.value })}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" placeholder="SEO Title" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+                                                <textarea value={catForm.metaDesc} onChange={(e) => setCatForm({ ...catForm, metaDesc: e.target.value })} rows={2}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent" placeholder="SEO Meta Description" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">SEO Hero Image</label>
+                                                <div className="flex items-center gap-4">
+                                                    <button type="button" disabled={uploading} onClick={() => pickImage((url) => setCatForm((prev) => ({ ...prev, seoHeroImage: url })))}
+                                                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                                        {uploading ? "Uploading..." : "Upload SEO Hero Image"}
+                                                    </button>
+                                                    {catForm.seoHeroImage && (
+                                                        <div className="relative w-24 h-12 rounded-lg overflow-hidden bg-gray-100">
+                                                            <Image src={catForm.seoHeroImage} alt="SEO Hero" fill className="object-cover" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-1">Leave empty to fallback to standard category image.</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">SEO Content (WYSIWYG)</label>
+                                                <div className="bg-white">
+                                                    <JoditEditor
+                                                        value={catForm.seoContent}
+                                                        config={{ 
+                                                            readonly: false, 
+                                                            height: 400, 
+                                                            uploader: { insertImageAsBase64URI: true },
+                                                            askBeforePasteHTML: false,
+                                                            askBeforePasteFromWord: false,
+                                                            defaultActionOnPaste: 'insert_as_html',
+                                                            image: {
+                                                                editSrc: true,
+                                                                editTitle: true,
+                                                                editAlt: true,
+                                                                editLink: true,
+                                                                editSize: true,
+                                                                editMargins: true,
+                                                                editAlign: true
+                                                            },
+                                                            buttons: [
+                                                                'source', '|',
+                                                                'bold', 'strikethrough', 'underline', 'italic', '|',
+                                                                'ul', 'ol', '|',
+                                                                'outdent', 'indent',  '|',
+                                                                'font', 'fontsize', 'brush', 'paragraph', '|',
+                                                                'image', 'link', 'video', 'table', '|',
+                                                                'align', 'undo', 'redo', '|',
+                                                                'hr', 'eraser', 'copyformat', '|',
+                                                                'symbol', 'fullsize'
+                                                            ]
+                                                        }}
+                                                        onBlur={(newContent) => setCatForm({ ...catForm, seoContent: newContent })}
+                                                        onChange={() => {}}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 mt-4">
                                 <button type="button" disabled={uploading} onClick={() => pickImage((url) => setCatForm((prev) => ({ ...prev, image: url })))}
                                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                                     {uploading ? "Uploading..." : "Upload Image"}

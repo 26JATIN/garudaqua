@@ -37,7 +37,7 @@ interface Product {
     image?: string;
     images?: string[];
     description?: string;
-    category: { id: string; name: string; slug?: string } | string;
+    category: { id: string; name: string; slug?: string; hasSeoPage?: boolean } | string;
     subcategory?: { id: string; name: string; slug?: string };
     specs?: { label: string; value: string }[];
     hasVariants?: boolean;
@@ -528,8 +528,17 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         {/* Category & Share */}
                         <div className="flex items-center justify-between">
                             <div className="inline-flex items-center gap-2">
-                                <span className="bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium px-4 py-2 rounded-full">
+                                <span className="bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium px-4 py-2 rounded-full inline-flex items-center gap-2">
                                     {categoryName}
+                                    {typeof product.category === 'object' && product.category.hasSeoPage && (
+                                        <Link 
+                                            href={`/categories/${categorySlug}`}
+                                            className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0EA5E9]/20 hover:bg-[#0EA5E9]/30 transition-colors"
+                                            title="View Category Details"
+                                        >
+                                            <span className="text-xs font-bold font-serif leading-none">i</span>
+                                        </Link>
+                                    )}
                                 </span>
                                 {product.subcategory?.name && (
                                     <span className="bg-[#0369A1]/10 text-[#0369A1] text-sm font-medium px-4 py-2 rounded-full">

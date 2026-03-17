@@ -64,6 +64,11 @@ export async function PUT(
         image: body.image,
         sortOrder: body.sortOrder,
         isActive: body.isActive,
+        hasSeoPage: body.hasSeoPage ?? false,
+        seoContent: body.seoContent || "",
+        seoHeroImage: body.seoHeroImage || "",
+        metaTitle: body.metaTitle || "",
+        metaDesc: body.metaDesc || "",
       },
     });
 
@@ -71,15 +76,25 @@ export async function PUT(
     if (existing?.image && existing.image !== body.image) {
       await deleteCloudinaryByUrl(existing.image);
     }
+    if (existing?.seoHeroImage && existing.seoHeroImage !== body.seoHeroImage) {
+      await deleteCloudinaryByUrl(existing.seoHeroImage);
+    }
 
     // Purge listing page, new + old category filter URLs
-    const pathsToPurge = ["/", "/products", `/products?category=${newSlug}`];
+    const pathsToPurge = [
+      "/", 
+      "/products", 
+      `/products?category=${newSlug}`,
+      `/categories/${newSlug}`
+    ];
     if (existing?.slug && existing.slug !== newSlug) {
       pathsToPurge.push(`/products?category=${existing.slug}`);
+      pathsToPurge.push(`/categories/${existing.slug}`);
       // Also purge all formerSlug filter URLs so stale CDN entries are cleared
-      (existing.formerSlugs ?? []).forEach((s) =>
-        pathsToPurge.push(`/products?category=${s}`)
-      );
+      (existing.formerSlugs ?? []).forEach((s) => {
+        pathsToPurge.push(`/products?category=${s}`);
+        pathsToPurge.push(`/categories/${s}`);
+      });
     }
     await revalidateAndWarm(pathsToPurge);
     return NextResponse.json(category);
@@ -105,14 +120,19 @@ export async function DELETE(
     await prisma.category.delete({ where: { id } });
 
     if (category?.image) await deleteCloudinaryByUrl(category.image);
+    if (category?.seoHeroImage) await deleteCloudinaryByUrl(category.seoHeroImage);
 
     // Purge the listing page, the live category filter URL, and every former
     // slug filter URL so no stale Cloudflare-cached page survives the deletion.
     const pathsToPurge = ["/", "/products"];
-    if (category?.slug) pathsToPurge.push(`/products?category=${category.slug}`);
-    (category?.formerSlugs ?? []).forEach((s) =>
-      pathsToPurge.push(`/products?category=${s}`)
-    );
+    if (category?.slug) {
+      pathsToPurge.push(`/products?category=${category.slug}`);
+      pathsToPurge.push(`/categories/${category.slug}`);
+    }
+    (category?.formerSlugs ?? []).forEach((s) => {
+      pathsToPurge.push(`/products?category=${s}`);
+      pathsToPurge.push(`/categories/${s}`);
+    });
     await revalidateAndWarm(pathsToPurge);
     return NextResponse.json({ success: true });
   } catch (error) {
