@@ -28,7 +28,7 @@ export default async function CategoriesIndexPage() {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#0A0A0A] flex flex-col">
             {/* Header Section */}
-            <div className="relative bg-[#0A0A0A] overflow-hidden pt-14 pb-6 sm:pt-16 sm:pb-8">
+            <div className="relative bg-[#0A0A0A] overflow-hidden pt-6 pb-6 sm:pt-10 sm:pb-8">
                 <div className="absolute inset-0">
                     <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
                     <div className="absolute inset-0 bg-linear-to-t from-[#0A0A0A] via-transparent to-[#0EA5E9]/10"></div>
@@ -75,15 +75,15 @@ export default async function CategoriesIndexPage() {
                                         <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     </div>
                                     <div className="p-3 sm:p-5 lg:p-6 flex flex-col flex-1 bg-white dark:bg-[#111111] relative">
-                                        <h3 className="text-[15px] sm:text-lg lg:text-xl font-bold text-gray-900 dark:text-gray-100 mb-1.5 sm:mb-2 group-hover:text-[#0EA5E9] transition-colors leading-tight line-clamp-2">
+                                        <h3 className="text-[15px] sm:text-lg lg:text-xl font-bold text-gray-900 dark:text-gray-100 mb-1.5 sm:mb-2 group-hover:text-[#0EA5E9] transition-colors leading-tight line-clamp-2 min-h-10 sm:min-h-12.5 lg:min-h-14">
                                             {category.name}
                                         </h3>
-                                        <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm line-clamp-2 mb-3 sm:mb-4 flex-1 hidden sm:block">
+                                        <p className="text-gray-500 dark:text-gray-400 text-[12px] sm:text-sm line-clamp-2 sm:line-clamp-3 mb-3 sm:mb-4 flex-1">
                                             {category.description || "View products in this category."}
                                         </p>
-                                        <div className="flex items-center text-[#0EA5E9] text-[11px] sm:text-sm font-semibold mt-auto group-hover:tracking-wider transition-all duration-300 uppercase sm:capitalize tracking-widest sm:tracking-normal">
-                                            Explore <span className="hidden sm:inline">&nbsp;Collection</span>
-                                            <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1 transform group-hover:translate-x-1.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <div className="flex items-center text-[#0EA5E9] text-[11px] sm:text-sm font-semibold mt-auto group-hover:tracking-wider transition-all duration-300 uppercase sm:capitalize tracking-widest sm:tracking-normal w-full justify-between sm:justify-start">
+                                            <span>Explore <span className="hidden sm:inline">&nbsp;Collection</span></span>
+                                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:ml-1 transform group-hover:translate-x-1.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                                             </svg>
                                         </div>

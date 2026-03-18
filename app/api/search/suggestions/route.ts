@@ -14,38 +14,40 @@ export async function GET(request: Request) {
       return NextResponse.json([]);
     }
 
-    const searchFilter = { contains: query, mode: "insensitive" as const };
+    const terms = query.split(/\s+/).filter(Boolean);
 
-    const [categories, subcategories, products] = await Promise.all([
+    // Categories must natively contain all typed words to match directly
+    const categoryFilter = {
+      AND: terms.map(term => ({
+        name: { contains: term, mode: "insensitive" as const }
+      }))
+    };
+
+    // Products intelligently scan all connected sub-trees for any combination of the words
+    const productFilter = {
+      AND: terms.map(term => ({
+        OR: [
+          { name: { contains: term, mode: "insensitive" as const } },
+          { description: { contains: term, mode: "insensitive" as const } },
+          { category: { name: { contains: term, mode: "insensitive" as const } } },
+          { subcategory: { name: { contains: term, mode: "insensitive" as const } } }
+        ]
+      }))
+    };
+
+    const [categories, products] = await Promise.all([
       prisma.category.findMany({
         where: {
           isActive: true,
-          name: searchFilter,
+          ...categoryFilter
         },
         select: { id: true, name: true, slug: true, image: true },
-        take: 3,
-      }),
-      prisma.subcategory.findMany({
-        where: {
-          isActive: true,
-          name: searchFilter,
-        },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          image: true,
-          category: { select: { id: true, name: true, slug: true } },
-        },
-        take: 3,
+        take: 2,
       }),
       prisma.product.findMany({
         where: {
           isActive: true,
-          OR: [
-            { name: searchFilter },
-            { description: searchFilter },
-          ],
+          ...productFilter
         },
         select: {
           id: true,
@@ -55,7 +57,7 @@ export async function GET(request: Request) {
           category: { select: { id: true, name: true } },
           subcategory: { select: { id: true, name: true } },
         },
-        take: 5,
+        take: 6,
       }),
     ]);
 
@@ -65,15 +67,7 @@ export async function GET(request: Request) {
         text: c.name,
         type: "category" as const,
         image: c.image || null,
-        url: `/products?category=${c.slug && c.slug !== "" ? c.slug : slugify(c.name)}`,
-      })),
-      ...subcategories.map((s) => ({
-        id: s.id,
-        text: s.name,
-        type: "subcategory" as const,
-        image: s.image || null,
-        category: s.category.name,
-        url: `/products?category=${s.category.slug && s.category.slug !== "" ? s.category.slug : slugify(s.category.name)}&subcategory=${s.slug && s.slug !== "" ? s.slug : slugify(s.name)}`,
+        url: `/categories/${c.slug && c.slug !== "" ? c.slug : slugify(c.name)}`,
       })),
       ...products.map((p) => ({
         id: p.id,

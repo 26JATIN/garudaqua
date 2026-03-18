@@ -62,37 +62,40 @@ export default async function CategorySeoPage(
 
     // A helper for robust slug paths similar to ProductsPage
     const productPath = (p: { slug?: string; id: string }) => p.slug || p.id;
+    const heroImageSrc = categoryFull.seoHeroImage || categoryFull.image || '/placeholder-hero.jpg';
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-[#F2FBFD] to-white dark:from-[#05151B] dark:to-black">
+        <div className="min-h-screen bg-white dark:bg-black">
             {/* Full-view Hero Section */}
             <div className="relative isolate overflow-hidden min-h-75 sm:min-h-[40vh] lg:min-h-[60vh] flex flex-col items-center justify-center pt-24 pb-12 rounded-b-[2rem] sm:rounded-b-[3rem] shadow-xl w-full">
                 {/* Background Image (optimized WebP) */}
                 <Image
-                    src={categoryFull.seoHeroImage || categoryFull.image || '/placeholder-hero.jpg'}
+                    src={heroImageSrc}
                     alt={categoryFull.name}
                     fill
                     className="object-cover object-center -z-20 w-full h-full"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
                     priority
+                    fetchPriority="high"
+                    decoding="sync"
                     quality={85}
-                    unoptimized
                 />
                 
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-black/50 dark:bg-black/70 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
+                {/* Gradient Overlay transparent to pointer events for Image SEO downloads */}
+                <div className="absolute inset-0 bg-black/50 dark:bg-black/70 -z-10 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
 
                 <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-8 sm:mt-12 md:mt-16">
                     {/* Breadcrumb */}
-                    <nav className="flex items-center justify-center space-x-2 text-xs sm:text-sm text-gray-200/80 mb-6 sm:mb-8 font-medium">
+                    <nav className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-200/80 mb-6 sm:mb-8 font-medium">
                         <Link href="/" className="hover:text-white transition-colors">Home</Link>
-                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                        <Link href="/products" className="hover:text-white transition-colors">Categories</Link>
-                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        
+                        <Link href="/products" className="hover:text-white transition-colors">Products</Link>
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        
+                        <Link href="/categories" className="hover:text-white transition-colors">Categories</Link>
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        
                         <span className="text-white line-clamp-1">{categoryFull.name}</span>
                     </nav>
 
@@ -120,13 +123,13 @@ export default async function CategorySeoPage(
                     {/* LEFT COLUMN: SEO Rich Content */}
                     <div className="order-2 lg:order-1 lg:col-span-8 space-y-12">
                         {categoryFull.seoContent ? (
-                            <div className="bg-white dark:bg-[#0A0A0A] rounded-[2rem] p-8 sm:p-12 shadow-sm border border-gray-100 dark:border-gray-800/50">
+                            <div className="lg:bg-white lg:dark:bg-[#0A0A0A] lg:rounded-[2rem] p-0 lg:p-8 xl:p-12 lg:shadow-sm lg:border lg:border-gray-100 lg:dark:border-gray-800/50">
                                 <div className="blog-content w-full">
                                     <div dangerouslySetInnerHTML={{ __html: categoryFull.seoContent }} />
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-white dark:bg-[#0A0A0A] rounded-[2rem] p-8 sm:p-12 shadow-sm border border-gray-100 dark:border-gray-800/50 flex flex-col items-center justify-center text-center">
+                            <div className="lg:bg-white lg:dark:bg-[#0A0A0A] lg:rounded-[2rem] p-4 lg:p-8 xl:p-12 lg:shadow-sm lg:border lg:border-gray-100 lg:dark:border-gray-800/50 flex flex-col items-center justify-center text-center">
                                 <div className="w-16 h-16 bg-[#0EA5E9]/10 text-[#0EA5E9] rounded-2xl flex items-center justify-center mb-4">
                                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -140,8 +143,8 @@ export default async function CategorySeoPage(
 
                     {/* RIGHT COLUMN: The Products grid list (Sticky) */}
                     <div className="order-1 lg:order-2 lg:col-span-4">
-                        <div className="sticky top-28 bg-gray-50 dark:bg-[#111111] p-6 sm:p-8 rounded-[2rem] border border-gray-200/60 dark:border-gray-800/60">
-                            <h2 className="text-2xl font-black text-[#2C2C2C] dark:text-white tracking-tight mb-8 flex items-center gap-3">
+                        <div className="sticky top-28 lg:bg-gray-50 lg:dark:bg-[#111111] p-0 lg:p-8 lg:rounded-[2rem] lg:border lg:border-gray-200/60 lg:dark:border-gray-800/60">
+                            <h2 className="text-2xl font-black text-[#2C2C2C] dark:text-white tracking-tight mb-6 lg:mb-8 flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
                                     <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -149,19 +152,19 @@ export default async function CategorySeoPage(
                                 </div>
                                 Top Products
                             </h2>
-                            <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-5">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-5">
                                 {categoryFull.products.map((product, index) => (
-                                    <div key={product.id} className="group relative">
-                                        <Link href={`/products/${productPath(product)}`} className="block">
-                                            <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-none dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-300 group-hover:-translate-y-1.5 border border-gray-100 dark:border-gray-800/80">
-                                                <div className="relative aspect-4/3 overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                                    <div key={product.id} className="group relative h-full">
+                                        <Link href={`/products/${productPath(product)}`} className="block h-full">
+                                            <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-none dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-300 group-hover:-translate-y-1.5 border border-gray-100 dark:border-gray-800/80 flex flex-col h-full">
+                                                <div className="relative aspect-square overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 shrink-0">
                                                     {product.image ? (
                                                         <Image
                                                             src={product.image}
                                                             alt={product.name}
                                                             fill
                                                             className="object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
-                                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
                                                         />
                                                     ) : (
                                                         <div className="absolute inset-0 flex items-center justify-center">
@@ -176,8 +179,8 @@ export default async function CategorySeoPage(
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="p-3 sm:p-4 border-t border-gray-50 dark:border-gray-800/50">
-                                                    <h3 className="text-[#2C2C2C] dark:text-gray-100 font-bold text-xs sm:text-sm leading-snug line-clamp-2 group-hover:text-[#0EA5E9] transition-colors">
+                                                <div className="p-3 sm:p-4 border-t border-gray-50 dark:border-gray-800/50 flex-1 flex flex-col justify-center text-center">
+                                                    <h3 className="text-[#2C2C2C] dark:text-gray-100 font-bold text-xs sm:text-sm truncate px-1 group-hover:text-[#0EA5E9] transition-colors" title={product.name}>
                                                         {product.name}
                                                     </h3>
                                                 </div>

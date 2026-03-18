@@ -175,14 +175,9 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
     }, [isOpen]);
 
     const handleSearch = (query = searchQuery) => {
-        const trimmedQuery = query.trim();
-        if (trimmedQuery) {
-            router.push(`/products?search=${encodeURIComponent(trimmedQuery)}`);
-        } else {
-            router.push('/products');
-        }
-        setIsOpen(false);
-        setSelectedIndex(-1);
+        // Form submission acts entirely as a UI stub natively unless an explicit 
+        // Autocomplete Suggestion is visibly selected or arrow-keyed by the user.
+        return;
     };
 
     const handleSuggestionClick = (suggestion: Suggestion) => {
@@ -391,19 +386,6 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                                             </div>
                                         </button>
                                     ))}
-                                </div>
-
-                                {/* Footer */}
-                                <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-2.5 bg-gray-50/50 dark:bg-white/2">
-                                    <button
-                                        onClick={() => handleSearch()}
-                                        className="flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                        </svg>
-                                        Search for &ldquo;{searchQuery}&rdquo;
-                                    </button>
                                 </div>
                             </>
                         )}
