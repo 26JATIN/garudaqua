@@ -361,11 +361,11 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
     const handleShare = async () => {
         const url = window.location.href;
         const title = product?.name || "Check out this product";
-        const text = `${product?.name} - Garud Aqua Solutions`;
+        const text = `${product?.name} - Garud Aqua Solutions\n${url}`;
 
         if (navigator.share) {
             try {
-                await navigator.share({ title, text, url });
+                await navigator.share({ title, text });
                 return;
             } catch (err: unknown) {
                 if (err instanceof Error && err.name === "AbortError") return;

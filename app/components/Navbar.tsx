@@ -312,6 +312,7 @@ export default function Navbar() {
                     <button
                         onClick={() => setIsSidebarOpen(false)}
                         className="p-2 shrink-0 rounded-full text-gray-400 hover:text-red-500 bg-white dark:bg-[#1A1A1A] border border-gray-200/60 dark:border-gray-800 shadow-sm active:scale-95 transition-all"
+                        aria-label="Close Menu"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -322,7 +323,7 @@ export default function Navbar() {
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                     {/* Main Navigation */}
                     <div className="space-y-1">
-                        <p className="px-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Explore</p>
+                        <p className="px-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Explore</p>
 
                         <Link href="/products" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">
                             <div className="p-2 rounded-xl bg-[#0EA5E9]/10 text-[#0EA5E9] group-hover:scale-110 transition-transform">
@@ -348,7 +349,7 @@ export default function Navbar() {
 
                     {/* Support & Company */}
                     <div className="space-y-1">
-                        <p className="px-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Company</p>
+                        <p className="px-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Company</p>
 
                         <Link href="/about" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">
                             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400 group-hover:scale-110 transition-transform">
