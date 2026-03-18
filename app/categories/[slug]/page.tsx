@@ -83,6 +83,19 @@ export default async function CategorySeoPage(
                 <div className="absolute inset-0 bg-black/50 dark:bg-black/70 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
 
                 <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-8 sm:mt-12 md:mt-16">
+                    {/* Breadcrumb */}
+                    <nav className="flex items-center justify-center space-x-2 text-xs sm:text-sm text-gray-200/80 mb-6 sm:mb-8 font-medium">
+                        <Link href="/" className="hover:text-white transition-colors">Home</Link>
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        <Link href="/products" className="hover:text-white transition-colors">Categories</Link>
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        <span className="text-white line-clamp-1">{categoryFull.name}</span>
+                    </nav>
+
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs sm:text-sm font-medium mb-4 sm:mb-6 shadow-sm">
                         <span className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0EA5E9] opacity-75"></span>

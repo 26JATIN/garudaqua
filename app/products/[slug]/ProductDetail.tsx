@@ -461,6 +461,16 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
+                    {categoryName && categorySlug && (
+                        <>
+                            <Link href={`/categories/${categorySlug}`} className="hover:text-[#0EA5E9] transition-colors whitespace-nowrap">
+                                {categoryName}
+                            </Link>
+                            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </>
+                    )}
                     <span className="text-[#2C2C2C] dark:text-gray-200 font-light line-clamp-1">{product.name}</span>
                 </nav>
 

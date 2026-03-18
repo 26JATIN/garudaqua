@@ -138,6 +138,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     });
   }
 
+  // Fetch all active product categories for internal navigation
+  const allCategories = await prisma.category.findMany({
+    where: { isActive: true },
+    select: { name: true, slug: true },
+    orderBy: { sortOrder: "asc" }
+  });
+
   // Format for client
   const blog = {
     ...blogData,
@@ -166,8 +173,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         { name: "Blog", url: "https://garudaqua.in/blogs" },
         { name: blog.title, url: `https://garudaqua.in/blogs/${blog.slug}` },
       ])) }} />
-      <BlogPostClient blog={blog} relatedBlogs={relatedBlogs} />
+      <BlogPostClient blog={blog} relatedBlogs={relatedBlogs} categories={allCategories} />
     </>
   );
 }
-

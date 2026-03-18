@@ -147,7 +147,7 @@ export default function AboutPage() {
                                 ),
                                 title: "Water Storage Tanks",
                                 desc: "Durable, food-grade polyethylene tanks engineered for long-term storage in residential, agricultural, and industrial settings. Available in multiple capacities.",
-                                link: "/products",
+                                link: "/categories/blow-mould-tank",
                                 cta: "Browse Tanks",
                             },
                             {
@@ -159,7 +159,7 @@ export default function AboutPage() {
                                 ),
                                 title: "Sprayer Tanks",
                                 desc: "High-performance sprayer tanks built for agricultural use. Corrosion-resistant, UV-stabilised, and compatible with leading pump systems for effective crop protection.",
-                                link: "/products",
+                                link: "/categories/agriculture-sprayer-tank",
                                 cta: "Explore Sprayers",
                             },
                             {
@@ -172,7 +172,7 @@ export default function AboutPage() {
                                 ),
                                 title: "CPVC / PVC Pipes & Fittings",
                                 desc: "Complete range of CPVC and PVC pipes, fittings, and accessories for plumbing, irrigation, and industrial fluid conveyance. Precision-fit and pressure-rated.",
-                                link: "/products",
+                                link: "/categories/cpvc-pipes-and-fittings",
                                 cta: "View Piping Systems",
                             },
                             {

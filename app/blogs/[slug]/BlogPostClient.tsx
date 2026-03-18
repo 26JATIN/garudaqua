@@ -23,10 +23,12 @@ interface Blog {
 
 export default function BlogPostClient({
     blog,
-    relatedBlogs = []
+    relatedBlogs = [],
+    categories = []
 }: {
     blog: Blog;
     relatedBlogs?: Blog[];
+    categories?: { name: string; slug: string }[];
 }) {
     if (!blog) {
         return null;
@@ -127,7 +129,7 @@ export default function BlogPostClient({
 
                         {/* Tags */}
                         {blog.tags.length > 0 && (
-                            <div className="pt-10 border-t border-gray-200 dark:border-white/6">
+                            <div className="pt-10 border-t border-gray-200 dark:border-white/6 mb-10">
                                 <h3 className="text-lg font-light mb-5 text-gray-900 dark:text-gray-100">Related Topics</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {blog.tags.map((tag, index) => (
@@ -141,6 +143,24 @@ export default function BlogPostClient({
                                 </div>
                             </div>
                         )}
+
+                        {/* Internal Navigation CTA */}
+                        <div className="pt-8 pb-4 border-t border-gray-200 dark:border-white/6 mt-8">
+                            <h3 className="text-xl font-light mb-4 text-gray-900 dark:text-gray-100">Explore Our Range</h3>
+                            <p className="text-gray-600 dark:text-gray-400 font-light mb-6">
+                                Looking for high-quality water management solutions? Discover our extensive range of durable products designed for everyday needs.
+                            </p>
+                            <div className="flex flex-wrap gap-4">
+                                <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[#0EA5E9] hover:bg-[#0284C7] text-white rounded-full font-medium transition-colors shadow-xs">
+                                    View All Products
+                                </Link>
+                                {categories.map(category => (
+                                    <Link key={category.slug} href={`/categories/${category.slug}`} className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white rounded-full font-medium transition-colors border border-gray-200 dark:border-transparent">
+                                        {category.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </motion.div>
 
