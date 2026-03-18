@@ -49,13 +49,67 @@ export default function CategoriesAdmin() {
     const [editingSub, setEditingSub] = useState<Subcategory | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
+    // ===== Image Upload via Cloudinary =====
+    const uploadImage = useCallback(async (file: File, folder: string): Promise<string | null> => {
+        setUploading(true);
+        try {
+            const { url } = await uploadDirect(file, folder);
+            return url;
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            toast.error("Failed to upload image");
+            return null;
+        } finally {
+            setUploading(false);
+        }
+    }, []);
+
+    const pickImage = useCallback((onPicked: (url: string) => void) => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = async (e: Event) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+            const url = await uploadImage(file, "garudaqua/categories");
+            if (url) onPicked(url);
+        };
+        input.click();
+    }, [uploadImage]);
+
     const joditConfig = useMemo(() => ({
         readonly: false, 
-        height: 400, 
-        uploader: { insertImageAsBase64URI: true },
+        height: 500, 
+        uploader: { 
+            insertImageAsBase64URI: false,
+            // Custom uploader handler to use our signed Cloudinary logic
+            handler: async (files: File[]) => {
+                if (!files.length) return;
+                try {
+                    const url = await uploadImage(files[0], "garudaqua/categories/seo");
+                    if (url) {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const editor = (window as any).jodit;
+                        if (editor) {
+                            editor.selection.insertImage(url);
+                        } else {
+                            // Fallback if global instance not found
+                            document.execCommand('insertImage', false, url);
+                        }
+                    }
+                } catch (error) {
+                    toast.error("Upload failed");
+                }
+            }
+        },
         askBeforePasteHTML: false,
         askBeforePasteFromWord: false,
         defaultActionOnPaste: 'insert_as_html' as const,
+        link: {
+            follow: true,
+            noFollowCheckbox: false,
+            openInNewTabCheckbox: true
+        },
         image: {
             editSrc: true,
             editTitle: true,
@@ -63,7 +117,8 @@ export default function CategoriesAdmin() {
             editLink: true,
             editSize: true,
             editMargins: true,
-            editAlign: true
+            editAlign: true,
+            useImageEditor: true
         },
         buttons: [
             'source', '|',
@@ -71,12 +126,14 @@ export default function CategoriesAdmin() {
             'ul', 'ol', '|',
             'outdent', 'indent',  '|',
             'font', 'fontsize', 'brush', 'paragraph', '|',
-            'image', 'link', 'video', 'table', '|',
+            'image', 'link', 'unlink', 'video', 'table', '|',
             'align', 'undo', 'redo', '|',
             'hr', 'eraser', 'copyformat', '|',
             'symbol', 'fullsize'
-        ]
-    }), []);
+        ],
+        toolbarButtonSize: 'middle' as const,
+        tabIndex: -1,
+    }), [uploadImage]);
 
     const [catForm, setCatForm] = useState({ name: "", description: "", image: "", sortOrder: 0, isActive: true, hasSeoPage: false, seoContent: "", seoHeroImage: "", metaTitle: "", metaDesc: "" });
     const [subForm, setSubForm] = useState({ name: "", description: "", image: "", categoryId: "", order: 0, isActive: true });
@@ -116,34 +173,6 @@ export default function CategoriesAdmin() {
         };
         loadData();
     }, [fetchCategories, fetchSubcategories]);
-
-    // ===== Image Upload via Cloudinary =====
-    const uploadImage = useCallback(async (file: File, folder: string): Promise<string | null> => {
-        setUploading(true);
-        try {
-            const { url } = await uploadDirect(file, folder);
-            return url;
-        } catch (error) {
-            console.error("Error uploading image:", error);
-            toast.error("Failed to upload image");
-            return null;
-        } finally {
-            setUploading(false);
-        }
-    }, []);
-
-    const pickImage = useCallback((onPicked: (url: string) => void) => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        input.onchange = async (e: Event) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (!file) return;
-            const url = await uploadImage(file, "garudaqua/categories");
-            if (url) onPicked(url);
-        };
-        input.click();
-    }, [uploadImage]);
 
     // ===== Category CRUD =====
     const handleCatSubmit = useCallback(async (e: React.FormEvent) => {

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 
+import { cn, optimizeHtml } from "@/lib/utils";
+
 // ===== Type Definitions =====
 interface Blog {
     id: string;
@@ -135,10 +137,9 @@ export default function BlogPostClient({
                             {blog.excerpt}
                         </div>
 
-                        {/* Content */}
                         <div
                             className="blog-content max-w-none mb-10 font-light leading-relaxed text-gray-800 dark:text-gray-200"
-                            dangerouslySetInnerHTML={{ __html: blog.content }}
+                            dangerouslySetInnerHTML={{ __html: optimizeHtml(blog.content) }}
                         />
 
                         {/* Tags */}

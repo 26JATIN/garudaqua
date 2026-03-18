@@ -28,6 +28,14 @@ export const metadata: Metadata = {
     title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
     description:
       "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products.",
+    images: [{ url: "https://garudaqua.in/DesktopLogo.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
+    description:
+      "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products.",
+    images: ["https://garudaqua.in/DesktopLogo.png"],
   },
 };
 

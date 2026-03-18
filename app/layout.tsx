@@ -76,7 +76,7 @@ export const metadata: Metadata = {
       "Trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products in Rajasthan. Quality products, reliable service.",
     images: [
       {
-        url: "/DesktopLogo.png",
+        url: `${SITE_URL}/DesktopLogo.png`,
         width: 1200,
         height: 630,
         alt: "Garud Aqua Solutions — Water Tanks and Pipe Fittings",
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
     title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
     description:
       "Trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products in Rajasthan.",
-    images: ["/DesktopLogo.png"],
+    images: [`${SITE_URL}/DesktopLogo.png`],
     creator: "@garudaqua",
   },
   appleWebApp: {
