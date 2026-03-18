@@ -730,11 +730,11 @@ function ProductCard({ product, index }: ProductCardProps) {
 
     return (
         <div
-            className="group"
+            className="group h-full"
         >
-            <Link href={productHref} className="block">
-                <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1 md:group-hover:-translate-y-2">
-                    <div className="relative aspect-4/5 overflow-hidden bg-gray-100 dark:bg-gray-800">
+            <Link href={productHref} className="block h-full">
+                <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1 md:group-hover:-translate-y-2 h-full flex flex-col">
+                    <div className="relative w-full aspect-4/5 overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
                         {product.image ? (
                                 <Image
                                 src={product.image}
@@ -754,21 +754,27 @@ function ProductCard({ product, index }: ProductCardProps) {
                                 </svg>
                             </div>
                         )}
-                        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1">
-                            <span className="bg-white/90 backdrop-blur-sm text-[#0EA5E9] text-[10px] md:text-xs px-2 py-1 rounded-full font-medium">
+                        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1 z-10">
+                            <span className="bg-white/90 backdrop-blur-sm text-[#0EA5E9] text-[10px] md:text-xs px-2 py-1 rounded-full font-medium shadow-sm">
                                 {categoryName}
                             </span>
                             {product.subcategory?.name && (
-                                <span className="bg-[#0EA5E9]/90 backdrop-blur-sm text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium">
+                                <span className="bg-[#0EA5E9]/90 backdrop-blur-sm text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium shadow-sm">
                                     {product.subcategory.name}
                                 </span>
                             )}
                         </div>
                     </div>
-                    <div className="p-3 md:p-4 lg:p-6">
-                        <h3 className="text-[#2C2C2C] dark:text-gray-100 font-light text-sm md:text-base lg:text-lg mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors line-clamp-2">
+                    <div className="p-3 md:p-4 lg:p-6 flex flex-col flex-1 relative bg-white dark:bg-[#0A0A0A]">
+                        <h3 className="text-[#2C2C2C] dark:text-gray-100 font-medium text-[13px] sm:text-sm md:text-base lg:text-lg mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors leading-tight line-clamp-2 min-h-10 md:min-h-12 lg:min-h-14 flex items-start">
                             {product.name}
                         </h3>
+                        <div className="mt-auto pt-2 flex items-center text-[#0EA5E9] text-xs font-semibold uppercase tracking-wider group-hover:tracking-widest transition-all duration-300">
+                            View Details
+                            <svg className="w-3.5 h-3.5 ml-1 transform group-hover:translate-x-1.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </Link>
