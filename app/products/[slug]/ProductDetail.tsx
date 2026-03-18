@@ -710,14 +710,11 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         <div className="flex items-center justify-between mb-8">
                             <div>
                                 <h2 className="text-2xl md:text-3xl font-light text-[#2C2C2C] dark:text-gray-100 mb-2">
-                                    Similar Products
+                                    Explore more on {categoryName}
                                 </h2>
-                                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-light">
-                                    More from {categoryName}
-                                </p>
                             </div>
                             <Link
-                                href={`/products?category=${categorySlug}`}
+                                href={`/categories/${categorySlug}`}
                                 className="hidden md:flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
                                 View All
@@ -734,10 +731,10 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         {/* Mobile View All Button */}
                         <div className="md:hidden mt-6 text-center">
                             <Link
-                                href={`/products?category=${categorySlug}`}
+                                href={`/categories/${categorySlug}`}
                                 className="inline-flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
-                                View All Similar Products
+                                Explore All {categoryName}
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>

@@ -66,34 +66,35 @@ export default async function CategorySeoPage(
     return (
         <div className="min-h-screen bg-linear-to-b from-[#F2FBFD] to-white dark:from-[#05151B] dark:to-black">
             {/* Full-view Hero Section */}
-            <div className="relative isolate overflow-hidden min-h-[40vh] sm:min-h-[50vh] lg:min-h-[60vh] flex flex-col items-center justify-center pt-24 pb-12 rounded-b-[3rem] shadow-xl">
+            <div className="relative isolate overflow-hidden min-h-[300px] sm:min-h-[40vh] lg:min-h-[60vh] flex flex-col items-center justify-center pt-24 pb-12 rounded-b-[2rem] sm:rounded-b-[3rem] shadow-xl w-full">
                 {/* Background Image (optimized WebP) */}
                 <Image
                     src={categoryFull.seoHeroImage || categoryFull.image || '/placeholder-hero.jpg'}
                     alt={categoryFull.name}
                     fill
-                    className="object-cover -z-20"
-                    sizes="100vw"
+                    className="object-cover object-center -z-20 w-full h-full"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
                     priority
                     quality={85}
+                    unoptimized
                 />
                 
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-black/50 dark:bg-black/70 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
 
-                <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12 md:mt-16">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-sm font-medium mb-6 shadow-sm">
-                        <span className="relative flex h-3 w-3">
+                <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-8 sm:mt-12 md:mt-16">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs sm:text-sm font-medium mb-4 sm:mb-6 shadow-sm">
+                        <span className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0EA5E9] opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0EA5E9]"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-[#0EA5E9]"></span>
                         </span>
                         Explore Our Range
                     </div>
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white tracking-tight leading-tight mb-6 drop-shadow-2xl">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-white tracking-tight leading-tight mb-4 sm:mb-6 drop-shadow-2xl px-2">
                         {categoryFull.name}
                     </h1>
                     {categoryFull.description && (
-                        <p className="text-lg md:text-2xl text-gray-100 leading-relaxed max-w-3xl mx-auto font-light drop-shadow-lg">
+                        <p className="text-base sm:text-lg md:text-2xl text-gray-100 leading-relaxed max-w-3xl mx-auto font-light drop-shadow-lg px-2">
                             {categoryFull.description}
                         </p>
                     )}
