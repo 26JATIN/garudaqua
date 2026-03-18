@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
-import { optimizeHtml } from "@/lib/utils";
 
 export const dynamic = "force-static";
 
@@ -126,7 +125,7 @@ export default async function CategorySeoPage(
                         {categoryFull.seoContent ? (
                             <div className="lg:bg-white lg:dark:bg-[#0A0A0A] lg:rounded-[2rem] p-0 lg:p-8 xl:p-12 lg:shadow-sm lg:border lg:border-gray-100 lg:dark:border-gray-800/50">
                                 <div className="blog-content w-full">
-                                    <div dangerouslySetInnerHTML={{ __html: optimizeHtml(categoryFull.seoContent || "") }} />
+                                    <div dangerouslySetInnerHTML={{ __html: categoryFull.seoContent }} />
                                 </div>
                             </div>
                         ) : (

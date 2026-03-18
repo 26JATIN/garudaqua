@@ -261,7 +261,7 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
 
                 {/* Card content */}
                 <div className={cn(
-                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-shadow duration-300 flex flex-col h-full",
+                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-shadow duration-300",
                     isHovered && "shadow-xl"
                 )}>
                     <div className="aspect-square relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -291,9 +291,9 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
                             <span className="text-white text-sm font-medium">View Details</span>
                         </div>
                     </div>
-                    <div className="p-3 md:p-4 flex-1 flex flex-col justify-center">
+                    <div className="p-3 md:p-4">
                         <h3 className={cn(
-                            "text-sm md:text-base font-light text-[#2C2C2C] dark:text-gray-200 line-clamp-2 transition-colors leading-tight text-center",
+                            "text-sm md:text-base font-light text-[#2C2C2C] dark:text-gray-200 mb-1 md:mb-2 line-clamp-2 transition-colors leading-tight",
                             isHovered && "text-[#0EA5E9]"
                         )}>
                             {relatedProduct.name}
@@ -540,9 +540,9 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         className="space-y-6"
                     >
                         {/* Category & Share */}
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <div className="flex flex-wrap items-center gap-2 min-w-0">
-                                <span className="bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium px-4 py-2 rounded-full inline-flex items-center gap-2 whitespace-nowrap">
+                        <div className="flex items-center justify-between">
+                            <div className="inline-flex items-center gap-2">
+                                <span className="bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium px-4 py-2 rounded-full inline-flex items-center gap-2">
                                     {categoryName}
                                     {typeof product.category === 'object' && product.category.hasSeoPage && (
                                         <Link 
@@ -555,14 +555,14 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                     )}
                                 </span>
                                 {product.subcategory?.name && (
-                                    <span className="bg-[#0369A1]/10 text-[#0369A1] text-sm font-medium px-4 py-2 rounded-full whitespace-nowrap">
+                                    <span className="bg-[#0369A1]/10 text-[#0369A1] text-sm font-medium px-4 py-2 rounded-full">
                                         {product.subcategory.name}
                                     </span>
                                 )}
                             </div>
                             <button
                                 onClick={handleShare}
-                                className="p-2.5 rounded-xl bg-gray-100 dark:bg-white/8 hover:bg-[#0EA5E9]/15 text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-all duration-200 shrink-0"
+                                className="p-2.5 rounded-xl bg-gray-100 dark:bg-white/8 hover:bg-[#0EA5E9]/15 text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-all duration-200"
                                 aria-label="Share product"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
