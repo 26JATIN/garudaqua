@@ -66,7 +66,7 @@ export default async function CategorySeoPage(
     return (
         <div className="min-h-screen bg-linear-to-b from-[#F2FBFD] to-white dark:from-[#05151B] dark:to-black">
             {/* Full-view Hero Section */}
-            <div className="relative isolate overflow-hidden min-h-[300px] sm:min-h-[40vh] lg:min-h-[60vh] flex flex-col items-center justify-center pt-24 pb-12 rounded-b-[2rem] sm:rounded-b-[3rem] shadow-xl w-full">
+            <div className="relative isolate overflow-hidden min-h-75 sm:min-h-[40vh] lg:min-h-[60vh] flex flex-col items-center justify-center pt-24 pb-12 rounded-b-[2rem] sm:rounded-b-[3rem] shadow-xl w-full">
                 {/* Background Image (optimized WebP) */}
                 <Image
                     src={categoryFull.seoHeroImage || categoryFull.image || '/placeholder-hero.jpg'}

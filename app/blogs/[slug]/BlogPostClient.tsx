@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 // ===== Type Definitions =====
 interface Blog {
@@ -35,47 +34,62 @@ export default function BlogPostClient({
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A]">
-            {/* Back Button */}
-            <div className="border-b border-gray-100 dark:border-white/6 sticky top-0 z-50 backdrop-blur-sm bg-white/90 dark:bg-black/90">
-                <div className="container mx-auto px-4 py-4">
-                    <Link href="/blogs" className="inline-flex items-center text-[#0369A1] hover:text-[#0EA5E9] transition-colors font-light">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Back to Blog
-                    </Link>
-                </div>
-            </div>
-
+        <div className="min-h-screen bg-white dark:bg-[#050505] lg:pt-[17px]">
             {/* Article */}
-            <article className="container mx-auto px-4 py-12 max-w-5xl">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="bg-white dark:bg-[#0A0A0A] rounded-3xl shadow-xl dark:shadow-none dark:border dark:border-white/6 overflow-hidden"
-                >
+            <article className="w-full pb-16">
+                {/* Hero / Header Section: Contains Image + Overlay Buttons */}
+                <div className="relative w-full">
                     {/* Featured Image */}
                     {blog.featuredImage && (
-                        <div className="relative h-64 sm:h-80 md:h-125 w-full overflow-hidden">
+                        <div className="w-full bg-gray-50 dark:bg-gray-900 animate-fadeIn">
                             <Image
                                 src={blog.featuredImage}
                                 alt={blog.title}
-                                fill
-                                className="object-cover"
+                                width={0}
+                                height={0}
+                                sizes="100vw"
+                                style={{ width: '100%', height: 'auto' }}
                                 priority
                                 fetchPriority="high"
                                 decoding="sync"
-                                sizes="(max-width: 1280px) 100vw, 1280px"
-                                quality={60}
                             />
-                            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
                         </div>
                     )}
+                </div>
 
-                    {/* Content */}
-                    <div className="p-8 md:p-12">
+                {/* Content Container (Sits perfectly below the image now) */}
+                <div className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-fadeIn ${blog.featuredImage ? 'pt-8 sm:pt-12 relative z-10' : 'pt-16 sm:pt-24'}`}>
+                    <div className="bg-white/0">
+                        {/* Action Buttons (Back & Share) */}
+                        <div className="flex items-center justify-between mb-8">
+                            <Link
+                                href="/blogs"
+                                className="inline-flex items-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-medium border border-gray-200 dark:border-white/10 group text-sm"
+                            >
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                Back to Articles
+                            </Link>
+
+                            <button
+                                onClick={() => {
+                                    if (navigator.share) {
+                                        navigator.share({ title: blog.title, url: window.location.href }).catch(() => { });
+                                    } else {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        alert("Link copied to clipboard!");
+                                    }
+                                }}
+                                className="inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400 transition-all border border-gray-200 dark:border-white/10 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9]"
+                                aria-label="Share article"
+                                title="Share article"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                            </button>
+                        </div>
                         {/* Category Badge */}
                         <div className="mb-6">
                             <span className="inline-block px-5 py-2 bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium rounded-full">
@@ -162,17 +176,11 @@ export default function BlogPostClient({
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </div>
 
                 {/* Related Blogs */}
                 {relatedBlogs.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="mt-16"
-                    >
+                    <div className="mt-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 animate-fadeIn">
                         <h2 className="text-3xl font-light tracking-wide mb-8 text-gray-900 dark:text-gray-100">You May Also Like</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {relatedBlogs.map((relatedBlog) => (
@@ -219,7 +227,7 @@ export default function BlogPostClient({
                                 </Link>
                             ))}
                         </div>
-                    </motion.div>
+                    </div>
                 )}
             </article>
         </div>
