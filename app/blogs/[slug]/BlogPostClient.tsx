@@ -34,19 +34,19 @@ export default function BlogPostClient({
     }
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#050505] lg:pt-[17px]">
+        <div className="min-h-screen bg-white dark:bg-[#050505] pt-[2px] lg:pt-[17px]">
             {/* Article */}
             <article className="w-full pb-16">
                 {/* Hero / Header Section: Contains Image + Overlay Buttons */}
                 <div className="relative w-full">
                     {/* Featured Image */}
                     {blog.featuredImage && (
-                        <div className="w-full bg-gray-50 dark:bg-gray-900 animate-fadeIn">
+                        <div className="w-full bg-gray-50 dark:bg-gray-900">
                             <Image
                                 src={blog.featuredImage}
                                 alt={blog.title}
-                                width={0}
-                                height={0}
+                                width={1920}
+                                height={1080}
                                 sizes="100vw"
                                 style={{ width: '100%', height: 'auto' }}
                                 priority
@@ -58,7 +58,7 @@ export default function BlogPostClient({
                 </div>
 
                 {/* Content Container (Sits perfectly below the image now) */}
-                <div className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-fadeIn ${blog.featuredImage ? 'pt-8 sm:pt-12 relative z-10' : 'pt-16 sm:pt-24'}`}>
+                <div className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 ${blog.featuredImage ? 'pt-8 sm:pt-12 relative z-10' : 'pt-16 sm:pt-24'}`}>
                     <div className="bg-white/0">
                         {/* Action Buttons (Back & Share) */}
                         <div className="flex items-center justify-between mb-8">

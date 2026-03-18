@@ -17,11 +17,10 @@ interface HeroProps {
 
 const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
     const common = {
-        fill: true,
+        style: { width: '100%', height: 'auto' } as const,
         priority: index === 0,
         fetchPriority: index === 0 ? 'high' as const : 'low' as const,
         loading: index === 0 ? 'eager' as const : 'lazy' as const,
-        quality: 50,
     };
 
     if (!slide.mobileImage) {
@@ -30,40 +29,49 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
                 src={slide.image}
                 alt={slide.title || "Garud Aqua"}
                 {...common}
+                width={1920}
+                height={1080}
                 sizes="100vw"
+                quality={100}
                 decoding={index === 0 ? "sync" : "async"}
-                className="object-cover object-top"
+                className="w-full h-auto"
             />
         );
     }
 
     const {
-        props: { srcSet: desktopSrcSet },
+        props: { srcSet: desktopSrcSet, width: desktopWidth, height: desktopHeight },
     } = getImageProps({
         ...common,
         alt: slide.title || "Garud Aqua",
         src: slide.image,
         sizes: "100vw",
+        quality: 80,
+        width: 1920,
+        height: 1080,
     });
 
     const {
-        props: { srcSet: mobileSrcSet, ...rest },
+        props: { srcSet: mobileSrcSet, width: mobileWidth, height: mobileHeight, ...rest },
     } = getImageProps({
         ...common,
         alt: slide.title || "Garud Aqua",
         src: slide.mobileImage,
         sizes: "100vw",
+        quality: 50,
+        width: 1080,
+        height: 1920,
     });
 
     return (
         <picture>
-            <source media="(min-width: 641px)" srcSet={desktopSrcSet} />
-            <source media="(max-width: 640px)" srcSet={mobileSrcSet} />
+            <source media="(min-width: 641px)" srcSet={desktopSrcSet} width={desktopWidth as number} height={desktopHeight as number} />
+            <source media="(max-width: 640px)" srcSet={mobileSrcSet} width={mobileWidth as number} height={mobileHeight as number} />
             <img
                 {...rest}
                 alt={slide.title || "Garud Aqua"}
                 decoding={index === 0 ? "sync" : "async"}
-                className="w-full h-full object-cover object-top"
+                className="w-full h-auto"
             />
         </picture>
     );
@@ -71,6 +79,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
 
 export default function HeroClient({ initialSlides }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [mounted, setMounted] = useState(false);
     const [slides, setSlides] = useState<HeroSlide[]>(initialSlides || []);
     const [loading, setLoading] = useState(!initialSlides || initialSlides.length === 0);
     const [isPaused, setIsPaused] = useState(false);
@@ -90,6 +99,7 @@ export default function HeroClient({ initialSlides }: HeroProps) {
 
     // Only fetch client-side if no initial slides were provided
     useEffect(() => {
+        setMounted(true);
         if (!initialSlides || initialSlides.length === 0) {
             fetchSlides();
         }
@@ -117,7 +127,7 @@ export default function HeroClient({ initialSlides }: HeroProps) {
     if (slides.length === 0) return null;
 
     return (
-        <div className="absolute inset-0 w-full h-full pointer-events-none">
+        <div className="absolute inset-0 w-full h-full">
             {/* ── Image layers ──────────────────────────────────────────────────────
                 All slides are ALWAYS in the DOM.
                 Slide 0 gets priority + no will-change (already the LCP element,
@@ -132,10 +142,13 @@ export default function HeroClient({ initialSlides }: HeroProps) {
                         className="hero-slide"
                         aria-hidden={index !== currentSlide}
                         style={{
-                            opacity: index === currentSlide ? 1 : 0,
-                            // Defer GPU layer promotion for non-LCP slides so the
-                            // compositor does not compete with the LCP image decode.
+                            // Keep entirely transparent on SSR so the static hero.tsx LCP image underneath instantly dictates the metric
+                            opacity: (index === currentSlide && mounted) ? 1 : 0,
+                            // Defer GPU layer promotion for non-LCP slides
                             willChange: index === 0 ? 'auto' : 'opacity',
+                            // Explict transition property to bypass React hydration mismatches with shorthand 'none'
+                            transitionDuration: index === 0 && currentSlide === 0 ? '0s' : '1.4s',
+                            transitionTimingFunction: 'ease-in-out',
                         }}
                     >
                         <SlideImage slide={slide} index={index} />

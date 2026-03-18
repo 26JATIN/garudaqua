@@ -488,7 +488,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
         </h2>
         <button
           onClick={() => router.push(getCategoryInfoLink())}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all mb-1"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all mb-1"
         >
           <Info className="w-4 h-4" />
           <span>{selectedCategory === 'ALL' ? 'All Categories' : 'Category Info'}</span>
@@ -554,7 +554,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
               </h2>
               <button
                 onClick={() => router.push(getCategoryInfoLink())}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all w-fit group"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all w-fit group"
               >
                 <Info className="w-4 h-4" />
                 <span>{selectedCategory === 'ALL' ? 'All Categories Info' : 'Category Info'}</span>

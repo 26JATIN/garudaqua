@@ -23,11 +23,10 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
 
     // Priority props for LCP
     const common = {
-        fill: true,
+        style: { width: '100%', height: 'auto' } as const,
         priority: true,
         fetchPriority: "high" as const,
         loading: "eager" as const,
-        quality: 60,
     };
 
     let LCPImage = null;
@@ -37,52 +36,64 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
                 src={slide.image}
                 alt={slide.title || "Garud Aqua"}
                 {...common}
+                width={1920}
+                height={1080}
                 sizes="100vw"
+                quality={80}
                 decoding="sync"
-                className="object-cover object-top"
+                className="w-full h-auto"
             />
         );
     } else {
         const {
-            props: { srcSet: desktopSrcSet },
+            props: { srcSet: desktopSrcSet, width: desktopWidth, height: desktopHeight },
         } = getImageProps({
             ...common,
             alt: slide.title || "Garud Aqua",
             src: slide.image,
             sizes: "100vw",
+            quality: 80,
+            width: 1920,
+            height: 1080,
         });
 
         const {
-            props: { srcSet: mobileSrcSet, ...rest },
+            props: { srcSet: mobileSrcSet, width: mobileWidth, height: mobileHeight, ...rest },
         } = getImageProps({
             ...common,
             alt: slide.title || "Garud Aqua",
             src: slide.mobileImage,
             sizes: "100vw",
+            quality: 50,
+            width: 1080,
+            height: 1920,
         });
 
         LCPImage = (
-            <picture>
-                <source media="(min-width: 641px)" srcSet={desktopSrcSet} />
-                <source media="(max-width: 640px)" srcSet={mobileSrcSet} />
-                <img
-                    {...rest}
-                    alt={slide.title || "Garud Aqua"}
-                    decoding="sync"
-                    className="w-full h-full object-cover object-top"
-                    style={{ position: 'absolute', height: '100%', width: '100%', inset: 0, objectFit: 'cover' }}
-                />
-            </picture>
+            <>
+                <link rel="preload" as="image" imageSrcSet={desktopSrcSet} media="(min-width: 641px)" fetchPriority="high" />
+                <link rel="preload" as="image" imageSrcSet={mobileSrcSet} media="(max-width: 640px)" fetchPriority="high" />
+                <picture>
+                    <source media="(min-width: 641px)" srcSet={desktopSrcSet} width={desktopWidth as number} height={desktopHeight as number} />
+                    <source media="(max-width: 640px)" srcSet={mobileSrcSet} width={mobileWidth as number} height={mobileHeight as number} />
+                    <img
+                        {...rest}
+                        alt={slide.title || "Garud Aqua"}
+                        decoding="sync"
+                        className="w-full h-auto"
+                    />
+                </picture>
+            </>
         );
     }
 
     return (
-        <section className="relative w-full h-[80vh] min-h-100 max-h-200 lg:h-screen lg:max-h-none overflow-hidden bg-black text-white">
+        <section className="relative w-full overflow-hidden bg-black text-white lg:mt-[17px]">
             {/* STAGE 1: Guaranteed Static LCP Image. Renders instantly without React JS */}
-            <div className="absolute inset-0 z-0 select-none pointer-events-none">
+            <div className="relative w-full z-0">
                 {LCPImage}
             </div>
-            
+
             {/* STAGE 2: Hydrate only the slider interactivity (dots, looping, crossfades) */}
             {initialSlides.length > 1 && (
                 <div className="absolute inset-0 z-10">
