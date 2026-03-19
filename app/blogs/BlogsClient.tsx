@@ -205,7 +205,7 @@ export default function BlogsClient({
                             <div key={blog.id}>
                                 <Link
                                     href={`/blogs/${blog.slug}`}
-                                    className="group bg-white dark:bg-[#0A0A0A] rounded-3xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 block"
+                                    className="group bg-white dark:bg-[#0A0A0A] rounded-3xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
                                 >
                                     {/* Featured Image */}
                                     {blog.featuredImage ? (
@@ -233,7 +233,7 @@ export default function BlogsClient({
                                     )}
 
                                     {/* Content */}
-                                    <div className="p-6">
+                                    <div className="p-6 flex flex-col flex-1">
                                         {/* Category Badge */}
                                         <div className="mb-3">
                                             <span className="inline-block px-4 py-1.5 bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs font-medium rounded-full">
@@ -252,7 +252,7 @@ export default function BlogsClient({
                                         </p>
 
                                         {/* Meta Info */}
-                                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-white/6">
+                                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-white/6 mt-auto">
                                             <div className="flex items-center gap-4 font-light">
                                                 <span className="flex items-center gap-1.5">
                                                     <svg className="w-4 h-4 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
