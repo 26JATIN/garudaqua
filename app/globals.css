@@ -842,6 +842,17 @@ textarea:focus-visible {
   height: auto;
   border-radius: 0.75rem;
   margin: 1.5rem 0;
+  display: block;
+}
+
+/* Anchor tags wrapping images should be block-level so each image keeps its own link */
+.blog-content a:has(> img) {
+  display: block;
+  text-decoration: none;
+}
+
+.blog-content a > img {
+  margin: 1.5rem 0;
 }
 
 /* Horizontal rules */

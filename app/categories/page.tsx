@@ -106,56 +106,45 @@ export default async function CategoriesIndexPage() {
                         <Link
                             key={category.id}
                             href={`/categories/${category.slug}`}
-                            className="group relative bg-white dark:bg-[#111111] rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl dark:shadow-none transition-all duration-500 hover:-translate-y-2 border border-gray-100 dark:border-white/8 hover:border-[#0EA5E9]/30 dark:hover:border-[#0EA5E9]/40 flex flex-col"
+                            className="group relative bg-white dark:bg-[#111111] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-none transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-white/8 hover:border-[#0EA5E9]/30 dark:hover:border-[#0EA5E9]/40 flex flex-col"
                         >
                             {/* Image */}
-                            <div className="relative aspect-4/3 overflow-hidden bg-linear-to-br from-gray-100 to-gray-50 dark:from-[#0A0A0A] dark:to-[#111]">
+                            <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] p-4 sm:p-6 flex items-center justify-center">
                                 {category.image ? (
                                     <Image
                                         src={category.image}
                                         alt={category.name}
                                         fill
-                                        className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                        className="object-contain group-hover:scale-105 transition-transform duration-500 p-3 sm:p-5"
+                                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                         priority={index < 4}
                                     />
                                 ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <svg className="w-16 h-16 text-gray-200 dark:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                        </svg>
-                                    </div>
+                                    <svg className="w-16 h-16 text-gray-200 dark:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
                                 )}
-                                {/* Gradient overlay */}
-                                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                 {/* Product count badge */}
                                 {category._count.products > 0 && (
-                                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700 dark:text-gray-200 shadow-sm border border-white/20">
+                                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 py-0.5 sm:px-2.5 sm:py-1 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 shadow-sm">
                                         {category._count.products} {category._count.products === 1 ? "Product" : "Products"}
                                     </div>
                                 )}
                             </div>
 
                             {/* Content */}
-                            <div className="p-5 sm:p-6 flex flex-col flex-1">
-                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-[#0EA5E9] transition-colors duration-300 mb-2 line-clamp-2">
+                            <div className="p-3 sm:p-4 border-t border-gray-100 dark:border-white/6">
+                                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-[#0EA5E9] transition-colors duration-300 line-clamp-1 mb-0.5">
                                     {category.name}
                                 </h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-4 flex-1 font-light leading-relaxed">
-                                    {category.description || "View products in this category."}
-                                </p>
-
-                                {/* CTA */}
-                                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/6 mt-auto">
-                                    <span className="text-sm font-medium text-[#0EA5E9] group-hover:text-[#0284C7] transition-colors">
-                                        Explore Collection
-                                    </span>
-                                    <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/10 group-hover:bg-[#0EA5E9] flex items-center justify-center transition-all duration-300">
-                                        <svg className="w-4 h-4 text-[#0EA5E9] group-hover:text-white transition-colors duration-300 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </div>
+                                <div className="flex items-center justify-between mt-1">
+                                    <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 line-clamp-1 font-light flex-1 mr-2">
+                                        {category.description || "View products in this category."}
+                                    </p>
+                                    <svg className="w-4 h-4 text-[#0EA5E9] shrink-0 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </div>
                             </div>
                         </Link>
