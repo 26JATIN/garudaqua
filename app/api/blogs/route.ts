@@ -12,10 +12,13 @@ export async function GET(request: Request) {
     const where: Record<string, unknown> = { isPublished: true };
 
     if (category && category !== "all") {
-      // Resolve the category slug (or id) to a categoryId so the filter is
-      // stable even after a blog-category rename.
+      // Resolve the category slug to a categoryId.
+      // Only match by id if the value looks like a valid ObjectId (24 hex chars).
+      const isObjectId = /^[a-f\d]{24}$/i.test(category);
       const blogCategory = await prisma.blogCategory.findFirst({
-        where: { OR: [{ slug: category }, { id: category }] },
+        where: isObjectId
+          ? { OR: [{ slug: category }, { id: category }] }
+          : { slug: category },
         select: { id: true },
       });
       if (blogCategory) {
