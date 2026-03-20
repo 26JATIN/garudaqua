@@ -13,11 +13,17 @@ export default function Navbar() {
     const ref = useRef<HTMLElement>(null);
 
     const [categories, setCategories] = useState<any[]>([]);
+    const [blogCategories, setBlogCategories] = useState<any[]>([]);
+    const [blogMenuOpen, setBlogMenuOpen] = useState(false);
 
     useEffect(() => {
         fetch("/api/categories")
             .then(res => res.json())
             .then(data => Array.isArray(data) && setCategories(data))
+            .catch(console.error);
+        fetch("/api/blog-categories")
+            .then(res => res.json())
+            .then(data => Array.isArray(data) && setBlogCategories(data))
             .catch(console.error);
     }, []);
 
@@ -96,7 +102,7 @@ export default function Navbar() {
                                 <div className="flex items-center gap-2 lg:gap-4 mr-2">
                                     <Link
                                         href="/products"
-                                        className="px-4 py-2 text-sm font-medium text-[var(--nav-text)] hover:bg-[var(--nav-hover-bg)] rounded-xl transition-all duration-300"
+                                        className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300"
                                     >
                                         Products
                                     </Link>
@@ -105,7 +111,7 @@ export default function Navbar() {
                                     <div className="relative group">
                                         <Link
                                             href="/categories"
-                                            className="px-4 py-2 text-sm font-medium text-[var(--nav-text)] hover:bg-[var(--nav-hover-bg)] rounded-xl transition-all duration-300 flex items-center gap-1"
+                                            className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300 flex items-center gap-1"
                                         >
                                             Categories
                                             <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-all group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +120,7 @@ export default function Navbar() {
                                         </Link>
 
                                         {/* Dropdown Panel - Classic List Style */}
-                                        <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] origin-top scale-95 group-hover:scale-100 z-50 w-[280px]">
+                                        <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] origin-top scale-95 group-hover:scale-100 z-50 w-70">
                                             {/* Invisible hover bridge to prevent mouse leaving */}
                                             <div className="absolute -top-8 left-0 right-0 h-8 bg-transparent"></div>
                                             
@@ -126,11 +132,11 @@ export default function Navbar() {
                                                         className="flex items-center gap-3 p-2.5 w-full rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group/item"
                                                     >
                                                         {cat.image ? (
-                                                            <div className="w-10 h-10 rounded-lg bg-white dark:bg-[#1A1A1A] border border-gray-100 dark:border-gray-800 overflow-hidden flex-shrink-0 flex items-center justify-center p-1 group-hover/item:border-gray-200 dark:group-hover/item:border-gray-700 transition-colors">
+                                                            <div className="w-10 h-10 rounded-lg bg-white dark:bg-[#1A1A1A] border border-gray-100 dark:border-gray-800 overflow-hidden shrink-0 flex items-center justify-center p-1 group-hover/item:border-gray-200 dark:group-hover/item:border-gray-700 transition-colors">
                                                                 <Image src={cat.image} alt={cat.name} width={40} height={40} className="w-full h-full object-contain scale-110 group-hover/item:scale-125 transition-transform duration-300" />
                                                             </div>
                                                         ) : (
-                                                            <div className="w-10 h-10 rounded-lg bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center flex-shrink-0">
+                                                            <div className="w-10 h-10 rounded-lg bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center shrink-0">
                                                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zm-10 10a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                                                             </div>
                                                         )}
@@ -156,16 +162,62 @@ export default function Navbar() {
                                         </div>
                                     </div>
 
-                                    <Link
-                                        href="/blogs"
-                                        className="px-4 py-2 text-sm font-medium text-[var(--nav-text)] hover:bg-[var(--nav-hover-bg)] rounded-xl transition-all duration-300"
-                                    >
-                                        Blog
-                                    </Link>
+                                    {/* Blog Dropdown */}
+                                    <div className="relative group">
+                                        <Link
+                                            href="/blogs"
+                                            className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300 flex items-center gap-1"
+                                        >
+                                            Blog
+                                            <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-all group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </Link>
+
+                                        <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] origin-top scale-95 group-hover:scale-100 z-50 w-62.5">
+                                            <div className="absolute -top-8 left-0 right-0 h-8 bg-transparent"></div>
+
+                                            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-2xl border border-gray-100/80 dark:border-gray-800/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] p-2 flex flex-col gap-0.5">
+                                                <Link
+                                                    href="/blogs"
+                                                    className="flex items-center gap-3 p-2.5 w-full rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group/item"
+                                                >
+                                                    <div className="w-10 h-10 rounded-lg bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center shrink-0">
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+                                                    </div>
+                                                    <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 leading-tight group-hover/item:text-[#0EA5E9] transition-colors">
+                                                        All Articles
+                                                    </span>
+                                                </Link>
+                                                {blogCategories.length > 0 && (
+                                                    <div className="mx-2 my-1 border-t border-gray-100 dark:border-gray-800/60"></div>
+                                                )}
+                                                {blogCategories.map((cat: any) => (
+                                                    <Link
+                                                        key={cat.id}
+                                                        href={`/blogs/category/${cat.slug}`}
+                                                        className="flex items-center gap-3 p-2.5 w-full rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group/item"
+                                                    >
+                                                        <div className="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 dark:bg-orange-400/10 dark:text-orange-400 flex items-center justify-center shrink-0">
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                                                        </div>
+                                                        <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 leading-tight group-hover/item:text-[#0EA5E9] transition-colors truncate">
+                                                            {cat.name}
+                                                        </span>
+                                                    </Link>
+                                                ))}
+                                                {blogCategories.length === 0 && (
+                                                    <div className="py-4 flex items-center justify-center">
+                                                        <div className="w-5 h-5 border-2 border-[#0EA5E9] border-t-transparent rounded-full animate-spin"></div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <Link
                                         href="/about"
-                                        className="px-4 py-2 text-sm font-medium text-[var(--nav-text)] hover:bg-[var(--nav-hover-bg)] rounded-xl transition-all duration-300"
+                                        className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300"
                                     >
                                         About
                                     </Link>
@@ -284,7 +336,7 @@ export default function Navbar() {
 
             {/* Mobile Sidebar Overlay */}
             <div
-                className={`lg:hidden fixed inset-0 z-[101] bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                className={`lg:hidden fixed inset-0 z-101 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setIsSidebarOpen(false)}
                 style={{ touchAction: 'none' }}
                 onTouchMove={(e) => e.preventDefault()}
@@ -292,7 +344,7 @@ export default function Navbar() {
 
             {/* Mobile Sidebar Drawer */}
             <div
-                className={`lg:hidden fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm bg-white dark:bg-[#0A0A0A] z-[102] shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] transform flex flex-col ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`lg:hidden fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm bg-white dark:bg-[#0A0A0A] z-102 shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] transform flex flex-col ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800/60 bg-gray-50/50 dark:bg-[#111]/50">
                     <div className="flex items-center gap-2">
@@ -339,12 +391,53 @@ export default function Navbar() {
                             Categories
                         </Link>
 
-                        <Link href="/blogs" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">
-                            <div className="p-2 rounded-xl bg-orange-500/10 text-orange-600 dark:bg-orange-400/10 dark:text-orange-400 group-hover:scale-110 transition-transform">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+                        {/* Blog Accordion */}
+                        <div>
+                            <button
+                                onClick={() => setBlogMenuOpen(prev => !prev)}
+                                className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all active:scale-[0.98]"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2 rounded-xl bg-orange-500/10 text-orange-600 dark:bg-orange-400/10 dark:text-orange-400">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+                                    </div>
+                                    <span>Insights & Blog</span>
+                                </div>
+                                <svg
+                                    className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${blogMenuOpen ? "rotate-180" : ""}`}
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <div
+                                className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+                                style={{ maxHeight: blogMenuOpen ? `${(blogCategories.length + 1) * 52}px` : "0px", opacity: blogMenuOpen ? 1 : 0 }}
+                            >
+                                <div className="ml-14 mr-2 mt-1 mb-2 space-y-0.5">
+                                    <Link
+                                        href="/blogs"
+                                        onClick={() => setIsSidebarOpen(false)}
+                                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-[#0EA5E9] transition-colors"
+                                    >
+                                        <svg className="w-4 h-4 text-[#0EA5E9] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+                                        All Articles
+                                    </Link>
+                                    {blogCategories.map((cat: any) => (
+                                        <Link
+                                            key={cat.id}
+                                            href={`/blogs/category/${cat.slug}`}
+                                            onClick={() => setIsSidebarOpen(false)}
+                                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-[#0EA5E9] transition-colors"
+                                        >
+                                            <svg className="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                                            {cat.name}
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
-                            Insights & Blog
-                        </Link>
+                        </div>
                     </div>
 
                     {/* Support & Company */}
@@ -376,7 +469,7 @@ export default function Navbar() {
 
                 {/* Footer fixed section */}
                 <div className="p-4 border-t border-gray-100 dark:border-gray-800/60 bg-gray-50/30 dark:bg-[#0A0A0A]">
-                    <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-900/50 rounded-[1rem] shadow-sm border border-gray-200/60 dark:border-gray-800">
+                    <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-900/50 rounded-3xl shadow-sm border border-gray-200/60 dark:border-gray-800">
                         <div className="flex flex-col">
                             <span className="text-gray-900 dark:text-gray-100 font-semibold text-sm">Theme Settings</span>
                             <span className="text-gray-500 dark:text-gray-400 text-xs">Switch aesthetics</span>

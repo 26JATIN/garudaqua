@@ -1,12 +1,22 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Footer() {
+    const [blogCategories, setBlogCategories] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetch("/api/blog-categories")
+            .then(res => res.json())
+            .then(data => Array.isArray(data) && setBlogCategories(data))
+            .catch(() => {});
+    }, []);
     return (
         <footer className="bg-[#2C2C2C] dark:bg-black text-white border-t border-transparent dark:border-white/6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-                    <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
+                    <div className="sm:col-span-2 lg:col-span-1 space-y-6">
                         <h3 className="text-2xl font-light tracking-widest">Garud Aqua Solutions</h3>
                         <p className="text-gray-400 font-light leading-relaxed">
                             A Bond of Trust & Quality — your reliable partner for water tanks, pipes & fittings.
@@ -24,7 +34,7 @@ export default function Footer() {
                             </a>
                         </div>
                     </div>
-                    
+
                     <div>
                         <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Explore</h4>
                         <ul className="space-y-3">
@@ -35,7 +45,7 @@ export default function Footer() {
                             <li><Link href="/contact" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Contact</Link></li>
                         </ul>
                     </div>
-                    
+
                     <div>
                         <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Our Categories</h4>
                         <ul className="space-y-3">
@@ -43,6 +53,20 @@ export default function Footer() {
                             <li><Link href="/categories/roto-mould-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Roto Mould Tanks</Link></li>
                             <li><Link href="/categories/agriculture-sprayer-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Agriculture Sprayer Tanks</Link></li>
                             <li><Link href="/categories/cpvc-pipes-and-fittings" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">CPVC Pipes & Fittings</Link></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Blog Topics</h4>
+                        <ul className="space-y-3">
+                            <li><Link href="/blogs" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">All Articles</Link></li>
+                            {blogCategories.map((cat: any) => (
+                                <li key={cat.id}>
+                                    <Link href={`/blogs/category/${cat.slug}`} className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
+                                        {cat.name}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                     
@@ -71,7 +95,7 @@ export default function Footer() {
                                     Sihagawali To Akkawali Road, 23 SDS,<br />
                                     Sadulshahar, Ganganagar  335062<br />
                                     Rajasthan, India<br />
-                                    <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener" className="inline-block mt-2 text-[#0EA5E9] hover:underline font-medium">View on Google Maps</a>
+                                    <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-[#0EA5E9] hover:underline font-medium">View on Google Maps</a>
                                 </span>
                             </li>
                         </ul>

@@ -21,7 +21,7 @@ export async function PUT(
         isActive: body.isActive,
       },
     });
-    await revalidateAndWarm(["/blogs"]);
+    await revalidateAndWarm(["/","/blogs"]);
     return NextResponse.json(category);
   } catch (error) {
     console.error("Error updating blog category:", error);
@@ -48,7 +48,7 @@ export async function DELETE(
     });
 
     await prisma.blogCategory.delete({ where: { id } });
-    await revalidateAndWarm(["/blogs"]);
+    await revalidateAndWarm(["/","/blogs"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting blog category:", error);

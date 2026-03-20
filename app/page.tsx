@@ -4,6 +4,7 @@ import Hero from './components/hero';
 import Footer from './components/Footer';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema } from '@/lib/jsonld';
+import LatestBlogs from './components/LatestBlogs';
 
 export const dynamic = "force-static";
 
@@ -105,6 +106,43 @@ async function getGalleryData() {
   }
 }
 
+async function getBlogData() {
+  try {
+    const [categories, blogs] = await Promise.all([
+      prisma.blogCategory.findMany({
+        where: { isActive: true },
+        orderBy: { order: "asc" },
+        select: { id: true, name: true, slug: true },
+      }),
+      prisma.blogPost.findMany({
+        where: { isPublished: true },
+        orderBy: { publishedAt: "desc" },
+        take: 6,
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          excerpt: true,
+          featuredImage: true,
+          readTime: true,
+          publishedAt: true,
+          categoryId: true,
+          blogCategory: { select: { name: true } },
+        },
+      }),
+    ]);
+    return {
+      categories,
+      blogs: blogs.map(b => ({
+        ...b,
+        publishedAt: b.publishedAt?.toISOString() ?? new Date().toISOString(),
+      })),
+    };
+  } catch {
+    return { categories: [], blogs: [] };
+  }
+}
+
 async function getVideoData() {
   try {
     const videos = await prisma.heroVideo.findMany({
@@ -128,11 +166,12 @@ async function getVideoData() {
 }
 
 export default async function Home() {
-  const [heroSlides, categoryData, galleryItems, videoData] = await Promise.all([
+  const [heroSlides, categoryData, galleryItems, videoData, blogData] = await Promise.all([
     getHeroSlides(),
     getCategoryData(),
     getGalleryData(),
     getVideoData(),
+    getBlogData(),
   ]);
 
   return (
@@ -154,6 +193,9 @@ export default async function Home() {
       <ImageGallery initialItems={galleryItems}/>
       <VideoShowcaseSection initialVideos={videoData}/>
       <Testimonials/>
+      {blogData.blogs.length > 0 && (
+        <LatestBlogs blogs={blogData.blogs} categories={blogData.categories} />
+      )}
       <Newsletter/>
       <Footer/>
       

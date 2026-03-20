@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -6,19 +6,48 @@ import { Metadata } from "next";
 
 export const dynamic = "force-static";
 
+const CATEGORY_INCLUDE = {
+    products: {
+        where: { isActive: true },
+        select: {
+            id: true,
+            name: true,
+            slug: true,
+            image: true,
+            category: { select: { name: true, slug: true } },
+            subcategory: { select: { name: true } },
+        },
+    },
+} as const;
+
+async function findCategory(slug: string) {
+    // 1. Try current slug
+    const bySlug = await prisma.category.findFirst({
+        where: { slug },
+        include: CATEGORY_INCLUDE,
+    });
+    if (bySlug) return bySlug;
+
+    // 2. Check formerSlugs (category was renamed)
+    return prisma.category.findFirst({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        where: { formerSlugs: { has: slug } } as any,
+        include: CATEGORY_INCLUDE,
+    });
+}
+
 export async function generateMetadata(
     { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
     const { slug } = await params;
-    const category = await prisma.category.findFirst({
-        where: { slug }
-    });
+    const category = await findCategory(slug);
 
     if (!category) {
         return {};
     }
 
-    const canonicalUrl = `https://garudaqua.in/categories/${slug}`;
+    const canonicalSlug = category.slug || slug;
+    const canonicalUrl = `https://garudaqua.in/categories/${canonicalSlug}`;
 
     return {
         title: category.metaTitle || `${category.name} | Garud Aqua Solutions`,
@@ -38,26 +67,15 @@ export default async function CategorySeoPage(
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const { slug } = await params;
-
-    const categoryFull = await prisma.category.findFirst({
-        where: { slug },
-        include: {
-            products: {
-                where: { isActive: true },
-                select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                    image: true,
-                    category: { select: { name: true, slug: true } },
-                    subcategory: { select: { name: true } },
-                }
-            }
-        }
-    });
+    const categoryFull = await findCategory(slug);
 
     if (!categoryFull) {
         notFound();
+    }
+
+    // If accessed via a former slug, 301 redirect to the canonical URL
+    if (categoryFull.slug && categoryFull.slug !== slug) {
+        redirect(`/categories/${categoryFull.slug}`);
     }
 
     const productPath = (p: { slug?: string; id: string }) => p.slug || p.id;

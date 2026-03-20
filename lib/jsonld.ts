@@ -178,13 +178,6 @@ export function productSchema(product: {
     },
     manufacturer: { "@id": `${SITE_URL}/#organization` },
     category: product.category?.name,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      reviewCount: "124",
-      bestRating: "5",
-      worstRating: "1"
-    },
     ...(product.guarantee
       ? {
           hasWarranty: {
@@ -253,6 +246,54 @@ export function articleSchema(blog: {
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `${SITE_URL}/blogs/${blog.slug}`,
+    },
+  };
+}
+
+// ─── FAQPage ──────────────────────────────────────────────────────────────────
+
+export function faqSchema(
+  faqs: { question: string; answer: string }[]
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+}
+
+// ─── VideoObject ──────────────────────────────────────────────────────────────
+
+export function videoSchema(video: {
+  name: string;
+  description: string;
+  thumbnailUrl: string;
+  uploadDate: string;
+  contentUrl?: string;
+  embedUrl?: string;
+  duration?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: video.name,
+    description: video.description,
+    thumbnailUrl: video.thumbnailUrl,
+    uploadDate: video.uploadDate,
+    ...(video.contentUrl ? { contentUrl: video.contentUrl } : {}),
+    ...(video.embedUrl ? { embedUrl: video.embedUrl } : {}),
+    ...(video.duration ? { duration: video.duration } : {}),
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      logo: { "@type": "ImageObject", url: LOGO_URL },
     },
   };
 }

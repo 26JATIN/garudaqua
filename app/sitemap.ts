@@ -110,5 +110,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB unavailable at build time — skip dynamic routes
   }
 
-  return [...staticRoutes, ...productRoutes, ...blogRoutes, ...categoryRoutes];
+  // ── Blog category pages ─────────────────────────────────────────────────
+  let blogCategoryRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const blogCategories = await prisma.blogCategory.findMany({
+      where: { isActive: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    blogCategoryRoutes = blogCategories.map((bc) => ({
+      url: `${SITE_URL}/blogs/category/${bc.slug}`,
+      lastModified: bc.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    // DB unavailable at build time — skip dynamic routes
+  }
+
+  return [
+    ...staticRoutes,
+    ...productRoutes,
+    ...blogRoutes,
+    ...categoryRoutes,
+    ...blogCategoryRoutes,
+  ];
 }

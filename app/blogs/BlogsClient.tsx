@@ -33,18 +33,20 @@ interface BlogsClientProps {
     initialBlogs?: Blog[];
     initialTotal?: number;
     initialTotalPages?: number;
+    initialCategory?: string;
 }
 
 export default function BlogsClient({
     initialCategories,
     initialBlogs,
     initialTotalPages,
+    initialCategory,
 }: BlogsClientProps) {
     const hasInitialData = !!(initialBlogs && initialCategories);
     const isInitialMount = useRef(true);
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [category, setCategory] = useState("all");
+    const [category, setCategory] = useState(initialCategory || "all");
     const [blogs, setBlogs] = useState<Blog[]>(initialBlogs ?? []);
     const [categories, setCategories] = useState<BlogCategory[]>(initialCategories ?? []);
     const [loading, setLoading] = useState(!hasInitialData);
@@ -150,8 +152,9 @@ export default function BlogsClient({
                 {/* Category Filter */}
                 <div className="mb-12">
                     <div className="flex flex-wrap gap-3 justify-center">
-                        <button
-                            onClick={() => setCategory("all")}
+                        <Link
+                            href="/blogs"
+                            onClick={(e) => { e.preventDefault(); setCategory("all"); }}
                             className={`px-6 py-3 rounded-full font-light transition-all duration-300 ${
                                 category === "all"
                                     ? "bg-[#0EA5E9] text-white shadow-lg scale-105"
@@ -159,11 +162,12 @@ export default function BlogsClient({
                             }`}
                         >
                             All Articles
-                        </button>
+                        </Link>
                         {categories.map((cat) => (
-                            <button
+                            <Link
                                 key={cat.id}
-                                onClick={() => setCategory(cat.slug)}
+                                href={`/blogs/category/${cat.slug}`}
+                                onClick={(e) => { e.preventDefault(); setCategory(cat.slug); }}
                                 className={`px-6 py-3 rounded-full font-light transition-all duration-300 ${
                                     category === cat.slug
                                         ? "bg-[#0EA5E9] text-white shadow-lg scale-105"
@@ -171,7 +175,7 @@ export default function BlogsClient({
                                 }`}
                             >
                                 {cat.name}
-                            </button>
+                            </Link>
                         ))}
                     </div>
                 </div>
