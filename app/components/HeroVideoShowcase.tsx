@@ -146,7 +146,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                                         loop
                                         muted={isMuted}
                                         playsInline
-                                        preload="metadata"
+                                        preload="none"
                                         poster={video.thumbnailUrl || undefined}
                                     >
                                         {video.videoUrl && (

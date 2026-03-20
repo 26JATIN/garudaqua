@@ -7,10 +7,18 @@ export default function Footer() {
     const [blogCategories, setBlogCategories] = useState<any[]>([]);
 
     useEffect(() => {
-        fetch("/api/blog-categories")
-            .then(res => res.json())
-            .then(data => Array.isArray(data) && setBlogCategories(data))
-            .catch(() => {});
+        const load = () => {
+            fetch("/api/blog-categories")
+                .then(res => res.json())
+                .then(data => Array.isArray(data) && setBlogCategories(data))
+                .catch(() => {});
+        };
+        if (typeof requestIdleCallback !== "undefined") {
+            const id = requestIdleCallback(load);
+            return () => cancelIdleCallback(id);
+        }
+        const t = setTimeout(load, 200);
+        return () => clearTimeout(t);
     }, []);
     return (
         <footer className="bg-[#2C2C2C] dark:bg-black text-white border-t border-transparent dark:border-white/6">

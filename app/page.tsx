@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import dynamicImports from "next/dynamic";
 import Hero from './components/hero';
-import Footer from './components/Footer';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema } from '@/lib/jsonld';
-import LatestBlogs from './components/LatestBlogs';
 
 export const dynamic = "force-static";
 
@@ -14,7 +12,9 @@ const Benefits = dynamicImports(() => import('./components/Benefits'));
 const ImageGallery = dynamicImports(() => import('./components/ImageGallery'));
 const VideoShowcaseSection = dynamicImports(() => import('./components/HeroVideoShowcase'));
 const Testimonials = dynamicImports(() => import('./components/Testimonials'));
+const LatestBlogs = dynamicImports(() => import('./components/LatestBlogs'));
 const Newsletter = dynamicImports(() => import('./components/Newsletter'));
+const Footer = dynamicImports(() => import('./components/Footer'));
 
 
 

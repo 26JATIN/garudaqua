@@ -31,7 +31,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 sm:mb-12">
                     <div>
-                        <p className="text-sm font-semibold text-[#0EA5E9] uppercase tracking-wider mb-2">From Our Blog</p>
+                        <p className="text-sm font-semibold text-[#0284C7] dark:text-[#0EA5E9] uppercase tracking-wider mb-2">From Our Blog</p>
                         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
                             Latest Insights
                         </h2>
@@ -48,7 +48,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                         ))}
                         <Link
                             href="/blogs"
-                            className="px-3.5 py-1.5 text-xs font-semibold text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors"
+                            className="px-3.5 py-1.5 text-xs font-semibold text-[#0284C7] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors"
                         >
                             View All
                         </Link>
@@ -72,9 +72,8 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                        quality={50}
-                                        priority={index < 3}
-                                        loading={index < 3 ? undefined : "lazy"}
+                                        quality={30}
+                                        loading="lazy"
                                     />
                                     <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 </div>
@@ -89,7 +88,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                             {/* Content */}
                             <div className="p-5 sm:p-6 flex flex-col flex-1">
                                 {blog.blogCategory && (
-                                    <span className="inline-block self-start px-3 py-1 bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs font-medium rounded-full mb-3">
+                                    <span className="inline-block self-start px-3 py-1 bg-[#0EA5E9]/10 text-[#0284C7] dark:text-[#0EA5E9] text-xs font-medium rounded-full mb-3">
                                         {blog.blogCategory.name}
                                     </span>
                                 )}
