@@ -22,7 +22,8 @@
 # misc
 .DS_Store
 *.pem
-
+deploy.sh
+garudaqua.conf
 # debug
 npm-debug.log*
 yarn-debug.log*
