@@ -287,54 +287,46 @@ export default function Navbar() {
                     paddingBottom: "env(safe-area-inset-bottom, 0px)",
                 }}
             >
-                <div className="flex items-center justify-around py-1.5">
+                <div className="flex items-center justify-around py-1.5" style={{ touchAction: "manipulation" }}>
                     {/* Home */}
-                    <div className="transition-transform duration-100 active:scale-[0.92]">
-                        <Link href="/" className="flex flex-col items-center px-3 py-1 space-y-0.5">
-                            <div className="p-1.5 rounded-xl">
-                                <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                            </div>
-                            <span className="text-[10px] text-(--nav-text-muted) font-medium">Home</span>
-                        </Link>
-                    </div>
+                    <Link href="/" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
+                        <div className="p-1.5 rounded-xl">
+                            <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </div>
+                        <span className="text-[10px] text-(--nav-text-muted) font-medium">Home</span>
+                    </Link>
 
                     {/* Browse */}
-                    <div className="transition-transform duration-100 active:scale-[0.92]">
-                        <Link href="/products" className="flex flex-col items-center px-3 py-1 space-y-0.5">
-                            <div className="p-1.5 rounded-xl">
-                                <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                </svg>
-                            </div>
-                            <span className="text-[10px] text-(--nav-text-muted) font-medium">Products</span>
-                        </Link>
-                    </div>
+                    <Link href="/products" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
+                        <div className="p-1.5 rounded-xl">
+                            <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                        </div>
+                        <span className="text-[10px] text-(--nav-text-muted) font-medium">Products</span>
+                    </Link>
 
                     {/* Category */}
-                    <div className="transition-transform duration-100 active:scale-[0.92]">
-                        <Link href="/categories" className="flex flex-col items-center px-3 py-1 space-y-0.5">
-                            <div className="p-1.5 rounded-xl">
-                                <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                </svg>
-                            </div>
-                            <span className="text-[10px] text-(--nav-text-muted) font-medium">Category</span>
-                        </Link>
-                    </div>
+                    <Link href="/categories" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
+                        <div className="p-1.5 rounded-xl">
+                            <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                        </div>
+                        <span className="text-[10px] text-(--nav-text-muted) font-medium">Category</span>
+                    </Link>
 
                     {/* Contact Us */}
-                    <div className="transition-transform duration-100 active:scale-[0.92]">
-                        <Link href="/contact" className="flex flex-col items-center px-3 py-1 space-y-0.5">
-                            <div className="p-1.5 rounded-xl">
-                                <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <span className="text-[10px] text-(--nav-text-muted) font-medium">Contact</span>
-                        </Link>
-                    </div>
+                    <Link href="/contact" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
+                        <div className="p-1.5 rounded-xl">
+                            <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <span className="text-[10px] text-(--nav-text-muted) font-medium">Contact</span>
+                    </Link>
                 </div>
             </div>
 
