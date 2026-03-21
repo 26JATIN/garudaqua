@@ -16,15 +16,23 @@ export default function Navbar() {
     const [blogCategories, setBlogCategories] = useState<any[]>([]);
     const [blogMenuOpen, setBlogMenuOpen] = useState(false);
 
+    // Defer API calls so they don't compete with hero LCP image on mobile
     useEffect(() => {
-        fetch("/api/categories")
-            .then(res => res.json())
-            .then(data => Array.isArray(data) && setCategories(data))
-            .catch(console.error);
-        fetch("/api/blog-categories")
-            .then(res => res.json())
-            .then(data => Array.isArray(data) && setBlogCategories(data))
-            .catch(console.error);
+        const load = () => {
+            fetch("/api/categories")
+                .then(res => res.json())
+                .then(data => Array.isArray(data) && setCategories(data))
+                .catch(console.error);
+            fetch("/api/blog-categories")
+                .then(res => res.json())
+                .then(data => Array.isArray(data) && setBlogCategories(data))
+                .catch(console.error);
+        };
+        if (typeof requestIdleCallback !== "undefined") {
+            requestIdleCallback(load);
+        } else {
+            setTimeout(load, 1000);
+        }
     }, []);
 
     // Track scroll position for floating effect
@@ -83,9 +91,7 @@ export default function Navbar() {
                                         width={181}
                                         height={80}
                                         className="h-20 w-auto"
-                                        priority
-                                        fetchPriority="high"
-                                        decoding="sync"
+                                        loading="eager"
                                     />
                                 </Link>
                             </div>
@@ -255,9 +261,7 @@ export default function Navbar() {
                             width={48}
                             height={48}
                             className="h-12 w-12 object-contain scale-200"
-                            priority
-                            fetchPriority="high"
-                            decoding="sync"
+                            loading="eager"
                         />
                     </Link>
                     {/* Search Bar */}
@@ -354,7 +358,7 @@ export default function Navbar() {
                                 alt="Garud Aqua Solutions"
                                 fill
                                 className="object-contain scale-[1.4] drop-shadow-sm"
-                                priority
+                                loading="lazy"
                             />
                         </div>
                         <h2 className="text-base sm:text-[17px] font-bold text-gray-900 dark:text-white tracking-tight leading-tight">

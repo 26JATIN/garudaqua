@@ -34,7 +34,7 @@ export default function BlogPostClient({
     }
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#050505] pt-[2px] lg:pt-[17px]">
+        <div className="min-h-screen bg-white dark:bg-[#050505] pt-0.5 lg:pt-4.25">
             {/* Article */}
             <article className="w-full pb-16">
                 {/* Hero / Header Section: Contains Image + Overlay Buttons */}

@@ -29,20 +29,41 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
         loading: "eager" as const,
     };
 
+    // Generate tiny Cloudinary blur placeholder for perceived instant load
+    function blurUrl(src: string): string {
+        if (!src || !src.includes("res.cloudinary.com")) return "";
+        return src.replace("/upload/", "/upload/w_20,q_10,e_blur:1000,f_webp/");
+    }
+
     let LCPImage = null;
     if (!slide.mobileImage) {
+        const { props: { srcSet } } = getImageProps({
+            ...common,
+            alt: slide.title || "Garud Aqua",
+            src: slide.image,
+            sizes: "100vw",
+            quality: 80,
+            width: 1920,
+            height: 1080,
+        });
+
         LCPImage = (
-            <Image
-                src={slide.image}
-                alt={slide.title || "Garud Aqua"}
-                {...common}
-                width={1920}
-                height={1080}
-                sizes="100vw"
-                quality={80}
-                decoding="sync"
-                className="w-full h-auto"
-            />
+            <>
+                <link rel="preload" as="image" imageSrcSet={srcSet} fetchPriority="high" />
+                <Image
+                    src={slide.image}
+                    alt={slide.title || "Garud Aqua"}
+                    {...common}
+                    width={1920}
+                    height={1080}
+                    sizes="100vw"
+                    quality={80}
+                    decoding="sync"
+                    className="w-full h-auto"
+                    placeholder="blur"
+                    blurDataURL={blurUrl(slide.image)}
+                />
+            </>
         );
     } else {
         const {
@@ -88,7 +109,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
     }
 
     return (
-        <section className="relative w-full overflow-hidden bg-black text-white lg:mt-[17px]">
+        <section className="relative w-full overflow-hidden bg-black text-white lg:mt-4.25">
             {/* STAGE 1: Guaranteed Static LCP Image. Renders instantly without React JS */}
             <div className="relative w-full z-0">
                 {LCPImage}

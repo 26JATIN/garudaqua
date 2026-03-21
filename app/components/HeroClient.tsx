@@ -32,7 +32,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
                 width={1920}
                 height={1080}
                 sizes="100vw"
-                quality={100}
+                quality={80}
                 decoding={index === 0 ? "sync" : "async"}
                 className="w-full h-auto"
             />
