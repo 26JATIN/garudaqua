@@ -282,21 +282,24 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Bottom Navigation - Enhanced Apple Liquid Glass Effect */}
+            {/* pointer-events:none on outer container + pointer-events:auto on
+                each Link prevents iOS from requiring a "first tap to activate"
+                the container before forwarding taps to child links. */}
             <div
-                onTouchStart={() => {}}
-                className={`lg:hidden fixed left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
-                style={{
-                    bottom: 0,
-                    backgroundColor: "var(--navbar-bg)",
-                    boxShadow: "var(--navbar-shadow)",
-                    paddingBottom: "env(safe-area-inset-bottom, 0px)",
-                    WebkitTapHighlightColor: "transparent",
-                    touchAction: "manipulation",
-                }}
+                className={`lg:hidden fixed left-0 right-0 z-100 pointer-events-none transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
+                style={{ bottom: 0 }}
             >
-                <div className="flex items-center justify-around py-1.5">
+                {/* Visual background layer — no pointer events */}
+                <div
+                    className="absolute inset-0 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border)"
+                    style={{
+                        backgroundColor: "var(--navbar-bg)",
+                        boxShadow: "var(--navbar-shadow)",
+                    }}
+                />
+                <div className="relative flex items-center justify-around py-1.5" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
                     {/* Home */}
-                    <Link href="/" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
+                    <Link href="/" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
                         <div className="p-1.5 rounded-xl">
                             <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -306,7 +309,7 @@ export default function Navbar() {
                     </Link>
 
                     {/* Browse */}
-                    <Link href="/products" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
+                    <Link href="/products" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
                         <div className="p-1.5 rounded-xl">
                             <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -316,7 +319,7 @@ export default function Navbar() {
                     </Link>
 
                     {/* Category */}
-                    <Link href="/categories" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
+                    <Link href="/categories" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
                         <div className="p-1.5 rounded-xl">
                             <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -326,7 +329,7 @@ export default function Navbar() {
                     </Link>
 
                     {/* Contact Us */}
-                    <Link href="/contact" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
+                    <Link href="/contact" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
                         <div className="p-1.5 rounded-xl">
                             <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

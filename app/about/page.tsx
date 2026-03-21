@@ -9,7 +9,7 @@ export default function AboutPage() {
     const ref = useAnimateOnView();
 
     return (
-        <main ref={ref as React.RefObject<HTMLElement>} className="min-h-screen bg-white dark:bg-[#0A0A0A]">
+        <main ref={ref as React.RefObject<HTMLElement>} className="min-h-screen bg-white dark:bg-[#0A0A0A] overflow-x-clip">
             <section className="about-hero max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-4 sm:pt-18 pb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 

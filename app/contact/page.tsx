@@ -86,7 +86,7 @@ export default function ContactPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4">
+        <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4 overflow-x-clip">
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
                 <motion.div
