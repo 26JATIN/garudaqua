@@ -11,6 +11,7 @@ export default function Navbar() {
     const [visible, setVisible] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const ref = useRef<HTMLElement>(null);
+    const bottomNavRef = useRef<HTMLDivElement>(null);
 
     const [categories, setCategories] = useState<any[]>([]);
     const [blogCategories, setBlogCategories] = useState<any[]>([]);
@@ -36,6 +37,36 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // iOS: track Visual Viewport so bottom nav follows browser chrome hide/show instantly
+    useEffect(() => {
+        const vv = window.visualViewport;
+        if (!vv) return;
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (!isIOS) return;
+
+        const reposition = () => {
+            const el = bottomNavRef.current;
+            if (!el) return;
+            const navH = el.offsetHeight;
+            el.style.top = `${vv.height + vv.offsetTop - navH}px`;
+        };
+
+        // Switch from bottom:0 to top-based positioning on iOS
+        const el = bottomNavRef.current;
+        if (el) el.style.bottom = 'auto';
+
+        vv.addEventListener('resize', reposition);
+        vv.addEventListener('scroll', reposition);
+        reposition();
+
+        return () => {
+            vv.removeEventListener('resize', reposition);
+            vv.removeEventListener('scroll', reposition);
+        };
+    }, []);
+
     // Prevent background scrolling when mobile sidebar is open (Requires HTML tag lock for iOS)
     useEffect(() => {
         if (isSidebarOpen) {
@@ -58,6 +89,7 @@ export default function Navbar() {
             <nav
                 ref={ref}
                 className={`fixed inset-x-0 top-0 z-100 hidden lg:block transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
+                style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
             >
                 <div
                     className="backdrop-blur-xl backdrop-saturate-200 border-b transition-[background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
@@ -240,7 +272,8 @@ export default function Navbar() {
                 className={`lg:hidden fixed top-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-b border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
                     backgroundColor: "var(--navbar-bg)",
-                    boxShadow: "var(--navbar-shadow)"
+                    boxShadow: "var(--navbar-shadow)",
+                    paddingTop: "env(safe-area-inset-top, 0px)",
                 }}
             >
                 <div className="px-4 py-2 flex items-center gap-2">
@@ -276,6 +309,7 @@ export default function Navbar() {
 
             {/* Mobile Bottom Navigation - Enhanced Apple Liquid Glass Effect */}
             <div
+                ref={bottomNavRef}
                 className={`lg:hidden fixed bottom-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
                     backgroundColor: "var(--navbar-bg)",
