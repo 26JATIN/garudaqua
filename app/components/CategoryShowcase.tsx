@@ -496,7 +496,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
       </div>
 
       {/* Mobile: Sticky filter bar — sticks below navbar as you scroll */}
-      <div ref={mobileFilterRef} className="lg:hidden sticky z-30 -mx-3 sm:-mx-6 px-3 sm:px-6 py-3 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5" style={{ top: "calc(60px + env(safe-area-inset-top, 0px))" }}>
+      <div ref={mobileFilterRef} className="lg:hidden sticky z-30 -mx-3 sm:-mx-6 px-3 sm:px-6 py-3 bg-white dark:bg-black border-b border-gray-200/50 dark:border-white/5" style={{ top: "calc(60px + env(safe-area-inset-top, 0px))", transform: "translate3d(0,0,0)" }}>
         <div className="space-y-2">
           <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
             Filter by Category
