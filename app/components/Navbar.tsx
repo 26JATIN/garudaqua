@@ -11,7 +11,6 @@ export default function Navbar() {
     const [visible, setVisible] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const ref = useRef<HTMLElement>(null);
-    const bottomNavRef = useRef<HTMLDivElement>(null);
 
     const [categories, setCategories] = useState<any[]>([]);
     const [blogCategories, setBlogCategories] = useState<any[]>([]);
@@ -37,32 +36,6 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // iOS: force bottom nav repaint when visual viewport resizes
-    // (browser chrome hide/show) so position:fixed bottom:0 updates instantly
-    useEffect(() => {
-        const vv = window.visualViewport;
-        if (!vv) return;
-
-        let raf = 0;
-        const nudge = () => {
-            cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(() => {
-                const el = bottomNavRef.current;
-                if (!el) return;
-                // Tiny translateZ nudge forces iOS to re-composite the layer
-                el.style.willChange = 'transform';
-                requestAnimationFrame(() => {
-                    if (el) el.style.willChange = '';
-                });
-            });
-        };
-
-        vv.addEventListener('resize', nudge);
-        return () => {
-            vv.removeEventListener('resize', nudge);
-            cancelAnimationFrame(raf);
-        };
-    }, []);
 
     // Prevent background scrolling when mobile sidebar is open (Requires HTML tag lock for iOS)
     useEffect(() => {
@@ -306,9 +279,9 @@ export default function Navbar() {
 
             {/* Mobile Bottom Navigation - Enhanced Apple Liquid Glass Effect */}
             <div
-                ref={bottomNavRef}
-                className={`lg:hidden fixed bottom-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
+                className={`lg:hidden fixed left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
+                    bottom: 0,
                     backgroundColor: "var(--navbar-bg)",
                     boxShadow: "var(--navbar-shadow)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)",
