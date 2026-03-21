@@ -279,15 +279,18 @@ export default function Navbar() {
 
             {/* Mobile Bottom Navigation - Enhanced Apple Liquid Glass Effect */}
             <div
+                onTouchStart={() => {}}
                 className={`lg:hidden fixed left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
                     bottom: 0,
                     backgroundColor: "var(--navbar-bg)",
                     boxShadow: "var(--navbar-shadow)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)",
+                    WebkitTapHighlightColor: "transparent",
+                    touchAction: "manipulation",
                 }}
             >
-                <div className="flex items-center justify-around py-1.5" style={{ touchAction: "manipulation" }}>
+                <div className="flex items-center justify-around py-1.5">
                     {/* Home */}
                     <Link href="/" className="flex flex-col items-center px-3 py-1 space-y-0.5 transition-transform duration-100 active:scale-[0.92]">
                         <div className="p-1.5 rounded-xl">
