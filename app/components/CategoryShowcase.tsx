@@ -496,7 +496,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
       </div>
 
       {/* Mobile: Sticky filter bar — sticks below navbar as you scroll */}
-      <div ref={mobileFilterRef} className="lg:hidden sticky top-15 z-30 -mx-3 sm:-mx-6 px-3 sm:px-6 py-3 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5">
+      <div ref={mobileFilterRef} className="lg:hidden sticky z-30 -mx-3 sm:-mx-6 px-3 sm:px-6 py-3 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5" style={{ top: "calc(60px + env(safe-area-inset-top, 0px))" }}>
         <div className="space-y-2">
           <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
             Filter by Category
@@ -543,8 +543,9 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
         {/* Sidebar - Filter Section (Desktop only: sticky sidebar with heading + filters) */}
         <div className="hidden lg:block lg:w-1/5 shrink-0 lg:pr-6 xl:pr-8">
           <div
-            className={`lg:sticky lg:top-22 transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+            className={`lg:sticky transform transition-all duration-700 ease-out ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
               }`}
+            style={{ top: "calc(88px + env(safe-area-inset-top, 0px))" }}
           >
             <div className="mb-8">
               <h2 className="text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 hover:text-[#0EA5E9] transition-all duration-300 cursor-default hover:scale-105 transform leading-tight">
