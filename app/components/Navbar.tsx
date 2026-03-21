@@ -37,33 +37,30 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // iOS: track Visual Viewport so bottom nav follows browser chrome hide/show instantly
+    // iOS: force bottom nav repaint when visual viewport resizes
+    // (browser chrome hide/show) so position:fixed bottom:0 updates instantly
     useEffect(() => {
         const vv = window.visualViewport;
         if (!vv) return;
 
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if (!isIOS) return;
-
-        const reposition = () => {
-            const el = bottomNavRef.current;
-            if (!el) return;
-            const navH = el.offsetHeight;
-            el.style.top = `${vv.height + vv.offsetTop - navH}px`;
+        let raf = 0;
+        const nudge = () => {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+                const el = bottomNavRef.current;
+                if (!el) return;
+                // Tiny translateZ nudge forces iOS to re-composite the layer
+                el.style.willChange = 'transform';
+                requestAnimationFrame(() => {
+                    if (el) el.style.willChange = '';
+                });
+            });
         };
 
-        // Switch from bottom:0 to top-based positioning on iOS
-        const el = bottomNavRef.current;
-        if (el) el.style.bottom = 'auto';
-
-        vv.addEventListener('resize', reposition);
-        vv.addEventListener('scroll', reposition);
-        reposition();
-
+        vv.addEventListener('resize', nudge);
         return () => {
-            vv.removeEventListener('resize', reposition);
-            vv.removeEventListener('scroll', reposition);
+            vv.removeEventListener('resize', nudge);
+            cancelAnimationFrame(raf);
         };
     }, []);
 
@@ -379,6 +376,7 @@ export default function Navbar() {
             {/* Mobile Sidebar Drawer */}
             <div
                 className={`lg:hidden fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm bg-white dark:bg-[#0A0A0A] z-102 shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] transform flex flex-col ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
             >
                 <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800/60 bg-gray-50/50 dark:bg-[#111]/50">
                     <div className="flex items-center gap-2">
