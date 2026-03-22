@@ -82,6 +82,11 @@ export default async function CategorySeoPage(
     const productPath = (p: { slug?: string; id: string }) => p.slug || p.id;
     const heroImageSrc = categoryFull.seoHeroImage || categoryFull.image || "/placeholder-hero.jpg";
 
+    // Promote CMS headings: h3→h2, h4→h3 so they follow the page h1 without skipping levels
+    const promotedSeoContent = categoryFull.seoContent
+        ?.replace(/<h4(\s|>)/g, "<h3$1").replace(/<\/h4>/g, "</h3>")
+        .replace(/<h3(\s|>)/g, "<h2$1").replace(/<\/h3>/g, "</h2>");
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#060606]">
             {/* Hero Section */}
@@ -196,7 +201,7 @@ export default async function CategorySeoPage(
             )}
 
             {/* SEO Content Section */}
-            {categoryFull.seoContent && (
+            {promotedSeoContent && (
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 lg:pb-28">
                     <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 lg:p-14 shadow-sm border border-gray-100 dark:border-white/6">
                         <div className="flex items-center gap-3 mb-6 sm:mb-8 max-w-4xl mx-auto">
@@ -206,7 +211,7 @@ export default async function CategorySeoPage(
                             </h2>
                         </div>
                         <div className="blog-content max-w-4xl mx-auto">
-                            <div dangerouslySetInnerHTML={{ __html: categoryFull.seoContent }} />
+                            <div dangerouslySetInnerHTML={{ __html: promotedSeoContent }} />
                         </div>
                     </div>
                 </div>
