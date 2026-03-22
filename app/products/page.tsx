@@ -88,25 +88,20 @@ async function getInitialData(filters: {
   search?: string;
   sort?: string;
 }) {
-  const where: Record<string, unknown> = { isActive: true };
-
   // Resolved canonical slugs — used to 301 redirect if a formerSlug was used in the URL
   let canonicalCategory: string | undefined;
   let canonicalSubcategory: string | undefined;
 
+  // Validate category/subcategory slugs and resolve former slugs for redirects
   if (filters.category) {
-    let cat;
     if (isObjectId(filters.category)) {
-      cat = await prisma.category.findUnique({ where: { id: filters.category }, select: { id: true } });
+      const cat = await prisma.category.findUnique({ where: { id: filters.category }, select: { id: true } });
       if (!cat) notFound();
-      where.categoryId = filters.category;
     } else {
-      // 1. Try current slug
-      cat = await prisma.category.findFirst({
+      let cat = await prisma.category.findFirst({
         where: { slug: filters.category },
         select: { id: true, slug: true },
       });
-      // 2. Try formerSlugs (renamed category)
       if (!cat) {
         cat = await prisma.category.findFirst({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -114,7 +109,6 @@ async function getInitialData(filters: {
           select: { id: true, slug: true },
         });
       }
-      // 3. Legacy: name match / slugify fallback
       if (!cat) {
         const allCats = await prisma.category.findMany({ select: { id: true, name: true, slug: true } });
         const match = allCats.find(
@@ -125,8 +119,6 @@ async function getInitialData(filters: {
         if (match) cat = match;
       }
       if (cat) {
-        where.categoryId = cat.id;
-        // If the URL used an old slug, record the canonical so the page can redirect
         if (cat.slug && cat.slug !== filters.category) {
           canonicalCategory = cat.slug;
         }
@@ -137,18 +129,14 @@ async function getInitialData(filters: {
   }
 
   if (filters.subcategory) {
-    let sub;
     if (isObjectId(filters.subcategory)) {
-      sub = await prisma.subcategory.findUnique({ where: { id: filters.subcategory }, select: { id: true } });
+      const sub = await prisma.subcategory.findUnique({ where: { id: filters.subcategory }, select: { id: true } });
       if (!sub) notFound();
-      where.subcategoryId = filters.subcategory;
     } else {
-      // 1. Try current slug
-      sub = await prisma.subcategory.findFirst({
+      let sub = await prisma.subcategory.findFirst({
         where: { slug: filters.subcategory },
         select: { id: true, slug: true },
       });
-      // 2. Try formerSlugs (renamed subcategory)
       if (!sub) {
         sub = await prisma.subcategory.findFirst({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -156,7 +144,6 @@ async function getInitialData(filters: {
           select: { id: true, slug: true },
         });
       }
-      // 3. Legacy: name match / slugify fallback
       if (!sub) {
         const allSubs = await prisma.subcategory.findMany({ select: { id: true, name: true, slug: true } });
         const match = allSubs.find(
@@ -167,7 +154,6 @@ async function getInitialData(filters: {
         if (match) sub = match;
       }
       if (sub) {
-        where.subcategoryId = sub.id;
         if (sub.slug && sub.slug !== filters.subcategory) {
           canonicalSubcategory = sub.slug;
         }
@@ -176,18 +162,11 @@ async function getInitialData(filters: {
       }
     }
   }
-  if (filters.search) {
-    where.OR = [
-      { name: { contains: filters.search, mode: 'insensitive' } },
-      { description: { contains: filters.search, mode: 'insensitive' } },
-    ];
-  }
 
-  const orderBy =
-    filters.sort === 'newest'
-      ? [{ createdAt: 'desc' as const }]
-      : [{ category: { sortOrder: 'asc' as const } }, { createdAt: 'desc' as const }];
+  const orderBy = [{ category: { sortOrder: 'asc' as const } }, { createdAt: 'desc' as const }];
 
+  // Always load ALL active products so the client can filter locally
+  // without needing API calls (works even with aggressive API caching)
   const [categories, subcategories, productData] = await Promise.all([
     prisma.category.findMany({
       where: { isActive: true },
@@ -206,15 +185,16 @@ async function getInitialData(filters: {
       },
     }),
     prisma.product.findMany({
-      where,
+      where: { isActive: true },
       orderBy,
       take: 200,
       select: {
         id: true,
         name: true,
+        slug: true,
         image: true,
-        category: { select: { id: true, name: true } },
-        subcategory: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, slug: true } },
+        subcategory: { select: { id: true, name: true, slug: true } },
       },
     }),
   ]);

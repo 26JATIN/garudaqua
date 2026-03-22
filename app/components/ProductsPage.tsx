@@ -41,8 +41,8 @@ interface Product {
     image?: string;
     images?: string[];
     description?: string;
-    category: { id: string; name: string } | string;
-    subcategory?: { id: string; name: string };
+    category: { id: string; name: string; slug?: string } | string;
+    subcategory?: { id: string; name: string; slug?: string };
     createdAt?: string;
 }
 
@@ -90,8 +90,8 @@ export default function ProductsPage({
         initialCategories ? [{ id: "all", name: "All" }, ...initialCategories] : [{ id: "all", name: "All" }]
     );
     const [subcategories, setSubcategories] = useState<Subcategory[]>(initialSubcategories || []);
-    const [products, setProducts] = useState<Product[]>(initialProducts || []);
-    const [totalProducts, setTotalProducts] = useState(initialTotal || 0);
+    // allProducts holds the complete unfiltered list for client-side filtering
+    const [allProducts, setAllProducts] = useState<Product[]>(initialProducts || []);
     const [loadingCategories, setLoadingCategories] = useState(!hasInitialData);
     const [, setLoadingSubcategories] = useState(!hasInitialData);
     const [loadingProducts, setLoadingProducts] = useState(!hasInitialData);
@@ -99,16 +99,6 @@ export default function ProductsPage({
     const productsGridRef = useRef<HTMLDivElement>(null);
     const categoryScrollRef = useRef<HTMLDivElement>(null);
     const subcategoryScrollRef = useRef<HTMLDivElement>(null);
-    // Track whether filters have actually changed from their initial values
-    const initialFiltersRef = useRef({
-        category: initialSearchParams?.category || "all",
-        subcategory: initialSearchParams?.subcategory || "All",
-        search: initialSearchParams?.search || "",
-        sort: initialSearchParams?.sort || "featured",
-    });
-    // Once any filter is changed from initial values, always fetch on subsequent changes
-    const filtersEverChangedRef = useRef(false);
-
     // Fetch categories on mount (skip if server-provided)
     useEffect(() => {
         if (hasInitialData) return;
@@ -149,6 +139,29 @@ export default function ProductsPage({
         fetchSubcategories();
     }, [hasInitialData]);
 
+    // Fetch all products on mount (skip if server-provided)
+    useEffect(() => {
+        if (hasInitialData) return;
+        async function fetchAllProducts() {
+            setLoadingProducts(true);
+            try {
+                const res = await fetch("/api/products?limit=200");
+                if (!res.ok) throw new Error("Failed to fetch products");
+                const data = await res.json();
+                if (data.products && Array.isArray(data.products)) {
+                    setAllProducts(data.products);
+                } else if (Array.isArray(data)) {
+                    setAllProducts(data);
+                }
+            } catch {
+                toast.error("Failed to load products");
+            } finally {
+                setLoadingProducts(false);
+            }
+        }
+        fetchAllProducts();
+    }, [hasInitialData]);
+
     // Sync state when URL params change (e.g. browser back/forward)
     useEffect(() => {
         const handlePopState = () => {
@@ -162,50 +175,48 @@ export default function ProductsPage({
         return () => window.removeEventListener("popstate", handlePopState);
     }, []);
 
-    // Fetch products when filters change (skip if values match server-provided initial data)
-    useEffect(() => {
-        if (hasInitialData && !filtersEverChangedRef.current) {
-            const init = initialFiltersRef.current;
-            const filtersUnchanged =
-                selectedCategory === init.category &&
-                selectedSubcategory === init.subcategory &&
-                searchTerm === init.search &&
-                sortBy === init.sort;
-            if (filtersUnchanged) return;
-            // Filters have changed from initial — mark so we always fetch from now on
-            filtersEverChangedRef.current = true;
+    // Client-side filtering — no API calls needed for category/subcategory/sort changes
+    const products = useMemo(() => {
+        let filtered = allProducts;
+
+        // Filter by category
+        if (selectedCategory !== "all") {
+            filtered = filtered.filter((p) => {
+                if (typeof p.category === "string") return false;
+                const catSlug = p.category.slug || slugify(p.category.name);
+                return catSlug === selectedCategory;
+            });
         }
 
-        async function fetchProducts() {
-            setLoadingProducts(true);
-            try {
-                const params = new URLSearchParams();
-                if (selectedCategory !== "all") params.set("category", selectedCategory);
-                if (selectedSubcategory !== "All") params.set("subcategory", selectedSubcategory);
-                if (searchTerm.trim()) params.set("search", searchTerm.trim());
-                params.set("limit", "200");
-                if (sortBy !== "featured") params.set("sort", sortBy);
-
-                const res = await fetch(`/api/products?${params.toString()}`);
-                if (!res.ok) throw new Error("Failed to fetch products");
-                const data = await res.json();
-
-                if (data.products && Array.isArray(data.products)) {
-                    setProducts(data.products);
-                    setTotalProducts(data.total || data.products.length);
-                } else if (Array.isArray(data)) {
-                    setProducts(data);
-                    setTotalProducts(data.length);
-                }
-            } catch {
-                toast.error("Failed to load products");
-            } finally {
-                setLoadingProducts(false);
-            }
+        // Filter by subcategory
+        if (selectedSubcategory !== "All") {
+            filtered = filtered.filter((p) => {
+                if (!p.subcategory) return false;
+                const subSlug = p.subcategory.slug || slugify(p.subcategory.name);
+                return subSlug === selectedSubcategory;
+            });
         }
 
-        fetchProducts();
-    }, [selectedCategory, selectedSubcategory, searchTerm, sortBy, hasInitialData]);
+        // Filter by search term
+        if (searchTerm.trim()) {
+            const term = searchTerm.trim().toLowerCase();
+            filtered = filtered.filter((p) =>
+                p.name.toLowerCase().includes(term) ||
+                (p.description && p.description.toLowerCase().includes(term))
+            );
+        }
+
+        // Sort
+        if (sortBy === "newest") {
+            filtered = [...filtered].sort((a, b) =>
+                (b.createdAt || "").localeCompare(a.createdAt || "")
+            );
+        }
+
+        return filtered;
+    }, [allProducts, selectedCategory, selectedSubcategory, searchTerm, sortBy]);
+
+    const totalProducts = products.length;
 
     // Scroll a container left or right
     const scrollByAmount = useCallback((ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
