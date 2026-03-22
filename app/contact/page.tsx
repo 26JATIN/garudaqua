@@ -110,7 +110,7 @@ export default function ContactPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Address</h3>
+                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Address</h2>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 font-light leading-relaxed">
                                         Ground, Murraba No. 62, Killa No. 2,<br />
                                         Garud Aqua Solutions,<br />
@@ -128,7 +128,7 @@ export default function ContactPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Phone</h3>
+                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Phone</h2>
                                     <a href="tel:+919462594603" className="text-sm text-gray-600 dark:text-gray-400 font-light hover:text-[#0EA5E9] transition-colors">
                                         +91 94625 94603
                                     </a>
@@ -142,7 +142,7 @@ export default function ContactPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Email</h3>
+                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Email</h2>
                                     <a href="mailto:rkg210@gmail.com" className="text-sm text-gray-600 dark:text-gray-400 font-light hover:text-[#0EA5E9] transition-colors">
                                         rkg210@gmail.com
                                     </a>
@@ -156,7 +156,7 @@ export default function ContactPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Business Hours</h3>
+                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Business Hours</h2>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 font-light">
                                         Mon - Sat: 9:00 AM - 6:00 PM
                                     </p>
@@ -166,7 +166,7 @@ export default function ContactPage() {
 
                         {/* Quick Links */}
                         <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 p-6">
-                            <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">Looking for something specific?</h3>
+                            <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">Looking for something specific?</h2>
                             <div className="space-y-2">
                                 <Link href="/products" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
