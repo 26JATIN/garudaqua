@@ -118,6 +118,9 @@ export default async function CategoriesIndexPage() {
                                         className="object-contain group-hover:scale-105 transition-transform duration-500 p-3 sm:p-5"
                                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                         priority={index < 4}
+                                        fetchPriority={index < 4 ? "high" : "auto"}
+                                        decoding={index < 4 ? "sync" : "async"}
+                                        loading={index < 4 ? undefined : "lazy"}
                                     />
                                 ) : (
                                     <svg className="w-16 h-16 text-gray-200 dark:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">

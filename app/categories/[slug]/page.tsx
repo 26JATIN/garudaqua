@@ -199,6 +199,12 @@ export default async function CategorySeoPage(
             {categoryFull.seoContent && (
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 lg:pb-28">
                     <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 lg:p-14 shadow-sm border border-gray-100 dark:border-white/6">
+                        <div className="flex items-center gap-3 mb-6 sm:mb-8 max-w-4xl mx-auto">
+                            <div className="w-1 h-7 rounded-full bg-linear-to-b from-[#0EA5E9] to-[#0284C7]" />
+                            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
+                                About {categoryFull.name}
+                            </h2>
+                        </div>
                         <div className="blog-content max-w-4xl mx-auto">
                             <div dangerouslySetInnerHTML={{ __html: categoryFull.seoContent }} />
                         </div>
