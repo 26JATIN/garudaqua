@@ -1,4 +1,5 @@
 "use client";
+import "@/app/styles/animations.css";
 import React, { useState } from "react";
 import { useAnimateOnView } from "@/lib/useAnimateOnView";
 

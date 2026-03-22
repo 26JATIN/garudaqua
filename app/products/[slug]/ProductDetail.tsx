@@ -1,4 +1,5 @@
 "use client";
+import "@/app/styles/animations.css";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -320,6 +321,11 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
     const [relatedProducts, setRelatedProducts] = useState<Product[]>(initialRelated ?? []);
     const [loading, setLoading] = useState(!hasInitialData);
     const [notFound, setNotFound] = useState(false);
+
+    // Scroll to top on mount (App Router preserves scroll on navigation)
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }, [productSlug]);
 
     // Fetch product data (skip if server-prefetched)
     useEffect(() => {

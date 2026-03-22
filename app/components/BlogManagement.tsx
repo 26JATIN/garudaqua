@@ -1,5 +1,7 @@
 "use client";
 
+import "@/app/styles/blog-content.css";
+import "@/app/styles/jodit-editor.css";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { toast } from "sonner";

@@ -1,5 +1,7 @@
 "use client";
 
+import "@/app/styles/blog-content.css";
+import "@/app/styles/animations.css";
 import Link from "next/link";
 import Image from "next/image";
 
