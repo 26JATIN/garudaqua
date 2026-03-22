@@ -15,7 +15,7 @@ export default function AboutPage() {
 
                     {/* Left — headline */}
                     <div className="animate-on-view-left">
-                        <p className="text-[#0284C7] dark:text-[#38BDF8] text-sm font-medium tracking-wide mb-5">
+                        <p className="text-[#0369A1] dark:text-[#38BDF8] text-sm font-medium tracking-wide mb-5">
                             GARUD AQUA SOLUTIONS · SRIGANGANAGAR, INDIA
                         </p>
 

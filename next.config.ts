@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
 
   experimental: {
     inlineCss: true,
-    optimizePackageImports: ["lucide-react"],
+    optimizePackageImports: ["lucide-react", "sonner"],
     serverActions: {
       bodySizeLimit: "10mb",
     },

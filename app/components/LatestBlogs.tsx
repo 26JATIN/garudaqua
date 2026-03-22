@@ -31,7 +31,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 sm:mb-12">
                     <div>
-                        <p className="text-sm font-semibold text-[#0284C7] dark:text-[#0EA5E9] uppercase tracking-wider mb-2">From Our Blog</p>
+                        <p className="text-sm font-semibold text-[#0369A1] dark:text-[#0EA5E9] uppercase tracking-wider mb-2">From Our Blog</p>
                         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
                             Latest Insights
                         </h2>
@@ -48,7 +48,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                         ))}
                         <Link
                             href="/blogs"
-                            className="px-3.5 py-1.5 text-xs font-semibold text-[#0284C7] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors"
+                            className="px-3.5 py-1.5 text-xs font-semibold text-[#0369A1] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors"
                         >
                             View All
                         </Link>
@@ -78,7 +78,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                                     <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 </div>
                             ) : (
-                                <div className="h-48 sm:h-52 bg-linear-to-br from-[#0EA5E9]/10 to-[#0284C7]/10 flex items-center justify-center">
+                                <div className="h-48 sm:h-52 bg-linear-to-br from-[#0EA5E9]/10 to-[#0369A1]/10 flex items-center justify-center">
                                     <svg className="w-12 h-12 text-[#0EA5E9]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                                     </svg>
@@ -88,7 +88,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                             {/* Content */}
                             <div className="p-5 sm:p-6 flex flex-col flex-1">
                                 {blog.blogCategory && (
-                                    <span className="inline-block self-start px-3 py-1 bg-[#0EA5E9]/10 text-[#0284C7] dark:text-[#0EA5E9] text-xs font-medium rounded-full mb-3">
+                                    <span className="inline-block self-start px-3 py-1 bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#0EA5E9] text-xs font-medium rounded-full mb-3">
                                         {blog.blogCategory.name}
                                     </span>
                                 )}

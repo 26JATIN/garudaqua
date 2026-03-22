@@ -3,8 +3,8 @@ import "./globals.css";
 import { NavbarProvider } from "./context/NavbarContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import ConditionalNavbar from "./components/ConditionalNavbar";
-import ThemeToaster from "./components/ThemeToaster";
 import PWARegister from "./components/PWARegister";
+import LazyToaster from "./components/LazyToaster";
 import type { Metadata } from "next";
 import { organizationSchema, websiteSchema } from "@/lib/jsonld";
 const SITE_URL = "https://garudaqua.in";
@@ -145,7 +145,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100">
         <PWARegister />
         <ThemeProvider>
-          <ThemeToaster />
+          <LazyToaster />
           <NavbarProvider>
             <ConditionalNavbar />
             <main>

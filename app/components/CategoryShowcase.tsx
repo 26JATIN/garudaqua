@@ -274,7 +274,7 @@ export const Card = React.memo(({
                     e.stopPropagation();
                     onClick(card);
                   }}
-                  className="text-xs text-[#0EA5E9] hover:text-[#0284C7] transition-colors font-medium"
+                  className="text-xs text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                 >
                   +{subcategories.length - 4} more types →
                 </button>
