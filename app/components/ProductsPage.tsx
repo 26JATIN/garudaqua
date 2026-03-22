@@ -768,7 +768,7 @@ function ProductCard({ product, index }: ProductCardProps) {
                         <h3 className="text-[#2C2C2C] dark:text-gray-100 font-medium text-[13px] sm:text-sm md:text-base lg:text-lg mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors leading-tight line-clamp-2 min-h-10 md:min-h-12 lg:min-h-14 flex items-start">
                             {product.name}
                         </h3>
-                        <div className="mt-auto pt-2 flex items-center text-[#0EA5E9] text-xs font-semibold uppercase tracking-wider group-hover:tracking-widest transition-all duration-300">
+                        <div className="mt-auto pt-2 flex items-center text-[#0369A1] dark:text-[#0EA5E9] text-xs font-semibold uppercase tracking-wider group-hover:tracking-widest transition-all duration-300">
                             View Details
                             <svg className="w-3.5 h-3.5 ml-1 transform group-hover:translate-x-1.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />

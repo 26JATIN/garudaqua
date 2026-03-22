@@ -585,7 +585,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         {/* Description */}
                         {product.description && (
                             <div>
-                                <h3 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100 mb-3">Description</h3>
+                                <h2 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100 mb-3">Description</h2>
                                 <p className="text-gray-600 dark:text-gray-400 font-light leading-relaxed">
                                     {product.description}
                                 </p>
@@ -595,7 +595,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         {/* Available Options */}
                         {product.hasVariants && product.variantOptions && product.variantOptions.length > 0 && (
                             <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-5 border border-gray-200 dark:border-white/6">
-                                <h3 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100">Available Options</h3>
+                                <h2 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100">Available Options</h2>
                                 {product.variantOptions.map((option) => {
                                     const availableValues = option.values.filter((v) => v.isAvailable);
                                     if (availableValues.length === 0) return null;
@@ -659,7 +659,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         {/* Specifications */}
                         {product.specs && product.specs.length > 0 && (
                             <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-3 border border-gray-200 dark:border-white/6">
-                                <h3 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100 mb-4">Specifications</h3>
+                                <h2 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100 mb-4">Specifications</h2>
                                 {product.specs.map((spec, i) => (
                                     <div key={i} className="flex justify-between items-center">
                                         <span className="text-gray-600 dark:text-gray-400 font-light">{spec.label}:</span>
