@@ -195,6 +195,8 @@ export const Card = React.memo(({
 }: CardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  const isPriority = index < 4;
+
   // Memoize the card preview to prevent unnecessary re-renders
   const cardPreview = useMemo(() => (
     <div
@@ -203,10 +205,10 @@ export const Card = React.memo(({
         <CategoryPreview
           category={card}
           className="w-full h-full"
-          priority={false}
+          priority={isPriority}
         />
     </div>
-  ), [card]);
+  ), [card, isPriority]);
 
   const handleOpen = () => {
     if (onClick) onClick(card);

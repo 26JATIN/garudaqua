@@ -139,7 +139,7 @@ export default async function CategoriesIndexPage() {
                                     {category.name}
                                 </h3>
                                 <div className="flex items-center justify-between mt-1">
-                                    <p className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 line-clamp-1 font-light flex-1 mr-2">
+                                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1 font-light flex-1 mr-2">
                                         {category.description || "View products in this category."}
                                     </p>
                                     <svg className="w-4 h-4 text-[#0EA5E9] shrink-0 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

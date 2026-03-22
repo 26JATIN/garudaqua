@@ -119,8 +119,8 @@ export default function BlogsClient({
                     <div
                         className="text-center mb-12"
                     >
-                        <h1 className="text-5xl md:text-6xl font-light tracking-wide mb-6">
-                            Our <span className="text-[#0EA5E9] font-normal">Blog</span>
+                        <h1 className="text-5xl md:text-6xl font-normal tracking-wide mb-6 text-white">
+                            Our <span className="text-[#7DD3FC]">Blog</span>
                         </h1>
                         <p className="text-xl font-light text-gray-300 max-w-2xl mx-auto leading-relaxed">
                             Expert tips, guides, and insights on water tanks, pipes & plumbing solutions
@@ -157,7 +157,7 @@ export default function BlogsClient({
                             onClick={(e) => { e.preventDefault(); setCategory("all"); }}
                             className={`px-6 py-3 rounded-full font-light transition-all duration-300 ${
                                 category === "all"
-                                    ? "bg-[#0EA5E9] text-white shadow-lg scale-105"
+                                    ? "bg-[#0369A1] text-white shadow-lg scale-105"
                                     : "bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 hover:shadow-md border border-gray-200 dark:border-white/6"
                             }`}
                         >
@@ -170,7 +170,7 @@ export default function BlogsClient({
                                 onClick={(e) => { e.preventDefault(); setCategory(cat.slug); }}
                                 className={`px-6 py-3 rounded-full font-light transition-all duration-300 ${
                                     category === cat.slug
-                                        ? "bg-[#0EA5E9] text-white shadow-lg scale-105"
+                                        ? "bg-[#0369A1] text-white shadow-lg scale-105"
                                         : "bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 hover:shadow-md border border-gray-200 dark:border-white/6"
                                 }`}
                             >
@@ -220,11 +220,10 @@ export default function BlogsClient({
                                                 fill
                                                 className="object-cover group-hover:scale-110 transition-transform duration-700"
                                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                                quality={50}
-                                                priority={index < 4}
-                                                fetchPriority={index < 4 ? "high" : "auto"}
-                                                decoding={index < 4 ? "sync" : "async"}
-                                                loading={index < 4 ? undefined : "lazy"}
+                                                priority={index < 3}
+                                                fetchPriority={index < 3 ? "high" : "auto"}
+                                                decoding={index < 3 ? "sync" : "async"}
+                                                loading={index < 3 ? undefined : "lazy"}
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         </div>
@@ -240,15 +239,15 @@ export default function BlogsClient({
                                     <div className="p-6 flex flex-col flex-1">
                                         {/* Category Badge */}
                                         <div className="mb-3">
-                                            <span className="inline-block px-4 py-1.5 bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs font-medium rounded-full">
+                                            <span className="inline-block px-4 py-1.5 bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#0EA5E9] text-xs font-medium rounded-full">
                                                 {getCategoryName(blog)}
                                             </span>
                                         </div>
 
                                         {/* Title */}
-                                        <h3 className="text-xl font-normal mb-3 text-gray-900 dark:text-gray-100 group-hover:text-[#0EA5E9] transition-colors line-clamp-2 tracking-wide">
+                                        <h2 className="text-xl font-normal mb-3 text-gray-900 dark:text-gray-100 group-hover:text-[#0369A1] dark:group-hover:text-[#0EA5E9] transition-colors line-clamp-2 tracking-wide">
                                             {blog.title}
-                                        </h3>
+                                        </h2>
 
                                         {/* Excerpt */}
                                         <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 font-light leading-relaxed text-sm">

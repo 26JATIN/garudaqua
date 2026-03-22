@@ -96,7 +96,6 @@ export default async function CategorySeoPage(
                     priority
                     fetchPriority="high"
                     decoding="sync"
-                    quality={85}
                 />
 
                 {/* Gradient overlays — pointer-events-none so image stays copyable */}
@@ -125,7 +124,7 @@ export default async function CategorySeoPage(
 
                     <div className="flex flex-wrap items-center gap-3 mt-5 sm:mt-7 pointer-events-auto">
                         {categoryFull.products.length > 0 && (
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0EA5E9] text-white text-xs sm:text-sm font-semibold shadow-lg shadow-[#0EA5E9]/25">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0369A1] text-white text-xs sm:text-sm font-semibold shadow-lg shadow-[#0369A1]/25">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                 </svg>
@@ -185,7 +184,7 @@ export default async function CategorySeoPage(
                                         {product.name}
                                     </h3>
                                     {product.subcategory && (
-                                        <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">
+                                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
                                             {product.subcategory.name}
                                         </p>
                                     )}

@@ -43,14 +43,13 @@ export default function BlogPostClient({
                 <div className="relative w-full">
                     {/* Featured Image */}
                     {blog.featuredImage && (
-                        <div className="w-full bg-gray-50 dark:bg-gray-900">
+                        <div className="w-full bg-gray-50 dark:bg-gray-900 aspect-video relative">
                             <Image
                                 src={blog.featuredImage}
                                 alt={blog.title}
-                                width={1920}
-                                height={1080}
+                                fill
                                 sizes="100vw"
-                                style={{ width: '100%', height: 'auto' }}
+                                className="object-cover"
                                 priority
                                 fetchPriority="high"
                                 decoding="sync"
@@ -94,7 +93,7 @@ export default function BlogPostClient({
                         </div>
                         {/* Category Badge */}
                         <div className="mb-6">
-                            <span className="inline-block px-5 py-2 bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium rounded-full">
+                            <span className="inline-block px-5 py-2 bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#0EA5E9] text-sm font-medium rounded-full">
                                 {blog.categoryName || blog.category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                             </span>
                         </div>
@@ -167,7 +166,7 @@ export default function BlogPostClient({
                                 Looking for high-quality water management solutions? Discover our extensive range of durable products designed for everyday needs.
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[#0EA5E9] hover:bg-[#0284C7] text-white rounded-full font-medium transition-colors shadow-xs">
+                                <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[#0369A1] hover:bg-[#0284C7] text-white rounded-full font-medium transition-colors shadow-xs">
                                     View All Products
                                 </Link>
                                 {categories.map(category => (
@@ -199,7 +198,6 @@ export default function BlogPostClient({
                                                 fill
                                                 className="object-cover group-hover:scale-110 transition-transform duration-700"
                                                 sizes="(max-width: 768px) 100vw, 33vw"
-                                                quality={50}
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         </div>
