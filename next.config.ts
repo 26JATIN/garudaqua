@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 
   experimental: {
+    inlineCss: true,
     optimizePackageImports: ["lucide-react"],
     serverActions: {
       bodySizeLimit: "10mb",
