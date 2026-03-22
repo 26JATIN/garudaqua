@@ -25,10 +25,14 @@ export default function cloudinaryLoader({
   }
 
   // Next.js passes quality=75 by default.
-  // Instead of a hardcoded 75, we leverage Cloudinary's powerful auto-quality (q_auto:eco / q_auto:good)
-  // or a user-defined lower quality, to satisfy Core Web Vitals constraints.
-  let finalQuality = "auto:eco"; // default for max Lighthouse score
-  if (quality && quality !== 75) {
+  // We leverage Cloudinary's auto-quality instead of fixed values.
+  // quality=75 (default) → q_auto:eco (smallest, good for thumbnails)
+  // quality=85 → q_auto:good (balanced, ideal for hero/LCP images)
+  // other values → passed as-is
+  let finalQuality = "auto:eco";
+  if (quality === 85) {
+    finalQuality = "auto:good";
+  } else if (quality && quality !== 75) {
     finalQuality = quality.toString();
   }
 

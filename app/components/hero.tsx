@@ -44,6 +44,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
             alt: slide.title || "Garud Aqua",
             src: slide.image,
             sizes: responsiveSizes,
+            quality: 85,
             width: 1920,
             height: 1080,
         });
@@ -58,6 +59,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
                     width={1920}
                     height={1080}
                     sizes={responsiveSizes}
+                    quality={85}
                     decoding="sync"
                     className="w-full h-auto"
                     placeholder="blur"
@@ -73,6 +75,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
             alt: slide.title || "Garud Aqua",
             src: slide.image,
             sizes: responsiveSizes,
+            quality: 85,
             width: 1920,
             height: 1080,
         });
@@ -84,6 +87,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
             alt: slide.title || "Garud Aqua",
             src: slide.mobileImage,
             sizes: "100vw",
+            quality: 50,
             width: 1080,
             height: 1920,
         });

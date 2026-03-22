@@ -110,7 +110,7 @@ export default function BlogsClient({
         <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A]">
             {/* Hero Section */}
             <div className="relative bg-linear-to-br from-[#2C2C2C] via-[#3A3A3A] to-[#2C2C2C] text-white py-24 overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
+                <div className="absolute inset-0 opacity-5">
                     <div className="absolute top-0 left-0 w-96 h-96 bg-[#0EA5E9] rounded-full filter blur-3xl"></div>
                     <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#0EA5E9] rounded-full filter blur-3xl"></div>
                 </div>
@@ -220,6 +220,7 @@ export default function BlogsClient({
                                                 fill
                                                 className="object-cover group-hover:scale-110 transition-transform duration-700"
                                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                                quality={50}
                                                 priority={index < 3}
                                                 fetchPriority={index < 3 ? "high" : "auto"}
                                                 decoding={index < 3 ? "sync" : "async"}

@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 export default function EnquirePage() {
@@ -67,11 +66,7 @@ function EnquireForm() {
     if (submitted) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center px-4">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="max-w-md w-full bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-xl dark:shadow-none dark:border dark:border-white/10 p-8 text-center"
-                >
+                <div className="max-w-md w-full bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-xl dark:shadow-none dark:border dark:border-white/10 p-8 text-center animate-[fadeIn_0.3s_ease-out]">
                     <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                         <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -96,7 +91,7 @@ function EnquireForm() {
                             New Enquiry
                         </button>
                     </div>
-                </motion.div>
+                </div>
             </div>
         );
     }
@@ -115,12 +110,7 @@ function EnquireForm() {
                 </div>
 
                 {/* Form */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 p-6 md:p-8"
-                >
+                <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 p-6 md:p-8">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Name & Phone */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -209,21 +199,19 @@ function EnquireForm() {
                         </div>
 
                         {/* Submit */}
-                        <motion.button
+                        <button
                             type="submit"
                             disabled={submitting}
-                            whileHover={{ scale: submitting ? 1 : 1.01 }}
-                            whileTap={{ scale: submitting ? 1 : 0.99 }}
-                            className="w-full py-3.5 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-medium text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="w-full py-3.5 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-medium text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99]"
                         >
                             {submitting ? "Submitting..." : "Submit Enquiry"}
-                        </motion.button>
+                        </button>
 
                         <p className="text-xs text-gray-500 dark:text-gray-500 text-center">
                             By submitting, you agree to be contacted by our sales team regarding your enquiry.
                         </p>
                     </form>
-                </motion.div>
+                </div>
 
                 {/* Back link */}
                 <div className="text-center mt-6">
