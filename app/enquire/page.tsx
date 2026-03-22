@@ -81,9 +81,9 @@ function EnquireForm() {
                     <p className="text-gray-600 dark:text-gray-400 mb-6">
                         Thank you for your interest. Our team will get back to you within 24 hours.
                     </p>
-                    <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener noreferrer" className="inline-block mb-6 text-[#0EA5E9] hover:underline font-medium">View Our Location on Google Maps</a>
+                    <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener noreferrer" className="inline-block mb-6 text-[#0369A1] dark:text-[#0EA5E9] hover:underline font-medium">View Our Location on Google Maps</a>
                     <div className="flex gap-3 justify-center">
-                        <Link href="/products" className="px-6 py-2.5 bg-[#0EA5E9] text-white rounded-full hover:bg-[#0369A1] transition text-sm font-medium">
+                        <Link href="/products" className="px-6 py-2.5 bg-[#0369A1] text-white rounded-full hover:bg-[#0284C7] transition text-sm font-medium">
                             Browse Products
                         </Link>
                         <button
@@ -105,18 +105,14 @@ function EnquireForm() {
         <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4">
             <div className="max-w-2xl mx-auto">
                 {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-10"
-                >
+                <div className="text-center mb-10">
                     <h1 className="text-3xl md:text-4xl font-light text-gray-900 dark:text-gray-100 mb-3">
-                        Product <span className="text-[#0EA5E9]">Enquiry</span>
+                        Product <span className="text-[#0369A1] dark:text-[#0EA5E9]">Enquiry</span>
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
                         Fill in your details and we&apos;ll get back to you with pricing and availability information.
                     </p>
-                </motion.div>
+                </div>
 
                 {/* Form */}
                 <motion.div
@@ -231,7 +227,7 @@ function EnquireForm() {
 
                 {/* Back link */}
                 <div className="text-center mt-6">
-                    <Link href="/products" className="text-sm text-[#0EA5E9] hover:text-[#0369A1] transition">
+                    <Link href="/products" className="text-sm text-[#0369A1] dark:text-[#0EA5E9] hover:text-[#0284C7] transition">
                         &larr; Back to Products
                     </Link>
                 </div>

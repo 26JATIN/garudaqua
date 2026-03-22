@@ -1,4 +1,11 @@
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Page Not Found",
+  robots: { index: false, follow: true },
+  alternates: { canonical: null },
+};
 
 export default function NotFound() {
   return (
@@ -31,7 +38,7 @@ export default function NotFound() {
       <div className="flex flex-col sm:flex-row gap-4 items-center">
         <Link
           href="/products"
-          className="px-8 py-3 bg-[#0EA5E9] text-white rounded-full hover:bg-[#0284c7] transition-all shadow-lg hover:shadow-xl font-medium w-full sm:w-auto text-center"
+          className="px-8 py-3 bg-[#0369A1] text-white rounded-full hover:bg-[#0284C7] transition-all shadow-lg hover:shadow-xl font-medium w-full sm:w-auto text-center"
         >
           View Products
         </Link>

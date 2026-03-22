@@ -35,29 +35,29 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
         return src.replace("/upload/", "/upload/w_20,q_10,e_blur:1000,f_webp/");
     }
 
+    const responsiveSizes = "(max-width: 640px) 640px, (max-width: 1024px) 1024px, 100vw";
+
     let LCPImage = null;
     if (!slide.mobileImage) {
         const { props: { srcSet } } = getImageProps({
             ...common,
             alt: slide.title || "Garud Aqua",
             src: slide.image,
-            sizes: "100vw",
-            quality: 80,
+            sizes: responsiveSizes,
             width: 1920,
             height: 1080,
         });
 
         LCPImage = (
             <>
-                <link rel="preload" as="image" imageSrcSet={srcSet} fetchPriority="high" />
+                <link rel="preload" as="image" imageSrcSet={srcSet} imageSizes={responsiveSizes} fetchPriority="high" />
                 <Image
                     src={slide.image}
                     alt={slide.title || "Garud Aqua"}
                     {...common}
                     width={1920}
                     height={1080}
-                    sizes="100vw"
-                    quality={80}
+                    sizes={responsiveSizes}
                     decoding="sync"
                     className="w-full h-auto"
                     placeholder="blur"
@@ -72,8 +72,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
             ...common,
             alt: slide.title || "Garud Aqua",
             src: slide.image,
-            sizes: "100vw",
-            quality: 80,
+            sizes: responsiveSizes,
             width: 1920,
             height: 1080,
         });
@@ -85,7 +84,6 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
             alt: slide.title || "Garud Aqua",
             src: slide.mobileImage,
             sizes: "100vw",
-            quality: 50,
             width: 1080,
             height: 1920,
         });

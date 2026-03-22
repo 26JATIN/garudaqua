@@ -31,8 +31,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
                 {...common}
                 width={1920}
                 height={1080}
-                sizes="100vw"
-                quality={80}
+                sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 100vw"
                 decoding={index === 0 ? "sync" : "async"}
                 className="w-full h-auto"
             />
@@ -45,8 +44,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
         ...common,
         alt: slide.title || "Garud Aqua",
         src: slide.image,
-        sizes: "100vw",
-        quality: 80,
+        sizes: "(max-width: 640px) 640px, (max-width: 1024px) 1024px, 100vw",
         width: 1920,
         height: 1080,
     });
@@ -58,7 +56,6 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
         alt: slide.title || "Garud Aqua",
         src: slide.mobileImage,
         sizes: "100vw",
-        quality: 50,
         width: 1080,
         height: 1920,
     });
