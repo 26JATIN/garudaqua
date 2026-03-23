@@ -171,20 +171,6 @@ html:has(:target) {
   body {
     padding-bottom: calc(68px + env(safe-area-inset-bottom, 20px));
   }
-
-  /* Ensure Safari's bottom toolbar always matches the site theme,
-     not the page-level bg-gray-50 that some pages use */
-  body::after {
-    content: '';
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: env(safe-area-inset-bottom, 0px);
-    background: var(--pwa-bottom-bg);
-    z-index: 99;
-    pointer-events: none;
-  }
 }
 
 /* Prevent text selection on interactive elements */
