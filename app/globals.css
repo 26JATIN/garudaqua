@@ -156,21 +156,6 @@ html {
   background-color: var(--background);
 }
 
-/*
-  iOS Safari bug: overflow-x:clip on <html> breaks position:fixed — fixed
-  elements scroll with the page instead of staying pinned to the viewport.
-  -webkit-touch-callout is iOS-only, so this override only fires on
-  iOS Safari/Chrome (WebKit) and leaves Android/desktop untouched.
-*/
-@supports (-webkit-touch-callout: none) {
-  html {
-    overflow-x: visible !important;
-  }
-  body {
-    overflow-x: clip;
-  }
-}
-
 /* Smooth scroll only for in-page anchor navigation, not route changes */
 html:has(:target) {
   scroll-behavior: smooth;

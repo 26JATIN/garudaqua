@@ -243,15 +243,24 @@ export default function Navbar() {
             </nav>
 
             {/* Mobile Top Search Bar - Enhanced Apple Liquid Glass Effect */}
+            {/* backdrop-filter must be on a CHILD, not the fixed container itself,
+                otherwise iOS Safari breaks position:fixed during scroll */}
             <div
-                className={`lg:hidden fixed top-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-b border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
+                className={`lg:hidden fixed top-0 left-0 right-0 z-100 transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
-                    backgroundColor: "var(--navbar-bg)",
-                    boxShadow: "var(--navbar-shadow)",
                     paddingTop: "env(safe-area-inset-top, 0px)",
+                    WebkitBackfaceVisibility: 'hidden',
                 }}
             >
-                <div className="px-4 py-2 flex items-center gap-2">
+                {/* Visual background layer with blur */}
+                <div
+                    className="absolute inset-0 backdrop-blur-xl backdrop-saturate-200 border-b border-(--navbar-border)"
+                    style={{
+                        backgroundColor: "var(--navbar-bg)",
+                        boxShadow: "var(--navbar-shadow)",
+                    }}
+                />
+                <div className="relative px-4 py-2 flex items-center gap-2">
                     {/* Mobile Logo */}
                     <Link href="/" className="shrink-0">
                         <Image
@@ -286,7 +295,7 @@ export default function Navbar() {
                 the container before forwarding taps to child links. */}
             <div
                 className={`lg:hidden fixed left-0 right-0 z-100 pointer-events-none transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
-                style={{ bottom: 0 }}
+                style={{ bottom: 0, WebkitBackfaceVisibility: 'hidden' }}
             >
                 {/* Visual background layer — no pointer events */}
                 <div
