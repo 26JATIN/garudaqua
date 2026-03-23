@@ -15,10 +15,9 @@ export const viewport = {
   maximumScale: 5,
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  // themeColor is managed by the inline script + hardcoded meta tag below
+  // to match the user's manual theme toggle (not system prefers-color-scheme).
+  // Having multiple theme-color metas causes Safari to pick inconsistently.
 };
 
 export const metadata: Metadata = {
@@ -138,6 +137,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               }
             } catch(e) {
               document.documentElement.classList.remove('dark');
+            }
+            // iOS: overflow-x:clip on <html> breaks position:fixed.
+            // Must run before first paint so Chrome locks in the correct context.
+            var ua = navigator.userAgent;
+            if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+              document.documentElement.style.overflowX = 'visible';
             }
           })();
         `}} />

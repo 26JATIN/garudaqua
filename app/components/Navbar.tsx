@@ -17,26 +17,21 @@ export default function Navbar() {
     const [blogMenuOpen, setBlogMenuOpen] = useState(false);
     const bottomNavRef = useRef<HTMLDivElement>(null);
 
-    // iOS fixes for position:fixed navbars
+    // iOS Chrome: when browser toolbar hides/shows, fixed bottom elements
+    // don't reposition. Use Visual Viewport API to correct on iOS only.
     useEffect(() => {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (!isIOS) return;
 
-        // Fix 1: overflow-x:clip on <html> breaks position:fixed on iOS Safari
-        document.documentElement.style.overflowX = 'visible';
-
-        // Fix 2: iOS Chrome — when browser toolbar hides/shows, fixed bottom
-        // elements don't reposition. Use Visual Viewport API to correct.
         const vv = window.visualViewport;
-        if (!vv) return () => { document.documentElement.style.overflowX = ''; };
+        if (!vv) return;
 
         let raf = 0;
         const update = () => {
             cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => {
                 if (!bottomNavRef.current) return;
-                // gap between layout viewport bottom and visual viewport bottom
                 const offset = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
                 bottomNavRef.current.style.bottom = `${offset}px`;
             });
@@ -48,7 +43,6 @@ export default function Navbar() {
             cancelAnimationFrame(raf);
             vv.removeEventListener('resize', update);
             vv.removeEventListener('scroll', update);
-            document.documentElement.style.overflowX = '';
         };
     }, []);
 
