@@ -15,6 +15,18 @@ export default function Navbar() {
     const [categories, setCategories] = useState<any[]>([]);
     const [blogCategories, setBlogCategories] = useState<any[]>([]);
     const [blogMenuOpen, setBlogMenuOpen] = useState(false);
+
+    // iOS Safari: overflow-x:clip on <html> breaks position:fixed.
+    // Detect iOS and remove it via inline style (overrides stylesheet).
+    // Android/desktop are untouched since the check only matches iOS WebKit.
+    useEffect(() => {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (!isIOS) return;
+        document.documentElement.style.overflowX = 'visible';
+        return () => { document.documentElement.style.overflowX = ''; };
+    }, []);
+
     // Defer API calls so they don't compete with hero LCP image on mobile
     useEffect(() => {
         const load = () => {
