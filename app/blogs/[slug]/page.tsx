@@ -6,14 +6,17 @@ import { articleSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const dynamic = "force-static";
 
-/** Pre-build all published blog pages at deploy time (ISR refreshes them every 60s). */
+/** Pre-build all published blog pages + former slugs (so redirects are instant, no client error). */
 export async function generateStaticParams() {
   try {
     const blogs = await prisma.blogPost.findMany({
       where: { isPublished: true },
-      select: { slug: true },
+      select: { slug: true, formerSlugs: true },
     });
-    return blogs.map((b) => ({ slug: b.slug }));
+    return blogs.flatMap((b) => [
+      { slug: b.slug },
+      ...b.formerSlugs.map((fs) => ({ slug: fs })),
+    ]);
   } catch {
     return [];
   }

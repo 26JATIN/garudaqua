@@ -161,18 +161,20 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
 
             {/* Dot indicators */}
             {images.length > 1 && (
-                <div className="flex justify-center gap-2 mt-3">
+                <div className="flex justify-center gap-0 mt-3">
                     {images.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => { setActiveIndex(index); onIndexChange?.(index); }}
-                            className={`rounded-full transition-all duration-300 ${
+                            className="p-3 flex items-center justify-center"
+                            aria-label={`View image ${index + 1}`}
+                        >
+                            <span className={`block rounded-full transition-all duration-300 ${
                                 activeIndex === index
                                     ? "w-6 h-2 bg-[#0EA5E9]"
                                     : "w-2 h-2 bg-gray-300 dark:bg-gray-600"
-                            }`}
-                            aria-label={`View image ${index + 1}`}
-                        />
+                            }`} />
+                        </button>
                     ))}
                 </div>
             )}

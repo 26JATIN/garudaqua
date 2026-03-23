@@ -91,7 +91,7 @@ export default function Navbar() {
                                         width={181}
                                         height={80}
                                         className="h-20 w-auto"
-                                        loading="eager"
+                                        priority
                                     />
                                 </Link>
                             </div>
@@ -261,7 +261,7 @@ export default function Navbar() {
                             width={48}
                             height={48}
                             className="h-12 w-12 object-contain scale-200"
-                            loading="eager"
+                            priority
                         />
                     </Link>
                     {/* Search Bar */}

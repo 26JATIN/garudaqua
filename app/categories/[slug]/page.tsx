@@ -11,9 +11,12 @@ export const dynamic = "force-static";
 export async function generateStaticParams() {
     const categories = await prisma.category.findMany({
         where: { isActive: true },
-        select: { slug: true },
+        select: { slug: true, formerSlugs: true },
     });
-    return categories.filter(c => c.slug).map(c => ({ slug: c.slug! }));
+    return categories.filter(c => c.slug).flatMap(c => [
+        { slug: c.slug! },
+        ...c.formerSlugs.map((fs) => ({ slug: fs })),
+    ]);
 }
 
 const CATEGORY_INCLUDE = {

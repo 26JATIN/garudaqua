@@ -8,14 +8,17 @@ import { productSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const dynamic = "force-static";
 
-/** Pre-build all active product pages at deploy time (ISR refreshes them every 60s). */
+/** Pre-build all active product pages + former slugs (so redirects are instant, no client error). */
 export async function generateStaticParams() {
   try {
     const products = await prisma.product.findMany({
       where: { isActive: true },
-      select: { slug: true },
+      select: { slug: true, formerSlugs: true },
     });
-    return products.map((p) => ({ slug: p.slug }));
+    return products.flatMap((p) => [
+      { slug: p.slug },
+      ...p.formerSlugs.map((fs) => ({ slug: fs })),
+    ]);
   } catch {
     return [];
   }
