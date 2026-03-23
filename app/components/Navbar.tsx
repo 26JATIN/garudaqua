@@ -15,6 +15,29 @@ export default function Navbar() {
     const [categories, setCategories] = useState<any[]>([]);
     const [blogCategories, setBlogCategories] = useState<any[]>([]);
     const [blogMenuOpen, setBlogMenuOpen] = useState(false);
+    const bottomNavRef = useRef<HTMLDivElement>(null);
+
+    // Fix iOS Safari/Chrome: when browser chrome hides on scroll,
+    // fixed bottom elements don't reposition. Use Visual Viewport API
+    // to keep the bottom nav pinned to the actual visible viewport bottom.
+    useEffect(() => {
+        const vv = window.visualViewport;
+        if (!vv) return;
+
+        const update = () => {
+            if (!bottomNavRef.current) return;
+            // offset between layout viewport and visual viewport bottom
+            const offset = window.innerHeight - (vv.height + vv.offsetTop);
+            bottomNavRef.current.style.bottom = `${offset}px`;
+        };
+
+        vv.addEventListener('resize', update);
+        vv.addEventListener('scroll', update);
+        return () => {
+            vv.removeEventListener('resize', update);
+            vv.removeEventListener('scroll', update);
+        };
+    }, []);
 
     // Defer API calls so they don't compete with hero LCP image on mobile
     useEffect(() => {
@@ -286,6 +309,7 @@ export default function Navbar() {
                 each Link prevents iOS from requiring a "first tap to activate"
                 the container before forwarding taps to child links. */}
             <div
+                ref={bottomNavRef}
                 className={`lg:hidden fixed left-0 right-0 z-100 pointer-events-none transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{ bottom: 0 }}
             >
