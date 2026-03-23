@@ -15,16 +15,41 @@ export default function Navbar() {
     const [categories, setCategories] = useState<any[]>([]);
     const [blogCategories, setBlogCategories] = useState<any[]>([]);
     const [blogMenuOpen, setBlogMenuOpen] = useState(false);
+    const bottomNavRef = useRef<HTMLDivElement>(null);
 
-    // iOS Safari: overflow-x:clip on <html> breaks position:fixed.
-    // Detect iOS and remove it via inline style (overrides stylesheet).
-    // Android/desktop are untouched since the check only matches iOS WebKit.
+    // iOS fixes for position:fixed navbars
     useEffect(() => {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (!isIOS) return;
+
+        // Fix 1: overflow-x:clip on <html> breaks position:fixed on iOS Safari
         document.documentElement.style.overflowX = 'visible';
-        return () => { document.documentElement.style.overflowX = ''; };
+
+        // Fix 2: iOS Chrome — when browser toolbar hides/shows, fixed bottom
+        // elements don't reposition. Use Visual Viewport API to correct.
+        const vv = window.visualViewport;
+        if (!vv) return () => { document.documentElement.style.overflowX = ''; };
+
+        let raf = 0;
+        const update = () => {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+                if (!bottomNavRef.current) return;
+                // gap between layout viewport bottom and visual viewport bottom
+                const offset = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+                bottomNavRef.current.style.bottom = `${offset}px`;
+            });
+        };
+
+        vv.addEventListener('resize', update);
+        vv.addEventListener('scroll', update);
+        return () => {
+            cancelAnimationFrame(raf);
+            vv.removeEventListener('resize', update);
+            vv.removeEventListener('scroll', update);
+            document.documentElement.style.overflowX = '';
+        };
     }, []);
 
     // Defer API calls so they don't compete with hero LCP image on mobile
@@ -306,6 +331,7 @@ export default function Navbar() {
                 each Link prevents iOS from requiring a "first tap to activate"
                 the container before forwarding taps to child links. */}
             <div
+                ref={bottomNavRef}
                 className={`lg:hidden fixed left-0 right-0 z-100 pointer-events-none transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{ bottom: 0, WebkitBackfaceVisibility: 'hidden' }}
             >
