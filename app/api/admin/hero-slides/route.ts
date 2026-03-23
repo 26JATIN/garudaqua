@@ -12,7 +12,7 @@ export async function GET() {
 
     return NextResponse.json(slides, {
       headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+        "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
       },
     });
   } catch (error) {

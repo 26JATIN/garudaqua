@@ -53,9 +53,12 @@ export default function SafeImage({
             <img
                 src={fallbackSrc}
                 alt={alt}
+                width={fill ? undefined : (width || 400)}
+                height={fill ? undefined : (height || 400)}
                 className={className}
                 style={fill ? { objectFit: "cover", width: "100%", height: "100%" } : undefined}
                 loading="lazy"
+                decoding="async"
             />
         );
     }

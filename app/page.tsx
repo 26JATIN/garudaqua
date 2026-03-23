@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import dynamicImports from "next/dynamic";
 import Hero from './components/hero';
 import { prisma } from '@/lib/prisma';
-import { webPageSchema } from '@/lib/jsonld';
+import { webPageSchema, videoSchema } from '@/lib/jsonld';
 
 export const dynamic = "force-static";
 
@@ -181,6 +181,18 @@ export default async function Home() {
         description: "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes, fittings & agricultural water management products.",
         url: "https://garudaqua.in",
       })) }} />
+      {videoData.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(
+          videoData.map(v => videoSchema({
+            name: v.title,
+            description: v.description || `${v.title} — product showcase by Garud Aqua Solutions`,
+            thumbnailUrl: v.thumbnailUrl,
+            uploadDate: new Date().toISOString(),
+            contentUrl: v.videoUrl,
+            duration: v.duration ? `PT${v.duration}S` : undefined,
+          }))
+        ) }} />
+      )}
 
       {/* Gradient Background */}
       <div className="fixed inset-0 bg-linear-to-br from-white via-[#FEFEFE] to-[#F3F8FE] dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] -z-10" />

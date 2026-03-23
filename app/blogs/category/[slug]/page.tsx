@@ -3,9 +3,17 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import BlogsClient from "../../BlogsClient";
-import { collectionPageSchema } from "@/lib/jsonld";
+import { collectionPageSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const dynamic = "force-static";
+
+export async function generateStaticParams() {
+    const categories = await prisma.blogCategory.findMany({
+        where: { isActive: true },
+        select: { slug: true },
+    });
+    return categories.filter(c => c.slug).map(c => ({ slug: c.slug! }));
+}
 
 const SITE_URL = "https://garudaqua.in";
 
@@ -99,6 +107,18 @@ export default async function BlogCategoryPage(
                             description: `Expert articles about ${blogCategory.name.toLowerCase()} from Garud Aqua Solutions.`,
                             url: `${SITE_URL}/blogs/category/${slug}`,
                         })
+                    ),
+                }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(
+                        breadcrumbSchema([
+                            { name: "Home", url: SITE_URL },
+                            { name: "Blog", url: `${SITE_URL}/blogs` },
+                            { name: blogCategory.name, url: `${SITE_URL}/blogs/category/${slug}` },
+                        ])
                     ),
                 }}
             />

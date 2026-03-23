@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Page Not Found",
@@ -10,6 +11,11 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center bg-gray-50 dark:bg-[#0A0A0A] px-4 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema({
+        name: "Page Not Found — Garud Aqua Solutions",
+        description: "The page you are looking for could not be found. Browse our products or read our blog.",
+        url: "https://garudaqua.in/404",
+      })) }} />
       {/* Icon / Graphics */}
       <div className="mb-8 text-[#0EA5E9] dark:text-[#38bdf8] opacity-80">
         <svg

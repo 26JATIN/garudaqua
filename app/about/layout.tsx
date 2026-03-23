@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { aboutPageSchema } from "@/lib/jsonld";
 
+export const dynamic = "force-static";
+
 export const metadata: Metadata = {
   title: "About Us — Our Story, Mission & Team",
   description:

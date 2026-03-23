@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useAnimateOnView } from "@/lib/useAnimateOnView";
 
-const CircularGallery = dynamic(() => import("@/components/ui/circular-gallery"), { ssr: false });
+const ScrollGallery = dynamic(() => import("@/components/ui/circular-gallery"), { ssr: false });
 
 interface GalleryItem {
     image: string;
@@ -119,14 +119,10 @@ export default function ImageGallery({ initialItems }: ImageGalleryProps) {
                             <div className="w-12 h-12 border-2 border-[#0EA5E9]/30 border-t-[#0EA5E9] rounded-full animate-spin" />
                         </div>
                     ) : (
-                        <CircularGallery
+                        <ScrollGallery
                             items={galleryItems}
-                            bend={3}
                             textColor="#0EA5E9"
                             borderRadius={0.05}
-                            font="bold 30px sans-serif"
-                            scrollSpeed={2}
-                            scrollEase={0.05}
                         />
                     )}
                 </div>

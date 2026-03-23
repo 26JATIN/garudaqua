@@ -4,8 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
+import { collectionPageSchema, breadcrumbSchema } from "@/lib/jsonld";
 
 export const dynamic = "force-static";
+
+export async function generateStaticParams() {
+    const categories = await prisma.category.findMany({
+        where: { isActive: true },
+        select: { slug: true },
+    });
+    return categories.filter(c => c.slug).map(c => ({ slug: c.slug! }));
+}
 
 const CATEGORY_INCLUDE = {
     products: {
@@ -87,14 +96,26 @@ export default async function CategorySeoPage(
         ?.replace(/<h4(\s|>)/g, "<h3$1").replace(/<\/h4>/g, "</h3>")
         .replace(/<h3(\s|>)/g, "<h2$1").replace(/<\/h3>/g, "</h2>");
 
+    const canonicalUrl = `https://garudaqua.in/categories/${categoryFull.slug || slug}`;
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#060606]">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema({
+                name: categoryFull.name,
+                description: categoryFull.description || `Explore ${categoryFull.name} products at Garud Aqua Solutions.`,
+                url: canonicalUrl,
+            })) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
+                { name: "Home", url: "https://garudaqua.in" },
+                { name: "Categories", url: "https://garudaqua.in/categories" },
+                { name: categoryFull.name, url: canonicalUrl },
+            ])) }} />
             {/* Hero Section */}
             <div className="relative overflow-hidden min-h-72 sm:min-h-96 lg:min-h-[55vh] flex flex-col justify-end">
                 {/* Background image — fully interactive for copy/save */}
                 <Image
                     src={heroImageSrc}
-                    alt={categoryFull.name}
+                    alt={`${categoryFull.name} — product category at Garud Aqua Solutions`}
                     fill
                     className="object-cover object-center"
                     sizes="100vw"
@@ -170,7 +191,7 @@ export default async function CategorySeoPage(
                                     {product.image ? (
                                         <Image
                                             src={product.image}
-                                            alt={product.name}
+                                            alt={`${product.name} — ${product.category?.name || categoryFull.name} product`}
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"

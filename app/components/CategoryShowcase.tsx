@@ -93,7 +93,7 @@ const CategoryPreview = React.memo(({ category, className, priority = false }: C
         <>
           <Image
             src={category.image}
-            alt={category.name}
+            alt={`${category.name} — water management category`}
             fill={true}
             className={`object-cover object-top transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'
               } ${hasError ? 'hidden' : 'block'}`}
@@ -150,7 +150,7 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
           <>
             <Image
               src={subcategory.image}
-              alt={subcategory.name}
+              alt={`${subcategory.name} subcategory`}
               fill={true}
               className={`object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={() => setIsLoaded(true)}

@@ -57,7 +57,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                 entries.forEach((entry) => {
                     const video = entry.target as HTMLVideoElement;
                     if (entry.isIntersecting) {
-                        video.play().catch((err: unknown) => console.log("Auto-play prevented:", err));
+                        video.play().catch(() => {});
                     } else {
                         video.pause();
                     }

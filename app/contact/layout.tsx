@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { contactPageSchema } from "@/lib/jsonld";
 
+export const dynamic = "force-static";
+
 export const metadata: Metadata = {
   title: "Contact Us — Get a Quote or Enquiry",
   description:

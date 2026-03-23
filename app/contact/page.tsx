@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 export default function ContactPage() {
@@ -51,10 +50,8 @@ export default function ContactPage() {
     if (submitted) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center px-4">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="max-w-md w-full bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-xl dark:shadow-none dark:border dark:border-white/10 p-8 text-center"
+                <div
+                    className="max-w-md w-full bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-xl dark:shadow-none dark:border dark:border-white/10 p-8 text-center animate-[fadeInScale_0.3s_ease-out]"
                 >
                     <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                         <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +77,7 @@ export default function ContactPage() {
                             Send Another
                         </button>
                     </div>
-                </motion.div>
+                </div>
             </div>
         );
     }
@@ -110,7 +107,7 @@ export default function ContactPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Address</h2>
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Address</h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 font-light leading-relaxed">
                                         Ground, Murraba No. 62, Killa No. 2,<br />
                                         Garud Aqua Solutions,<br />
@@ -128,7 +125,7 @@ export default function ContactPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Phone</h2>
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Phone</h3>
                                     <a href="tel:+919462594603" className="text-sm text-gray-600 dark:text-gray-400 font-light hover:text-[#0EA5E9] transition-colors">
                                         +91 94625 94603
                                     </a>
@@ -142,7 +139,7 @@ export default function ContactPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Email</h2>
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Email</h3>
                                     <a href="mailto:rkg210@gmail.com" className="text-sm text-gray-600 dark:text-gray-400 font-light hover:text-[#0EA5E9] transition-colors">
                                         rkg210@gmail.com
                                     </a>
@@ -156,7 +153,7 @@ export default function ContactPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Business Hours</h2>
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Business Hours</h3>
                                     <p className="text-sm text-gray-600 dark:text-gray-400 font-light">
                                         Mon - Sat: 9:00 AM - 6:00 PM
                                     </p>
@@ -166,7 +163,7 @@ export default function ContactPage() {
 
                         {/* Quick Links */}
                         <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 p-6">
-                            <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">Looking for something specific?</h2>
+                            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">Looking for something specific?</h3>
                             <div className="space-y-2">
                                 <Link href="/products" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,7 +190,7 @@ export default function ContactPage() {
                     {/* Contact Form */}
                     <div className="lg:col-span-3">
                         <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 p-6 md:p-8">
-                            <h2 className="text-xl font-light text-gray-900 dark:text-gray-100 mb-6">Send us a message</h2>
+                            <h2 className="text-xl font-light text-gray-900 dark:text-gray-100 mb-6">Send Us a Message</h2>
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 {/* Name & Phone */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -259,15 +256,13 @@ export default function ContactPage() {
                                 </div>
 
                                 {/* Submit */}
-                                <motion.button
+                                <button
                                     type="submit"
                                     disabled={submitting}
-                                    whileHover={{ scale: submitting ? 1 : 1.01 }}
-                                    whileTap={{ scale: submitting ? 1 : 0.99 }}
-                                    className="w-full py-3.5 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-medium text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                                    className="w-full py-3.5 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-medium text-lg shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                                     {submitting ? "Sending..." : "Send Message"}
-                                </motion.button>
+                                </button>
 
                                 <p className="text-xs text-gray-500 dark:text-gray-500 text-center">
                                     By submitting, you agree to be contacted by our team regarding your message.

@@ -206,7 +206,7 @@ export default function AboutPage() {
 
                                 {/* Text */}
                                 <div className="flex-1">
-                                    <p className="text-gray-900 dark:text-white font-bold text-lg leading-snug mb-3">{item.title}</p>
+                                    <h3 className="text-gray-900 dark:text-white font-bold text-lg leading-snug mb-3">{item.title}</h3>
                                     <p className="text-gray-600 dark:text-[#888888] text-sm leading-relaxed">{item.desc}</p>
                                 </div>
 
@@ -235,7 +235,7 @@ export default function AboutPage() {
                         title: "Vision & Leadership",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Mr. Rajesh Gupta — Founder & MD</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Mr. Rajesh Gupta — Founder & MD</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Mr. Rajesh Gupta brings a wealth of experience and a deep-rooted passion for innovation. His strategic insights and customer-centric approach have shaped Garud Aqua Solutions into a company known for quality, innovative solutions, and unwavering dedication to customer satisfaction since its inception in 2014.
                                 </p>
@@ -251,7 +251,7 @@ export default function AboutPage() {
                         title: "25+ Years",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Unmatched Industry Expertise</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Unmatched Industry Expertise</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     With over 25 years of experience in pipe fitting and water tank retail, Mr. Gupta has a unique understanding of both customer needs and manufacturer capabilities. This depth of knowledge allows Garud Aqua Solutions to bridge the gap with innovative, market-ready solutions that truly serve the industry.
                                 </p>
@@ -267,7 +267,7 @@ export default function AboutPage() {
                         title: "Sustainability",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Commitment to Excellence & Environment</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Commitment to Excellence & Environment</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Mr. Gupta&apos;s relentless pursuit of excellence is matched by his commitment to sustainable practices. Under his guidance, Garud Aqua Solutions continuously pushes the boundaries of innovation — making a positive impact on communities and the environment across Rajasthan and beyond.
                                 </p>
@@ -283,7 +283,7 @@ export default function AboutPage() {
                         title: "Today",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">10,000+ Customers. One Vision.</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">10,000+ Customers. One Vision.</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     From a single retail outlet in Sriganganagar to a pan-Rajasthan operation serving over 10,000 customers — Mr. Gupta&apos;s vision has been the constant driving force. His mission: to provide reliable and sustainable water management solutions for generations to come.
                                 </p>
@@ -307,7 +307,7 @@ export default function AboutPage() {
                         title: "Manufacturing",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Advanced Manufacturing Facility</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Advanced Manufacturing Facility</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Our manufacturing facility is equipped with advanced machinery and equipment, operated by skilled technicians and engineers. From water tank production lines to piping system assembly stations, every aspect of our manufacturing process is carefully designed to ensure precision, consistency, and reliability.
                                 </p>
@@ -323,7 +323,7 @@ export default function AboutPage() {
                         title: "Quality",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Testing & Quality Assurance</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Testing & Quality Assurance</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     We have dedicated testing and quality assurance laboratories where our products undergo rigorous testing and inspection. Our quality control experts use cutting-edge equipment and techniques to verify the performance, durability, and safety of our products — ensuring they meet or exceed industry standards.
                                 </p>
@@ -339,7 +339,7 @@ export default function AboutPage() {
                         title: "Logistics",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Warehousing & Logistics</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Warehousing & Logistics</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Our spacious warehouses are strategically located to facilitate efficient storage and distribution. With ample storage capacity and modern logistics infrastructure, we fulfill orders quickly and accurately — ensuring timely delivery to customers across Rajasthan and beyond.
                                 </p>
@@ -355,7 +355,7 @@ export default function AboutPage() {
                         title: "R&D",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Research & Development</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Research & Development</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Innovation is at the heart of everything we do. Our dedicated R&D team focuses on creating new products and improving existing ones. Equipped with advanced technology and resources, our R&D facility supports continuous innovation across our entire product range.
                                 </p>
@@ -371,7 +371,7 @@ export default function AboutPage() {
                         title: "Green Ops",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Environmental Sustainability</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Environmental Sustainability</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     We are committed to minimising our environmental footprint. From energy-efficient manufacturing processes to eco-friendly packaging materials, we strive to incorporate sustainable practices into our infrastructure — promoting responsibility at every level of our operations.
                                 </p>
@@ -387,7 +387,7 @@ export default function AboutPage() {
                         title: "Support",
                         content: (
                             <div>
-                                <p className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Customer Support Centre</p>
+                                <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold text-base md:text-lg mb-2">Customer Support Centre</h3>
                                 <p className="text-neutral-600 dark:text-neutral-400 text-sm md:text-base leading-relaxed mb-4">
                                     Our infrastructure includes a customer support centre staffed by knowledgeable and friendly professionals dedicated to exceptional service. Whether you have questions about our products or need assistance with an order, our team is always here to help.
                                 </p>

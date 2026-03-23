@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
 
   experimental: {
     inlineCss: true,
-    optimizePackageImports: ["lucide-react", "sonner"],
+    optimizePackageImports: ["lucide-react", "sonner", "framer-motion"],
     serverActions: {
       bodySizeLimit: "10mb",
     },
@@ -27,13 +27,13 @@ const nextConfig: NextConfig = {
   },
 
   headers: async () => [
-    // ⭐ Cache all HTML pages aggressively for CDN
+    // ⭐ HTML pages — immutable, Cloudflare purges on admin writes
     {
       source: "/((?!api).*)",
       headers: [
         {
           key: "Cache-Control",
-          value: "public, s-maxage=31536000, stale-while-revalidate=86400",
+          value: "public, max-age=31536000, s-maxage=31536000, immutable",
         },
       ],
     },
@@ -54,10 +54,14 @@ const nextConfig: NextConfig = {
           key: "Content-Security-Policy",
           value: "frame-ancestors 'self'",
         },
+        {
+          key: "Permissions-Policy",
+          value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
+        },
       ],
     },
 
-    // Static assets cache
+    // Static assets — immutable
     {
       source: "/:path*\\.(woff2|woff|ttf|ico|png|jpg|jpeg|webp|svg|avif)",
       headers: [
@@ -68,25 +72,25 @@ const nextConfig: NextConfig = {
       ],
     },
 
-    // Public API caching
+    // Public API — immutable, Cloudflare purges on admin writes
     {
       source:
         "/api/(hero-slides|hero-videos|gallery|categories|subcategories|blog-categories|products|blogs)",
       headers: [
         {
           key: "Cache-Control",
-          value: "public, s-maxage=60, stale-while-revalidate=300",
+          value: "public, max-age=31536000, s-maxage=31536000, immutable",
         },
       ],
     },
 
-    // Search suggestions cache
+    // Search suggestions — immutable, Cloudflare purges on admin writes
     {
       source: "/api/search/suggestions",
       headers: [
         {
           key: "Cache-Control",
-          value: "public, s-maxage=30, stale-while-revalidate=120",
+          value: "public, max-age=31536000, s-maxage=31536000, immutable",
         },
       ],
     },

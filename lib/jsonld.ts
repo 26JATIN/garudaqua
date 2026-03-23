@@ -312,6 +312,25 @@ export function contactPageSchema() {
   };
 }
 
+// ─── EnquirePage ────────────────────────────────────────────────────────────
+
+export function enquirePageSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "Product Enquiry — Garud Aqua Solutions",
+    description:
+      "Submit a product enquiry or request a quote for water tanks, pipes, and fittings from Garud Aqua Solutions.",
+    url: `${SITE_URL}/enquire`,
+    mainEntity: { "@id": `${SITE_URL}/#organization` },
+    potentialAction: {
+      "@type": "CommunicateAction",
+      target: `${SITE_URL}/enquire`,
+      name: "Request a Quote",
+    },
+  };
+}
+
 // ─── AboutPage ───────────────────────────────────────────────────────────────
 
 export function aboutPageSchema() {
