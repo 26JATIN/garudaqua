@@ -15,41 +15,6 @@ export default function Navbar() {
     const [categories, setCategories] = useState<any[]>([]);
     const [blogCategories, setBlogCategories] = useState<any[]>([]);
     const [blogMenuOpen, setBlogMenuOpen] = useState(false);
-    const topNavRef = useRef<HTMLDivElement>(null);
-    const bottomNavRef = useRef<HTMLDivElement>(null);
-
-    // Fix iOS Safari/Chrome viewport issues:
-    // 1. When browser chrome hides, fixed elements don't reposition
-    // 2. Clamp to >= 0 so overscroll/pull-to-refresh doesn't shift navbars
-    useEffect(() => {
-        const vv = window.visualViewport;
-        if (!vv) return;
-
-        let raf = 0;
-        const update = () => {
-            cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(() => {
-                const offset = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
-                const topOffset = Math.max(0, vv.offsetTop);
-
-                if (bottomNavRef.current) {
-                    bottomNavRef.current.style.bottom = `${offset}px`;
-                }
-                if (topNavRef.current) {
-                    topNavRef.current.style.top = `${topOffset}px`;
-                }
-            });
-        };
-
-        vv.addEventListener('resize', update);
-        vv.addEventListener('scroll', update);
-        return () => {
-            cancelAnimationFrame(raf);
-            vv.removeEventListener('resize', update);
-            vv.removeEventListener('scroll', update);
-        };
-    }, []);
-
     // Defer API calls so they don't compete with hero LCP image on mobile
     useEffect(() => {
         const load = () => {
@@ -279,14 +244,11 @@ export default function Navbar() {
 
             {/* Mobile Top Search Bar - Enhanced Apple Liquid Glass Effect */}
             <div
-                ref={topNavRef}
                 className={`lg:hidden fixed top-0 left-0 right-0 z-100 backdrop-blur-xl backdrop-saturate-200 border-b border-(--navbar-border) transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 style={{
                     backgroundColor: "var(--navbar-bg)",
                     boxShadow: "var(--navbar-shadow)",
                     paddingTop: "env(safe-area-inset-top, 0px)",
-                    transform: isNavbarHidden ? undefined : 'translate3d(0,0,0)',
-                    willChange: 'transform',
                 }}
             >
                 <div className="px-4 py-2 flex items-center gap-2">
@@ -323,13 +285,8 @@ export default function Navbar() {
                 each Link prevents iOS from requiring a "first tap to activate"
                 the container before forwarding taps to child links. */}
             <div
-                ref={bottomNavRef}
                 className={`lg:hidden fixed left-0 right-0 z-100 pointer-events-none transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
-                style={{
-                    bottom: 0,
-                    transform: isNavbarHidden ? undefined : 'translate3d(0,0,0)',
-                    willChange: 'transform',
-                }}
+                style={{ bottom: 0 }}
             >
                 {/* Visual background layer — no pointer events */}
                 <div
