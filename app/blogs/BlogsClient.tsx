@@ -151,13 +151,13 @@ export default function BlogsClient({
             <div className="container mx-auto px-4 py-16">
                 {/* Category Filter */}
                 <div className="mb-12">
-                    <div className="flex flex-wrap gap-3 justify-center">
+                    <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-2 md:flex-wrap md:justify-center md:overflow-x-visible md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                         <Link
                             href="/blogs"
                             onClick={(e) => { e.preventDefault(); setCategory("all"); }}
-                            className={`px-6 py-3 rounded-full font-light transition-all duration-300 ${
+                            className={`shrink-0 snap-start whitespace-nowrap px-5 py-2.5 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 ${
                                 category === "all"
-                                    ? "bg-[#0369A1] text-white shadow-lg scale-105"
+                                    ? "bg-[#0369A1] text-white shadow-lg md:scale-105"
                                     : "bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 hover:shadow-md border border-gray-200 dark:border-white/6"
                             }`}
                         >
@@ -168,9 +168,9 @@ export default function BlogsClient({
                                 key={cat.id}
                                 href={`/blogs/category/${cat.slug}`}
                                 onClick={(e) => { e.preventDefault(); setCategory(cat.slug); }}
-                                className={`px-6 py-3 rounded-full font-light transition-all duration-300 ${
+                                className={`shrink-0 snap-start whitespace-nowrap px-5 py-2.5 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 ${
                                     category === cat.slug
-                                        ? "bg-[#0369A1] text-white shadow-lg scale-105"
+                                        ? "bg-[#0369A1] text-white shadow-lg md:scale-105"
                                         : "bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 hover:shadow-md border border-gray-200 dark:border-white/6"
                                 }`}
                             >
@@ -269,7 +269,7 @@ export default function BlogsClient({
                                                 <svg className="w-3.5 h-3.5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
-                                                {new Date(blog.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                                <span suppressHydrationWarning>{new Date(blog.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
                                             </span>
                                         </div>
 
