@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     inlineCss: true,
     optimizePackageImports: ["lucide-react", "sonner", "framer-motion"],
     serverActions: {
-      bodySizeLimit: "10mb",
+      bodySizeLimit: "100mb",
     },
   },
 
