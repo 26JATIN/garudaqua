@@ -4,6 +4,22 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   poweredByHeader: false,
 
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "garudaqua.in",
+          },
+        ],
+        destination: "https://www.garudaqua.in/:path*",
+        permanent: true, // ✅ forces 301 instead of 307
+      },
+    ];
+  },
+
   experimental: {
     inlineCss: true,
     optimizePackageImports: ["lucide-react", "sonner", "framer-motion"],
@@ -56,7 +72,8 @@ const nextConfig: NextConfig = {
         },
         {
           key: "Permissions-Policy",
-          value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
+          value:
+            "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
         },
       ],
     },
