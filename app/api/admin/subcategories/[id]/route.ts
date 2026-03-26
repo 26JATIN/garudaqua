@@ -76,7 +76,7 @@ export async function PUT(
     }
 
     // Purge listing page, new + old subcategory filter URLs
-    const pathsToPurge = ["/", "/products", `/products?subcategory=${newSlug}`];
+    const pathsToPurge = ["/", "/products", `/products?subcategory=${newSlug}`, "/api/subcategories"];
     if (existing?.slug && existing.slug !== newSlug) {
       pathsToPurge.push(`/products?subcategory=${existing.slug}`);
       // Also purge all formerSlug filter URLs
@@ -111,7 +111,7 @@ export async function DELETE(
 
     // Purge the listing page, the live subcategory filter URL, and every former
     // slug filter URL so no stale Cloudflare-cached page survives the deletion.
-    const pathsToPurge = ["/", "/products"];
+    const pathsToPurge = ["/", "/products", "/api/subcategories"];
     if (subcategory?.slug) pathsToPurge.push(`/products?subcategory=${subcategory.slug}`);
     (subcategory?.formerSlugs ?? []).forEach((s) =>
       pathsToPurge.push(`/products?subcategory=${s}`)

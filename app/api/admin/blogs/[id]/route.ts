@@ -76,7 +76,7 @@ export async function PUT(
 
     // Purge new slug path, old slug path (if changed), and every previously-known
     // formerSlug path so no stale Cloudflare-cached page survives a rename.
-    const pathsToPurge = ["/","/blogs", ...(blog.slug ? [`/blogs/${blog.slug}`] : [])];
+    const pathsToPurge = ["/","/blogs", "/api/blogs", ...(blog.slug ? [`/blogs/${blog.slug}`, `/api/blogs/${blog.slug}`] : [])];
     if (slugChanged && existing.slug) pathsToPurge.push(`/blogs/${existing.slug}`);
     (existing.formerSlugs ?? []).forEach((s) => pathsToPurge.push(`/blogs/${s}`));
     await revalidateAndWarm(pathsToPurge);
@@ -105,8 +105,11 @@ export async function DELETE(
     if (blog?.featuredImage) await deleteCloudinaryByUrl(blog.featuredImage);
 
     // Purge current slug + all former slugs so no stale page remains in Cloudflare
-    const pathsToPurge = ["/","/blogs"];
-    if (blog?.slug) pathsToPurge.push(`/blogs/${blog.slug}`);
+    const pathsToPurge = ["/","/blogs", "/api/blogs"];
+    if (blog?.slug) {
+      pathsToPurge.push(`/blogs/${blog.slug}`);
+      pathsToPurge.push(`/api/blogs/${blog.slug}`);
+    }
     if (blog?.formerSlugs?.length) {
       blog.formerSlugs.forEach((s) => pathsToPurge.push(`/blogs/${s}`));
     }

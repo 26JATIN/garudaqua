@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         subcategory: { select: { id: true, name: true } },
       },
     });
-    await revalidateAndWarm(["/","/products"]);
+    await revalidateAndWarm(["/","/products", "/api/products"]);
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);

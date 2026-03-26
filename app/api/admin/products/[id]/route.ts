@@ -117,7 +117,7 @@ export async function PUT(
 
     // Revalidate new slug, old slug (if changed), and every formerSlug so no
     // stale Cloudflare-cached page can serve the wrong product.
-    const pathsToRevalidate = ["/", "/products", `/products/${newSlug}`];
+    const pathsToRevalidate = ["/", "/products", `/products/${newSlug}`, "/api/products", `/api/products/${newSlug}`];
     if (existing.slug !== newSlug) {
       pathsToRevalidate.push(`/products/${existing.slug}`);
     }
@@ -161,8 +161,11 @@ export async function DELETE(
     );
 
     // Purge current slug + all former slugs so no stale page remains in Cloudflare
-    const pathsToPurge = ["/", "/products"];
-    if (product.slug) pathsToPurge.push(`/products/${product.slug}`);
+    const pathsToPurge = ["/", "/products", "/api/products"];
+    if (product.slug) {
+      pathsToPurge.push(`/products/${product.slug}`);
+      pathsToPurge.push(`/api/products/${product.slug}`);
+    }
     (product.formerSlugs ?? []).forEach((s) => pathsToPurge.push(`/products/${s}`));
     await revalidateAndWarm(pathsToPurge);
     return NextResponse.json({ success: true });

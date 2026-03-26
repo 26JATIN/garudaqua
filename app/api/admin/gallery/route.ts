@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         tags: body.tags || [],
       },
     });
-    await revalidateAndWarm(["/"]);
+    await revalidateAndWarm(["/", "/api/gallery"]);
     return NextResponse.json(item, { status: 201 });
   } catch (error) {
     console.error("Error creating gallery item:", error);

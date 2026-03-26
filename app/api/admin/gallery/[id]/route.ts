@@ -39,7 +39,7 @@ export async function PUT(
       await deleteCloudinaryByUrl(existing.thumbnailUrl);
     }
 
-    await revalidateAndWarm(["/"]);
+    await revalidateAndWarm(["/", "/api/gallery"]);
     return NextResponse.json(item);
   } catch (error) {
     console.error("Error updating gallery item:", error);
@@ -68,7 +68,7 @@ export async function DELETE(
     }
     if (item?.thumbnailUrl) await deleteCloudinaryByUrl(item.thumbnailUrl);
 
-    await revalidateAndWarm(["/"]);
+    await revalidateAndWarm(["/", "/api/gallery"]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting gallery item:", error);

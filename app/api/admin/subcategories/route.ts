@@ -52,7 +52,7 @@ export async function POST(request: Request) {
         category: { select: { id: true, name: true } },
       },
     });
-    await revalidateAndWarm(["/", "/products"]);
+    await revalidateAndWarm(["/", "/products", "/api/subcategories"]);
     return NextResponse.json(subcategory, { status: 201 });
   } catch (error) {
     console.error("Error creating subcategory:", error);

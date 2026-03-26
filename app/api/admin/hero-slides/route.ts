@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       },
     });
 
-    await revalidateAndWarm(["/"]);
+    await revalidateAndWarm(["/", "/api/hero-slides"]);
 
     return NextResponse.json(slide, { status: 201 });
 
