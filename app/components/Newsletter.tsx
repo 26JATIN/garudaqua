@@ -161,7 +161,7 @@ export default function Newsletter() {
                                         </button>
                                     </div>
                                     <p className="text-gray-400 text-sm font-light">
-                                        By subscribing, you agree to receive product updates from Garud Aqua. Unsubscribe at any time.
+                                        By subscribing, you agree to receive product updates from Garud. Unsubscribe at any time.
                                     </p>
                                 </form>
                             ) : (

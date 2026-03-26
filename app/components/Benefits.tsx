@@ -72,7 +72,7 @@ export default function Benefits() {
                 <div className="animate-on-view text-center mb-16 lg:mb-20">
                     <div className="inline-block mb-6">
                         <div className="text-sm md:text-base text-[#0EA5E9] font-light tracking-[0.2em] uppercase relative">
-                            Why Choose Garud Aqua
+                            Why Choose Garud
                             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-px bg-linear-to-r from-transparent via-[#0EA5E9] to-transparent" />
                         </div>
                     </div>
@@ -130,7 +130,7 @@ export default function Benefits() {
                 {/* Bottom CTA */}
                 <div className="animate-on-view text-center mt-16" style={{ animationDelay: '0.6s' }}>
                     <p className="text-lg text-gray-600 dark:text-gray-400 font-light mb-6">
-                        Join hundreds of dealers and builders who rely on Garud Aqua for quality products
+                        Join hundreds of dealers and builders who rely on Garud for quality products
                     </p>
                     <div className="flex items-center justify-center gap-2">
                         <div className="flex -space-x-2">

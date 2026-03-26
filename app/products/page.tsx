@@ -33,7 +33,7 @@ export async function generateMetadata({
         select: { name: true, metaTitle: true, metaDesc: true, category: { select: { slug: true } } }
       });
       if (subcategory) {
-        title = subcategory.metaTitle && subcategory.metaTitle.trim() !== "" ? subcategory.metaTitle : `Buy ${subcategory.name} Online | Best Price - Garud Aqua`;
+        title = subcategory.metaTitle && subcategory.metaTitle.trim() !== "" ? subcategory.metaTitle : `Buy ${subcategory.name} Online | Best Price - Garud`;
         description = subcategory.metaDesc && subcategory.metaDesc.trim() !== "" ? subcategory.metaDesc : `Shop the best quality ${subcategory.name} in Rajasthan. Browse top-rated products at Garud Aqua Solutions.`;
         url = `https://garudaqua.in/products?category=${subcategory.category?.slug}&subcategory=${subcategoryParam}`;
       }
@@ -43,7 +43,7 @@ export async function generateMetadata({
         select: { name: true, metaTitle: true, metaDesc: true, slug: true }
       });
       if (category) {
-        title = category.metaTitle && category.metaTitle.trim() !== "" ? category.metaTitle : `Buy ${category.name} Online | Top Quality - Garud Aqua`;
+        title = category.metaTitle && category.metaTitle.trim() !== "" ? category.metaTitle : `Buy ${category.name} Online | Top Quality - Garud`;
         description = category.metaDesc && category.metaDesc.trim() !== "" ? category.metaDesc : `Explore our premium range of ${category.name}. Guaranteed quality & best prices at Garud Aqua Solutions.`;
         url = `https://garudaqua.in/products?category=${category.slug}`;
       }

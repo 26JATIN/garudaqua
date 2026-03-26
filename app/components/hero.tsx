@@ -41,7 +41,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
     if (!slide.mobileImage) {
         const { props: { srcSet } } = getImageProps({
             ...common,
-            alt: slide.title || "Garud Aqua",
+            alt: slide.title || "Garud",
             src: slide.image,
             sizes: responsiveSizes,
             quality: 85,
@@ -54,7 +54,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
                 <link rel="preload" as="image" imageSrcSet={srcSet} imageSizes={responsiveSizes} fetchPriority="high" />
                 <Image
                     src={slide.image}
-                    alt={slide.title || "Garud Aqua"}
+                    alt={slide.title || "Garud"}
                     {...common}
                     width={1920}
                     height={1080}
@@ -72,7 +72,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
             props: { srcSet: desktopSrcSet, width: desktopWidth, height: desktopHeight },
         } = getImageProps({
             ...common,
-            alt: slide.title || "Garud Aqua",
+            alt: slide.title || "Garud",
             src: slide.image,
             sizes: responsiveSizes,
             quality: 85,
@@ -84,7 +84,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
             props: { srcSet: mobileSrcSet, width: mobileWidth, height: mobileHeight, ...rest },
         } = getImageProps({
             ...common,
-            alt: slide.title || "Garud Aqua",
+            alt: slide.title || "Garud",
             src: slide.mobileImage,
             sizes: "100vw",
             quality: 50,
@@ -101,7 +101,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
                     <source media="(max-width: 640px)" srcSet={mobileSrcSet} width={mobileWidth as number} height={mobileHeight as number} />
                     <img
                         {...rest}
-                        alt={slide.title || "Garud Aqua"}
+                        alt={slide.title || "Garud"}
                         decoding="sync"
                         className="w-full h-auto"
                     />

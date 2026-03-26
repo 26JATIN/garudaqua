@@ -65,7 +65,7 @@ export default function BlogManagement() {
         metaUrl: "",
         isPublished: false,
         readTime: 5,
-        author: "Garud Aqua Team",
+        author: "Garud Team",
     });
 
     const fetchCategories = useCallback(async () => {
@@ -249,7 +249,7 @@ export default function BlogManagement() {
             metaUrl: blog.metaUrl || "",
             isPublished: blog.isPublished,
             readTime: blog.readTime || 5,
-            author: blog.author || "Garud Aqua Team",
+            author: blog.author || "Garud Team",
         });
         setImagePreview(blog.featuredImage || "");
         setShowForm(true);
@@ -287,7 +287,7 @@ export default function BlogManagement() {
             metaUrl: "",
             isPublished: false,
             readTime: 5,
-            author: "Garud Aqua Team",
+            author: "Garud Team",
         });
         setImagePreview("");
         if (editorRef.current) editorRef.current.innerHTML = "";
@@ -505,7 +505,7 @@ export default function BlogManagement() {
                                 type="text"
                                 value={formData.metaTitle}
                                 onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
-                                placeholder="Water Tank Quality Guide: How Garud Aqua Ensures Reliable Water Storage"
+                                placeholder="Water Tank Quality Guide: How Garud Ensures Reliable Water Storage"
                                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
                             />
                         </div>
@@ -514,7 +514,7 @@ export default function BlogManagement() {
                             <textarea
                                 value={formData.metaDesc}
                                 onChange={(e) => setFormData({ ...formData, metaDesc: e.target.value })}
-                                placeholder="Learn how Garud Aqua ensures water tank quality using food-grade materials..."
+                                placeholder="Learn how Garud ensures water tank quality using food-grade materials..."
                                 rows={2}
                                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
                             />

@@ -93,7 +93,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Garud Aqua",
+    title: "Garud",
     startupImage: ["/icons/icon-512x512.png"],
   },
   icons: {

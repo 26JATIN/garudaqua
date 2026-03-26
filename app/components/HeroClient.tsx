@@ -27,7 +27,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
         return (
             <Image
                 src={slide.image}
-                alt={slide.title || "Garud Aqua"}
+                alt={slide.title || "Garud"}
                 {...common}
                 width={1920}
                 height={1080}
@@ -43,7 +43,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
         props: { srcSet: desktopSrcSet, width: desktopWidth, height: desktopHeight },
     } = getImageProps({
         ...common,
-        alt: slide.title || "Garud Aqua",
+        alt: slide.title || "Garud",
         src: slide.image,
         sizes: "(max-width: 640px) 640px, (max-width: 1024px) 1024px, 100vw",
         quality: 85,
@@ -55,7 +55,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
         props: { srcSet: mobileSrcSet, width: mobileWidth, height: mobileHeight, ...rest },
     } = getImageProps({
         ...common,
-        alt: slide.title || "Garud Aqua",
+        alt: slide.title || "Garud",
         src: slide.mobileImage,
         sizes: "100vw",
         quality: 50,
@@ -69,7 +69,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
             <source media="(max-width: 640px)" srcSet={mobileSrcSet} width={mobileWidth as number} height={mobileHeight as number} />
             <img
                 {...rest}
-                alt={slide.title || "Garud Aqua"}
+                alt={slide.title || "Garud"}
                 decoding={index === 0 ? "sync" : "async"}
                 className="w-full h-auto"
             />

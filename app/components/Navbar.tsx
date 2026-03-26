@@ -117,7 +117,7 @@ export default function Navbar() {
                                 >
                                     <Image
                                         src="/DesktopLogo.webp"
-                                        alt="Garud Aqua"
+                                        alt="Garud"
                                         width={181}
                                         height={80}
                                         className="h-20 w-auto"
@@ -296,7 +296,7 @@ export default function Navbar() {
                     <Link href="/" className="shrink-0">
                         <Image
                             src="/MobileLogo.webp"
-                            alt="Garud Aqua"
+                            alt="Garud"
                             width={48}
                             height={48}
                             className="h-12 w-12 object-contain scale-200"
@@ -495,7 +495,7 @@ export default function Navbar() {
                             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
-                            About Garud Aqua
+                            About Garud
                         </Link>
 
                         <Link href="/contact" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">

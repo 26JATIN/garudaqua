@@ -10,7 +10,7 @@ export default function Testimonials() {
             name: "Suresh Verma",
             role: "Dealer",
             location: "Kota, Rajasthan",
-            text: "Garud Aqua's tanks have been a game-changer in Kota. Durable materials, timely deliveries, and excellent dealer support — we've seen steady repeat orders from local customers.",
+            text: "Garud's tanks have been a game-changer in Kota. Durable materials, timely deliveries, and excellent dealer support — we've seen steady repeat orders from local customers.",
             rating: 5,
             image: "SV",
             purchase: "3-Layer Overhead Tanks",
@@ -20,7 +20,7 @@ export default function Testimonials() {
             name: "Ramesh Yadav",
             role: "Contractor",
             location: "Dausa, Rajasthan",
-            text: "We installed Garud Aqua tanks and piping across several villages near Dausa. The build quality and fit-and-forget performance have impressed both homeowners and site engineers.",
+            text: "We installed Garud tanks and piping across several villages near Dausa. The build quality and fit-and-forget performance have impressed both homeowners and site engineers.",
             rating: 5,
             image: "RY",
             purchase: "Overhead & Underground Tanks",
@@ -30,7 +30,7 @@ export default function Testimonials() {
             name: "Kamla Devi",
             role: "Builder",
             location: "Sriganganagar, Rajasthan",
-            text: "For our residential projects around the Ganganagar area, Garud Aqua supplies have been consistently reliable. The tanks withstand local conditions and customer satisfaction is high.",
+            text: "For our residential projects around the Ganganagar area, Garud supplies have been consistently reliable. The tanks withstand local conditions and customer satisfaction is high.",
             rating: 5,
             image: "KD",
             purchase: "Loft & Farm Tanks",
@@ -40,7 +40,7 @@ export default function Testimonials() {
             name: "Amit Bhandari",
             role: "Distributor",
             location: "Ajmer, Rajasthan",
-            text: "Ajmer customers prefer Garud Aqua for its durability and UV resistance. Our orders keep growing and the brand trust is strong in the region.",
+            text: "Ajmer customers prefer Garud for its durability and UV resistance. Our orders keep growing and the brand trust is strong in the region.",
             rating: 5,
             image: "AB",
             purchase: "UV-Resistant Tanks & Pipes",
@@ -52,7 +52,7 @@ export default function Testimonials() {
             name: "Baldev Singh",
             role: "Dealer",
             location: "Punjab Region",
-            text: "Across Punjab, Garud Aqua products are known for consistent quality and quick supply. Farmers and builders both appreciate the robust tanks and reliable fittings.",
+            text: "Across Punjab, Garud products are known for consistent quality and quick supply. Farmers and builders both appreciate the robust tanks and reliable fittings.",
             rating: 5,
             image: "BS",
             purchase: "Agriculture Tanks & Fittings",
@@ -62,7 +62,7 @@ export default function Testimonials() {
             name: "Simran Kaur",
             role: "Plumbing Contractor",
             location: "Punjab Region",
-            text: "Working across several districts in Punjab, we choose Garud Aqua because their pipes and tanks handle varied water conditions well and the after-sales service is responsive.",
+            text: "Working across several districts in Punjab, we choose Garud because their pipes and tanks handle varied water conditions well and the after-sales service is responsive.",
             rating: 5,
             image: "SK",
             purchase: "CPVC & PVC Pipes",
@@ -111,7 +111,7 @@ export default function Testimonials() {
                         Trusted by Dealers & Builders
                     </h2>
                     <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 font-light max-w-3xl mx-auto leading-relaxed">
-                        Hear from the contractors, dealers, and builders who rely on Garud Aqua for quality water storage and plumbing solutions.
+                        Hear from the contractors, dealers, and builders who rely on Garud for quality water storage and plumbing solutions.
                     </p>
                 </div>
 
