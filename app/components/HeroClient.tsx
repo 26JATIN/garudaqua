@@ -83,6 +83,7 @@ export default function HeroClient({ initialSlides }: HeroProps) {
     const [slides, setSlides] = useState<HeroSlide[]>(initialSlides || []);
     const [loading, setLoading] = useState(!initialSlides || initialSlides.length === 0);
     const [isPaused, setIsPaused] = useState(false);
+    const [loadedIndices, setLoadedIndices] = useState<number[]>([0]);
 
     const fetchSlides = useCallback(async () => {
         try {
@@ -114,6 +115,18 @@ export default function HeroClient({ initialSlides }: HeroProps) {
         return () => clearInterval(timer);
     }, [slides.length, isPaused]);
 
+    // Preload next slide
+    useEffect(() => {
+        if (slides.length <= 1) return;
+        const nextSlide = (currentSlide + 1) % slides.length;
+        setLoadedIndices(prev => {
+            if (!prev.includes(nextSlide)) {
+                return [...prev, nextSlide];
+            }
+            return prev;
+        });
+    }, [currentSlide, slides.length]);
+
     const goToSlide = (index: number) => {
         setCurrentSlide(index);
         setIsPaused(true);
@@ -144,6 +157,8 @@ export default function HeroClient({ initialSlides }: HeroProps) {
                         style={{
                             // Keep entirely transparent on SSR so the static hero.tsx LCP image underneath instantly dictates the metric
                             opacity: (index === currentSlide && mounted) ? 1 : 0,
+                            pointerEvents: index === currentSlide ? 'auto' : 'none',
+                            zIndex: index === currentSlide ? 1 : 0,
                             // Defer GPU layer promotion for non-LCP slides
                             willChange: index === 0 ? 'auto' : 'opacity',
                             // Explict transition property to bypass React hydration mismatches with shorthand 'none'
@@ -151,7 +166,7 @@ export default function HeroClient({ initialSlides }: HeroProps) {
                             transitionTimingFunction: 'ease-in-out',
                         }}
                     >
-                        <SlideImage slide={slide} index={index} />
+                        {loadedIndices.includes(index) && <SlideImage slide={slide} index={index} />}
                     </div>
                 ))}
             </div>
