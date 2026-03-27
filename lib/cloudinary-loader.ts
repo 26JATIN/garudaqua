@@ -37,7 +37,7 @@ export default function cloudinaryLoader({
   }
 
   const params = [
-    "f_auto",          // automatic format (webp/avif)
+    "f_webp",          // force webp format
     `q_${finalQuality}`, // intelligent auto quality or user-specific override
     `w_${width}`,      // responsive width
     "c_limit",         // don't upscale

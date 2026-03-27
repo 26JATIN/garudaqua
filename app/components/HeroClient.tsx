@@ -155,8 +155,8 @@ export default function HeroClient({ initialSlides }: HeroProps) {
                         className="hero-slide"
                         aria-hidden={index !== currentSlide}
                         style={{
-                            // Keep entirely transparent on SSR so the static hero.tsx LCP image underneath instantly dictates the metric
-                            opacity: (index === currentSlide && mounted) ? 1 : 0,
+                            // Start visible on SSR to prevent the browser from recording a hydration re-paint as the final LCP (which causes Element Render Delay)
+                            opacity: index === currentSlide ? 1 : 0,
                             pointerEvents: index === currentSlide ? 'auto' : 'none',
                             zIndex: index === currentSlide ? 1 : 0,
                             // Defer GPU layer promotion for non-LCP slides
