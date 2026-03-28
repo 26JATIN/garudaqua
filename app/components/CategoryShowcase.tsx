@@ -474,8 +474,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
     return displayedProducts.map((product, index) => (
       <div
         key={`${selectedCategory}-${product.id}`}
-        className="h-full transform transition-all duration-500 ease-out animate-on-view is-visible"
-        style={{ animationDelay: `${index * 0.1}s` }}
+        className="h-full"
       >
         <Card
           card={product}
@@ -671,7 +670,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
               <>
                 <div
                   key={selectedCategory}
-                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 animate-fade-in"
+                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
                 >
                   {renderedProducts}
                 </div>
@@ -679,7 +678,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                 {/* Show More / Explore All Button */}
                 {hasMore && (
                   <div
-                    className="flex justify-center pt-8 animate-fade-in"
+                    className="flex justify-center pt-8"
                     style={{ animationDelay: '300ms' }}
                   >
                     <button
