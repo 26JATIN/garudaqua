@@ -135,8 +135,8 @@ body {
   }
 
   /* Extend every page's background into the body padding gap.
-     Selector: main > template-wrapper > page-wrapper */
-  main > * > * {
+     Selector: .app-main (layout) > .animate-template-in (template) > page-wrapper */
+  .app-main > .animate-template-in > * {
     padding-bottom: calc(var(--mobile-navbar-height) + env(safe-area-inset-bottom, 0px));
     margin-bottom: calc(-1 * var(--mobile-navbar-height) - env(safe-area-inset-bottom, 0px));
   }

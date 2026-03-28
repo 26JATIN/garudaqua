@@ -164,7 +164,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <PageTransitionProvider>
               <RouteChangeOverlay />
               <ConditionalNavbar />
-              <main>
+              <main className="app-main">
                 {children}
               </main>
             </PageTransitionProvider>
