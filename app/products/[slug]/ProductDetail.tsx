@@ -128,7 +128,7 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
         <div className="relative">
             <div
                 ref={containerRef}
-                className="overflow-hidden rounded-3xl shadow-lg dark:shadow-none dark:border dark:border-white/6"
+                className="overflow-hidden rounded-3xl shadow-lg dark:shadow-none dark:border dark:border-white/6 relative"
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -158,6 +158,13 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
                         </div>
                     ))}
                 </div>
+
+                {/* Image counter — inside the overflow container so it overlays the image */}
+                {images.length > 1 && (
+                    <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full z-20">
+                        {activeIndex + 1} / {images.length}
+                    </div>
+                )}
             </div>
 
             {/* Dot indicators */}
@@ -180,12 +187,6 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
                 </div>
             )}
 
-            {/* Image counter */}
-            {images.length > 1 && (
-                <div className="absolute bottom-4 right-5 bg-black/50 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full z-20">
-                    {activeIndex + 1} / {images.length}
-                </div>
-            )}
         </div>
     );
 }
