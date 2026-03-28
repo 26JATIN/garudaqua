@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { TransitionElement } from "./PageTransition";
 
 interface BlogPreview {
     id: string;
@@ -48,7 +49,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                         ))}
                         <Link
                             href="/blogs"
-                            className="px-3.5 py-1.5 text-xs font-semibold text-[#0369A1] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors"
+                            className="px-3.5 py-1.5 text-xs font-semibold text-[#0369A1] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors btn-shine"
                         >
                             View All
                         </Link>
@@ -61,11 +62,11 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                         <Link
                             key={blog.id}
                             href={`/blogs/${blog.slug}`}
-                            className="group bg-white dark:bg-[#0A0A0A] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-none transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-white/6 hover:border-[#0EA5E9]/30 flex flex-col h-full"
+                            className="group bg-white dark:bg-[#0A0A0A] rounded-2xl overflow-hidden shadow-sm dark:shadow-none border border-gray-100 dark:border-white/6 hover:border-[#0EA5E9]/30 flex flex-col h-full card-interactive"
                         >
                             {/* Image */}
                             {blog.featuredImage ? (
-                                <div className="relative h-48 sm:h-52 overflow-hidden">
+                                <TransitionElement name={`blog-${blog.slug}`} className="relative h-48 sm:h-52 overflow-hidden w-full block">
                                     <Image
                                         src={blog.featuredImage}
                                         alt={blog.title}
@@ -75,7 +76,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                                         loading="lazy"
                                     />
                                     <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                </div>
+                                </TransitionElement>
                             ) : (
                                 <div className="h-48 sm:h-52 bg-linear-to-br from-[#0EA5E9]/10 to-[#0369A1]/10 flex items-center justify-center">
                                     <svg className="w-12 h-12 text-[#0EA5E9]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">

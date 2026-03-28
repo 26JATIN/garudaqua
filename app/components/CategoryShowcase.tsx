@@ -12,6 +12,7 @@ import { Droplets, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { usePageTransition, TransitionElement } from "./PageTransition";
 
 /** Mirrors the server-side slugify so we never fall back to an ObjectId */
 function slugify(text: string): string {
@@ -198,17 +199,24 @@ export const Card = React.memo(({
   const isPriority = index < 4;
 
   // Memoize the card preview to prevent unnecessary re-renders
-  const cardPreview = useMemo(() => (
-    <div
-      className="bg-white dark:bg-[#0A0A0A] shadow-lg relative overflow-hidden transition-all duration-700 ease-out group-hover:scale-[1.03] aspect-square rounded-[16px_16px_2px_16px] sm:rounded-[24px_24px_4px_24px]"
-    >
-        <CategoryPreview
-          category={card}
-          className="w-full h-full"
-          priority={isPriority}
-        />
-    </div>
-  ), [card, isPriority]);
+  const cardPreview = useMemo(() => {
+    const isProduct = card.id && !!(card as any).category; // heuristically identify product vs category
+    const transitionName = isProduct ? `product-${(card as { slug?: string }).slug || slugify(card.name)}` : '';
+    
+    return (
+      <div
+        className="bg-white dark:bg-[#0A0A0A] shadow-lg relative overflow-hidden transition-all duration-700 ease-out group-hover:scale-[1.03] aspect-square rounded-[16px_16px_2px_16px] sm:rounded-[24px_24px_4px_24px]"
+      >
+        {transitionName ? (
+           <TransitionElement name={transitionName} className="w-full h-full block relative">
+             <CategoryPreview category={card} className="w-full h-full" priority={isPriority} />
+           </TransitionElement>
+        ) : (
+           <CategoryPreview category={card} className="w-full h-full" priority={isPriority} />
+        )}
+      </div>
+    );
+  }, [card, isPriority]);
 
   const handleOpen = () => {
     if (onClick) onClick(card);
@@ -227,7 +235,7 @@ export const Card = React.memo(({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm transition-all duration-300 md:active:scale-95 group",
+        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm group card-interactive",
         isHovered && "shadow-lg"
       )}
     >
@@ -306,6 +314,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
   const contentRef = useRef<HTMLDivElement>(null);
   const mobileFilterRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { navigate } = usePageTransition();
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -416,8 +425,8 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
   }, []);
 
   const handleProductClick = useCallback((product: Product) => {
-    router.push(`/products/${productPath(product)}`);
-  }, [router]);
+    navigate(`/products/${productPath(product)}`);
+  }, [navigate]);
 
   const getCategoryInfoLink = useCallback(() => {
     if (selectedCategory === 'ALL') return '/categories';
@@ -490,8 +499,8 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
           Categories
         </h2>
         <button
-          onClick={() => router.push(getCategoryInfoLink())}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all mb-1"
+          onClick={() => navigate(getCategoryInfoLink())}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all mb-1 btn-shine"
         >
           <Info className="w-4 h-4" />
           <span>{selectedCategory === 'ALL' ? 'All Categories' : 'Category Info'}</span>
@@ -557,8 +566,8 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                 Categories
               </h2>
               <button
-                onClick={() => router.push(getCategoryInfoLink())}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all w-fit group"
+              onClick={() => navigate(getCategoryInfoLink())}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all w-fit group btn-shine"
               >
                 <Info className="w-4 h-4" />
                 <span>{selectedCategory === 'ALL' ? 'All Categories Info' : 'Category Info'}</span>
@@ -682,7 +691,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                           router.push('/products');
                         }
                       }}
-                      className="group relative px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 font-medium tracking-wide overflow-hidden"
+                      className="group relative px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 font-medium tracking-wide overflow-hidden btn-shine"
                     >
                       <span className="relative z-10 flex items-center gap-3">
                         Explore All {filteredProducts.length} Products

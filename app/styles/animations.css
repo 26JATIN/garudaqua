@@ -94,32 +94,32 @@
   animation: dropdown-in 0.2s cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 
-/* IntersectionObserver-triggered view animations */
+/* IntersectionObserver-triggered view animations — spring-timed */
 @keyframes view-fade-up {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0);   filter: blur(0); }
 }
 @keyframes view-fade-left {
-  from { opacity: 0; transform: translateX(-50px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(-32px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateX(0);     filter: blur(0); }
 }
 @keyframes view-fade-right {
-  from { opacity: 0; transform: translateX(50px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(32px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateX(0);    filter: blur(0); }
 }
 @keyframes view-scale-in {
-  from { opacity: 0; transform: scale(0.9); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.92); filter: blur(3px); }
+  to   { opacity: 1; transform: scale(1);    filter: blur(0); }
 }
 
 .animate-on-view { opacity: 0; }
-.animate-on-view.is-visible { animation: view-fade-up 0.6s ease-out both; }
+.animate-on-view.is-visible { animation: view-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-on-view-left { opacity: 0; }
-.animate-on-view-left.is-visible { animation: view-fade-left 0.8s ease-out both; }
+.animate-on-view-left.is-visible { animation: view-fade-left 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-on-view-right { opacity: 0; }
-.animate-on-view-right.is-visible { animation: view-fade-right 0.8s ease-out both; }
+.animate-on-view-right.is-visible { animation: view-fade-right 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-on-view-scale { opacity: 0; }
-.animate-on-view-scale.is-visible { animation: view-scale-in 0.5s ease-out both; }
+.animate-on-view-scale.is-visible { animation: view-scale-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* Stagger delays */
 .delay-100 { animation-delay: 0.1s; }
@@ -129,6 +129,14 @@
 .delay-500 { animation-delay: 0.5s; }
 .delay-600 { animation-delay: 0.6s; }
 .delay-700 { animation-delay: 0.7s; }
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+.stagger-8 { animation-delay: 0.4s; }
 
 /* Newsletter orbit/particle animations */
 @keyframes particle-pulse {

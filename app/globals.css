@@ -103,6 +103,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Viewport adjustments */
@@ -143,7 +144,6 @@ body {
 }
 
 html {
-  scroll-behavior: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
@@ -153,11 +153,6 @@ html {
   min-height: 100%;
   min-height: 100dvh;
   background-color: var(--background);
-}
-
-/* Smooth scroll only for in-page anchor navigation, not route changes */
-html:has(:target) {
-  scroll-behavior: smooth;
 }
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
@@ -283,12 +278,164 @@ textarea:focus-visible {
   to { opacity: 1; }
 }
 
+/* ── Card Press Microinteraction ───────── */
+.card-interactive {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+.card-interactive:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) {
+  .card-interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+  .card-interactive:hover:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+}
+.dark .card-interactive:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) {
+  .dark .card-interactive:hover {
+    box-shadow: 0 12px 40px rgba(14, 165, 233, 0.06), 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* ── Button Shine Microinteraction ───────── */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
+  transition: left 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .btn-shine:hover::after {
+    left: 100%;
+  }
+}
+.btn-shine:active {
+  transform: scale(0.96);
+  transition: transform 0.15s ease;
+}
+
+/* ── Link Hover Underline Slide ───────── */
+.link-hover-slide {
+  position: relative;
+  display: inline-block;
+}
+.link-hover-slide::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  .link-hover-slide:hover::after {
+    width: 100%;
+  }
+}
+
+/* ── Off-screen Section Performance ───────── */
+.section-lazy {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+/* ── Improved Skeleton Shimmer ───────── */
+@keyframes skeleton-wave {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #f0f0f0 0%, #e8e8e8 50%, #f0f0f0 100%);
+  border-radius: 8px;
+}
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: skeleton-wave 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, #111 0%, #1a1a1a 50%, #111 100%);
+}
+.dark .skeleton-shimmer::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+}
+
+/* ── Native View Transitions (Morph Effects) ───────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(root) {
+  animation-name: fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: fade-in;
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Ensure images during morph don't distort */
+img {
+  view-transition-name: none;
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .card-interactive,
+  .card-interactive:hover,
+  .card-interactive:active {
+    transform: none !important;
+    transition: none !important;
+  }
+  .btn-shine::after {
+    display: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
+import { TransitionElement } from "./PageTransition";
 
 
 /** Mirrors the server-side slugify so we never fall back to an ObjectId */
@@ -743,50 +744,52 @@ function ProductCard({ product, index }: ProductCardProps) {
             className="group h-full"
         >
             <Link href={productHref} className="block h-full">
-                <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1 md:group-hover:-translate-y-2 h-full flex flex-col">
-                    <div className="relative w-full aspect-4/5 overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
-                        {product.image ? (
+                <TransitionElement name={`product-${product.slug}`} className="h-full">
+                    <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm h-full flex flex-col card-interactive">
+                        <div className="relative w-full aspect-4/5 overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
+                            {product.image ? (
                                 <Image
-                                src={product.image}
-                                alt={product.name}
-                                fill
-                                className="object-cover transform group-hover:scale-110 transition-transform duration-700"
-                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                quality={50}
-                                priority={index < 4}
-                                fetchPriority={index < 4 ? "high" : "auto"}
-                                decoding={index < 4 ? "sync" : "async"}
-                            />
-                        ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <svg className="w-12 h-12 text-[#0EA5E9] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    src={product.image}
+                                    alt={product.name}
+                                    fill
+                                    className="object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                    quality={50}
+                                    priority={index < 4}
+                                    fetchPriority={index < 4 ? "high" : "auto"}
+                                    decoding={index < 4 ? "sync" : "async"}
+                                />
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <svg className="w-12 h-12 text-[#0EA5E9] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                </div>
+                            )}
+                            <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1 z-10">
+                                <span className="bg-white/90 backdrop-blur-sm text-[#0EA5E9] text-[10px] md:text-xs px-2 py-1 rounded-full font-medium shadow-sm">
+                                    {categoryName}
+                                </span>
+                                {product.subcategory?.name && (
+                                    <span className="bg-[#0EA5E9]/90 backdrop-blur-sm text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium shadow-sm">
+                                        {product.subcategory.name}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                        <div className="p-3 md:p-4 lg:p-6 flex flex-col flex-1 relative bg-white dark:bg-[#0A0A0A]">
+                            <h3 className="text-[#2C2C2C] dark:text-gray-100 font-medium text-[13px] sm:text-sm md:text-base lg:text-lg mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors leading-tight line-clamp-2 min-h-10 md:min-h-12 lg:min-h-14 flex items-start">
+                                {product.name}
+                            </h3>
+                            <div className="mt-auto pt-2 flex items-center text-[#0369A1] dark:text-[#0EA5E9] text-xs font-semibold uppercase tracking-wider group-hover:tracking-widest transition-all duration-300">
+                                View Details
+                                <svg className="w-3.5 h-3.5 ml-1 transform group-hover:translate-x-1.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>
                             </div>
-                        )}
-                        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1 z-10">
-                            <span className="bg-white/90 backdrop-blur-sm text-[#0EA5E9] text-[10px] md:text-xs px-2 py-1 rounded-full font-medium shadow-sm">
-                                {categoryName}
-                            </span>
-                            {product.subcategory?.name && (
-                                <span className="bg-[#0EA5E9]/90 backdrop-blur-sm text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium shadow-sm">
-                                    {product.subcategory.name}
-                                </span>
-                            )}
                         </div>
                     </div>
-                    <div className="p-3 md:p-4 lg:p-6 flex flex-col flex-1 relative bg-white dark:bg-[#0A0A0A]">
-                        <h3 className="text-[#2C2C2C] dark:text-gray-100 font-medium text-[13px] sm:text-sm md:text-base lg:text-lg mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors leading-tight line-clamp-2 min-h-10 md:min-h-12 lg:min-h-14 flex items-start">
-                            {product.name}
-                        </h3>
-                        <div className="mt-auto pt-2 flex items-center text-[#0369A1] dark:text-[#0EA5E9] text-xs font-semibold uppercase tracking-wider group-hover:tracking-widest transition-all duration-300">
-                            View Details
-                            <svg className="w-3.5 h-3.5 ml-1 transform group-hover:translate-x-1.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+                </TransitionElement>
             </Link>
         </div>
     );
@@ -796,55 +799,56 @@ function ProductCard({ product, index }: ProductCardProps) {
 function ProductListItem({ product, index = 0 }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
     const productHref = `/products/${productPath(product)}`;
-
     return (
         <div
             className="group"
         >
-            <Link href={productHref} className="block">
-                <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl p-3 md:p-4 lg:p-6 shadow-sm hover:shadow-lg transition-all duration-300 group-hover:border-[#0EA5E9]/20 border border-transparent dark:border-white/6">
-                    <div className="flex gap-3 md:gap-4 lg:gap-6">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-48 xl:h-48 shrink-0 relative bg-gray-100 dark:bg-gray-800 rounded-lg md:rounded-xl overflow-hidden">
-                            {product.image ? (
-                                <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                    sizes="(max-width: 640px) 64px, 192px"
-                                    quality={70}
-                                    priority={index < 4}
-                                    fetchPriority={index < 4 ? "high" : "auto"}
-                                    decoding={index < 4 ? "sync" : "async"}
-                                />
-                            ) : (
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <svg className="w-8 h-8 text-[#0EA5E9] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                    </svg>
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex-1 flex flex-col justify-center min-w-0">
-                            <div className="flex items-center gap-2 mb-1 sm:mb-2">
-                                <p className="text-[10px] sm:text-xs text-[#0EA5E9] font-medium tracking-wide uppercase">
-                                    {categoryName}
-                                </p>
-                                {product.subcategory?.name && (
-                                    <>
-                                        <span className="text-gray-300">•</span>
-                                        <p className="text-[10px] sm:text-xs text-[#0369A1] font-medium tracking-wide uppercase">
-                                            {product.subcategory.name}
-                                        </p>
-                                    </>
+            <Link href={productHref} className="block w-full">
+                <TransitionElement name={`product-${product.slug}`}>
+                    <div className="bg-white dark:bg-[#0A0A0A] rounded-xl border border-gray-100 dark:border-white/6 overflow-hidden shadow-sm flex flex-col sm:flex-row card-interactive">
+                        <div className="flex gap-3 md:gap-4 lg:gap-6 w-full p-3 md:p-4 lg:p-6">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-48 xl:h-48 shrink-0 relative bg-gray-100 dark:bg-gray-800 rounded-lg md:rounded-xl overflow-hidden">
+                                {product.image ? (
+                                    <Image
+                                        src={product.image}
+                                        alt={product.name}
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        sizes="(max-width: 640px) 64px, 192px"
+                                        quality={70}
+                                        priority={index < 4}
+                                        fetchPriority={index < 4 ? "high" : "auto"}
+                                        decoding={index < 4 ? "sync" : "async"}
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <svg className="w-8 h-8 text-[#0EA5E9] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                    </div>
                                 )}
                             </div>
-                            <h3 className="text-sm sm:text-base md:text-lg lg:text-xl text-[#2C2C2C] dark:text-gray-100 font-light mb-1 sm:mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors line-clamp-2">
-                                {product.name}
-                            </h3>
+                            <div className="flex-1 flex flex-col justify-center min-w-0">
+                                <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                                    <p className="text-[10px] sm:text-xs text-[#0EA5E9] font-medium tracking-wide uppercase">
+                                        {categoryName}
+                                    </p>
+                                    {product.subcategory?.name && (
+                                        <>
+                                            <span className="text-gray-300">•</span>
+                                            <p className="text-[10px] sm:text-xs text-[#0369A1] font-medium tracking-wide uppercase">
+                                                {product.subcategory.name}
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
+                                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl text-[#2C2C2C] dark:text-gray-100 font-light mb-1 sm:mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors line-clamp-2">
+                                    {product.name}
+                                </h3>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </TransitionElement>
             </Link>
         </div>
     );

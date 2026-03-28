@@ -21,7 +21,7 @@ export default function Footer() {
         return () => clearTimeout(t);
     }, []);
     return (
-        <footer className="bg-[#2C2C2C] dark:bg-black text-white border-t border-transparent dark:border-white/6">
+        <footer className="bg-[#2C2C2C] dark:bg-black text-white border-t border-transparent dark:border-white/6" style={{ viewTransitionName: 'footer-section' }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
                     <div className="sm:col-span-2 lg:col-span-1 space-y-6">
@@ -46,28 +46,28 @@ export default function Footer() {
                     <div>
                         <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Explore</h4>
                         <ul className="space-y-3">
-                            <li><Link href="/" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Home</Link></li>
-                            <li><Link href="/products" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Products</Link></li>
-                            <li><Link href="/blogs" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Blog</Link></li>
-                            <li><Link href="/about" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">About Us</Link></li>
-                            <li><Link href="/contact" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Contact</Link></li>
+                            <li><Link href="/" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Home</Link></li>
+                            <li><Link href="/products" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Products</Link></li>
+                            <li><Link href="/blogs" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Blog</Link></li>
+                            <li><Link href="/about" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">About Us</Link></li>
+                            <li><Link href="/contact" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Contact</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Our Categories</h4>
                         <ul className="space-y-3">
-                            <li><Link href="/categories/blow-mould-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Blow Mould Tanks</Link></li>
-                            <li><Link href="/categories/roto-mould-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Roto Mould Tanks</Link></li>
-                            <li><Link href="/categories/agriculture-sprayer-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">Agriculture Sprayer Tanks</Link></li>
-                            <li><Link href="/categories/cpvc-pipes-and-fittings" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">CPVC Pipes & Fittings</Link></li>
+                            <li><Link href="/categories/blow-mould-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Blow Mould Tanks</Link></li>
+                            <li><Link href="/categories/roto-mould-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Roto Mould Tanks</Link></li>
+                            <li><Link href="/categories/agriculture-sprayer-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Agriculture Sprayer Tanks</Link></li>
+                            <li><Link href="/categories/cpvc-pipes-and-fittings" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">CPVC Pipes & Fittings</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Blog Topics</h4>
                         <ul className="space-y-3">
-                            <li><Link href="/blogs" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">All Articles</Link></li>
+                            <li><Link href="/blogs" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">All Articles</Link></li>
                             {blogCategories.map((cat: any) => (
                                 <li key={cat.id}>
                                     <Link href={`/blogs/category/${cat.slug}`} className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">

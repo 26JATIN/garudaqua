@@ -140,7 +140,7 @@ export default function Newsletter() {
                                         <button
                                             type="submit"
                                             disabled={isLoading}
-                                            className="px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-light tracking-wide hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+                                            className="px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-light tracking-wide hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 btn-shine"
                                         >
                                             {isLoading ? (
                                                 <>

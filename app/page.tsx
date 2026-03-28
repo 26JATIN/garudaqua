@@ -201,14 +201,26 @@ export default async function Home() {
       <Hero initialSlides={heroSlides} />
       {/*Category Showcase*/}
       <CategoryShowcase initialCategories={categoryData.categories} initialProducts={categoryData.products} />
-      <Benefits/>
-      <ImageGallery initialItems={galleryItems}/>
-      <VideoShowcaseSection initialVideos={videoData}/>
-      <Testimonials/>
+      <div className="section-lazy">
+        <Benefits/>
+      </div>
+      <div className="section-lazy">
+        <ImageGallery initialItems={galleryItems}/>
+      </div>
+      <div className="section-lazy">
+        <VideoShowcaseSection initialVideos={videoData}/>
+      </div>
+      <div className="section-lazy">
+        <Testimonials/>
+      </div>
       {blogData.blogs.length > 0 && (
-        <LatestBlogs blogs={blogData.blogs} categories={blogData.categories} />
+        <div className="section-lazy">
+          <LatestBlogs blogs={blogData.blogs} categories={blogData.categories} />
+        </div>
       )}
-      <Newsletter/>
+      <div className="section-lazy">
+        <Newsletter/>
+      </div>
       <Footer/>
       
       

@@ -4,6 +4,7 @@ import "@/app/styles/blog-content.css";
 import "@/app/styles/animations.css";
 import Link from "next/link";
 import Image from "next/image";
+import { TransitionElement } from "../../components/PageTransition";
 
 // ===== Type Definitions =====
 interface Blog {
@@ -43,7 +44,7 @@ export default function BlogPostClient({
                 <div className="relative w-full">
                     {/* Featured Image */}
                     {blog.featuredImage && (
-                        <div className="w-full bg-gray-50 dark:bg-gray-900 aspect-video relative">
+                        <TransitionElement name={`blog-${blog.slug}`} className="w-full bg-gray-50 dark:bg-gray-900 aspect-video relative block">
                             <Image
                                 src={blog.featuredImage}
                                 alt={blog.title}
@@ -54,7 +55,7 @@ export default function BlogPostClient({
                                 fetchPriority="high"
                                 decoding="sync"
                             />
-                        </div>
+                        </TransitionElement>
                     )}
                 </div>
 

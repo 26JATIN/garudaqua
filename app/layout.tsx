@@ -3,6 +3,7 @@ import "./globals.css";
 import { NavbarProvider } from "./context/NavbarContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import ConditionalNavbar from "./components/ConditionalNavbar";
+import { PageTransitionProvider } from "./components/PageTransition";
 import PWARegister from "./components/PWARegister";
 import LazyToaster from "./components/LazyToaster";
 import type { Metadata } from "next";
@@ -153,9 +154,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LazyToaster />
           <NavbarProvider>
             <ConditionalNavbar />
-            <main>
-              {children}
-            </main>
+            <PageTransitionProvider>
+              <main style={{ viewTransitionName: 'main-content' }}>
+                {children}
+              </main>
+            </PageTransitionProvider>
           </NavbarProvider>
         </ThemeProvider>
       </body>

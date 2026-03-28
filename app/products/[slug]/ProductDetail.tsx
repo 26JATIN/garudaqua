@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { TransitionElement } from "../../components/PageTransition";
 
 /** Mirrors server slugify — ensures related product links never use an ObjectId */
 function slugify(text: string): string {
@@ -489,7 +490,8 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                 {/* Product Details */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
                     {/* Images Section */}
-                    <div
+                    <TransitionElement
+                        name={`product-${productSlug}`}
                         className="space-y-4"
                     >
                         {/* Unified Image Gallery */}
@@ -541,7 +543,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                 </svg>
                             </div>
                         )}
-                    </div>
+                    </TransitionElement>
 
                     {/* Product Info Section */}
                     <div

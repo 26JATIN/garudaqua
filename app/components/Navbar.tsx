@@ -2,18 +2,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from 'next/navigation';
 import { useNavbar } from '../context/NavbarContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
     const { isNavbarHidden } = useNavbar();
+    const pathname = usePathname();
     const [visible, setVisible] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const ref = useRef<HTMLElement>(null);
 
-    const [categories, setCategories] = useState<any[]>([]);
-    const [blogCategories, setBlogCategories] = useState<any[]>([]);
+    const [categories, setCategories] = useState<{id: string, name: string, slug: string, image?: string}[]>([]);
+    const [blogCategories, setBlogCategories] = useState<{id: string, name: string, slug: string}[]>([]);
     const [blogMenuOpen, setBlogMenuOpen] = useState(false);
     const bottomNavRef = useRef<HTMLDivElement>(null);
 
@@ -97,15 +99,11 @@ export default function Navbar() {
             <nav
                 ref={ref}
                 className={`fixed inset-x-0 top-0 z-100 hidden lg:block transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
-                style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+                style={{ paddingTop: "env(safe-area-inset-top, 0px)", viewTransitionName: 'desktop-nav' }}
             >
                 <div
-                    className="backdrop-blur-xl backdrop-saturate-200 border-b transition-[background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
-                    style={{
-                        backgroundColor: visible ? "var(--navbar-bg-scroll)" : "var(--navbar-bg)",
-                        borderBottomColor: visible ? "var(--navbar-border-scroll)" : "var(--navbar-border)",
-                        boxShadow: visible ? "var(--navbar-shadow-scroll)" : "var(--navbar-shadow)"
-                    }}
+                    className={`border-b transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] transform-gpu ${visible ? 'bg-white/90 dark:bg-[#0A0A0A]/90 shadow-sm border-gray-200 dark:border-white/10' : 'bg-white/80 dark:bg-[#0A0A0A]/80 border-transparent shadow-none'}`}
+                    style={{ backdropFilter: "blur(24px) saturate(200%)", WebkitBackdropFilter: "blur(24px) saturate(200%)" }}
                 >
                     <div className="max-w-7xl mx-auto px-6 py-1">
                         <div className="flex items-center justify-between">
@@ -230,7 +228,7 @@ export default function Navbar() {
                                                 {blogCategories.length > 0 && (
                                                     <div className="mx-2 my-1 border-t border-gray-100 dark:border-gray-800/60"></div>
                                                 )}
-                                                {blogCategories.map((cat: any) => (
+                                                {blogCategories.map((cat) => (
                                                     <Link
                                                         key={cat.id}
                                                         href={`/blogs/category/${cat.slug}`}
@@ -281,15 +279,13 @@ export default function Navbar() {
                 style={{
                     paddingTop: "env(safe-area-inset-top, 0px)",
                     WebkitBackfaceVisibility: 'hidden',
+                    viewTransitionName: 'mobile-nav-top'
                 }}
             >
-                {/* Visual background layer with blur */}
+                {/* Visual background layer with explicit filter to ensure glass effect */}
                 <div
-                    className="absolute inset-0 backdrop-blur-xl backdrop-saturate-200 border-b border-(--navbar-border)"
-                    style={{
-                        backgroundColor: "var(--navbar-bg)",
-                        boxShadow: "var(--navbar-shadow)",
-                    }}
+                    className="absolute inset-0 bg-white/90 dark:bg-[#0A0A0A]/90 border-b border-gray-200/50 dark:border-white/10 shadow-sm transform-gpu"
+                    style={{ backdropFilter: "blur(24px) saturate(200%)", WebkitBackdropFilter: "blur(24px) saturate(200%)" }}
                 />
                 <div className="relative px-4 py-2 flex items-center gap-2">
                     {/* Mobile Logo */}
@@ -310,12 +306,14 @@ export default function Navbar() {
                     {/* Hamburger Menu */}
                     <button
                         onClick={() => setIsSidebarOpen(true)}
-                        className="p-2 -mr-2 text-gray-600 dark:text-gray-300 hover:text-[#0EA5E9] transition-colors"
+                        className="p-3 -mr-2 text-gray-700 dark:text-gray-200 hover:text-[#0EA5E9] transition-all duration-300 active:scale-90"
                         aria-label="Open Menu"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                        </svg>
+                        <div className="w-5 h-4 relative flex flex-col justify-between">
+                            <span className="w-full h-[2px] bg-current rounded-full" />
+                            <span className="w-full h-[2px] bg-current rounded-full" />
+                            <span className="w-3/4 h-[2px] bg-current rounded-full self-end" />
+                        </div>
                     </button>
                 </div>
             </div>
@@ -327,55 +325,52 @@ export default function Navbar() {
             <div
                 ref={bottomNavRef}
                 className={`lg:hidden fixed left-0 right-0 z-100 pointer-events-none transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
-                style={{ bottom: 0, WebkitBackfaceVisibility: 'hidden' }}
+                style={{ bottom: 0, WebkitBackfaceVisibility: 'hidden', viewTransitionName: 'mobile-nav-bottom' }}
             >
-                {/* Visual background layer — no pointer events */}
+                {/* Visual background layer — no pointer events, explicit filter */}
                 <div
-                    className="absolute inset-0 backdrop-blur-xl backdrop-saturate-200 border-t border-(--navbar-border)"
-                    style={{
-                        backgroundColor: "var(--navbar-bg)",
-                        boxShadow: "var(--navbar-shadow)",
-                    }}
+                    className="absolute inset-0 bg-white/90 dark:bg-[#0A0A0A]/90 border-t border-gray-200/50 dark:border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.04)] transform-gpu"
+                    style={{ backdropFilter: "blur(24px) saturate(200%)", WebkitBackdropFilter: "blur(24px) saturate(200%)" }}
                 />
                 <div className="relative flex items-center justify-around py-1.5" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
                     {/* Home */}
                     <Link href="/" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
-                        <div className="p-1.5 rounded-xl">
-                            <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        <div className={`p-1.5 rounded-xl transition-colors ${pathname === '/' ? 'text-[#0EA5E9] bg-[#0EA5E9]/10' : 'text-gray-500 dark:text-gray-400'}`}>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname === '/' ? 2.5 : 2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
                         </div>
-                        <span className="text-[10px] text-(--nav-text-muted) font-medium">Home</span>
+                        <span className={`text-[10px] font-medium transition-colors ${pathname === '/' ? 'text-[#0EA5E9]' : 'text-gray-500 dark:text-gray-400'}`}>Home</span>
                     </Link>
 
                     {/* Browse */}
                     <Link href="/products" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
-                        <div className="p-1.5 rounded-xl">
-                            <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        <div className={`p-1.5 rounded-xl transition-colors ${pathname?.startsWith('/products') ? 'text-[#0EA5E9] bg-[#0EA5E9]/10' : 'text-gray-500 dark:text-gray-400'}`}>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname?.startsWith('/products') ? 2.5 : 2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                             </svg>
                         </div>
-                        <span className="text-[10px] text-(--nav-text-muted) font-medium">Products</span>
+                        <span className={`text-[10px] font-medium transition-colors ${pathname?.startsWith('/products') ? 'text-[#0EA5E9]' : 'text-gray-500 dark:text-gray-400'}`}>Products</span>
                     </Link>
 
                     {/* Category */}
                     <Link href="/categories" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
-                        <div className="p-1.5 rounded-xl">
-                            <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        <div className={`p-1.5 rounded-xl transition-colors ${pathname?.startsWith('/categories') ? 'text-[#0EA5E9] bg-[#0EA5E9]/10' : 'text-gray-500 dark:text-gray-400'}`}>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname?.startsWith('/categories') ? 2.5 : 2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                             </svg>
                         </div>
-                        <span className="text-[10px] text-(--nav-text-muted) font-medium">Category</span>
+                        <span className={`text-[10px] font-medium transition-colors ${pathname?.startsWith('/categories') ? 'text-[#0EA5E9]' : 'text-gray-500 dark:text-gray-400'}`}>Category</span>
                     </Link>
 
                     {/* Contact Us */}
                     <Link href="/contact" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
-                        <div className="p-1.5 rounded-xl">
-                            <svg className="w-5 h-5 text-(--nav-icon-color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <div className={`p-1.5 rounded-xl transition-colors ${pathname?.startsWith('/contact') ? 'text-[#0EA5E9] bg-[#0EA5E9]/10' : 'text-gray-500 dark:text-gray-400'}`}>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname?.startsWith('/contact') ? 2.5 : 2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                         </div>
-                        <span className="text-[10px] text-(--nav-text-muted) font-medium">Contact</span>
+                        <span className={`text-[10px] font-medium transition-colors ${pathname?.startsWith('/contact') ? 'text-[#0EA5E9]' : 'text-gray-500 dark:text-gray-400'}`}>Contact</span>
                     </Link>
                 </div>
             </div>
@@ -410,10 +405,10 @@ export default function Navbar() {
                     </div>
                     <button
                         onClick={() => setIsSidebarOpen(false)}
-                        className="p-2 shrink-0 rounded-full text-gray-400 hover:text-red-500 bg-white dark:bg-[#1A1A1A] border border-gray-200/60 dark:border-gray-800 shadow-sm active:scale-95 transition-all"
+                        className="p-2 shrink-0 rounded-full text-gray-400 hover:text-red-500 bg-white dark:bg-[#1A1A1A] border border-gray-200/60 dark:border-gray-800 shadow-sm active:scale-90 transition-all group"
                         aria-label="Close Menu"
                     >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -422,16 +417,16 @@ export default function Navbar() {
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                     {/* Main Navigation */}
                     <div className="space-y-1">
-                        <p className="px-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Explore</p>
+                        <p className={`px-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 transition-all duration-500 transform ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[100ms]' : 'translate-y-4 opacity-0'}`}>Explore</p>
 
-                        <Link href="/products" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">
+                        <Link href="/products" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[150ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-[#0EA5E9]/10 text-[#0EA5E9] group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                             </div>
                             Products
                         </Link>
 
-                        <Link href="/categories" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">
+                        <Link href="/categories" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[200ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500 dark:bg-indigo-400/10 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                             </div>
@@ -439,7 +434,7 @@ export default function Navbar() {
                         </Link>
 
                         {/* Blog Accordion */}
-                        <div>
+                        <div className={`transition-all duration-300 transform ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[250ms]' : 'translate-y-4 opacity-0'}`}>
                             <button
                                 onClick={() => setBlogMenuOpen(prev => !prev)}
                                 className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all active:scale-[0.98]"
@@ -489,23 +484,23 @@ export default function Navbar() {
 
                     {/* Support & Company */}
                     <div className="space-y-1">
-                        <p className="px-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Company</p>
+                        <p className={`px-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 transition-all duration-300 transform ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[300ms]' : 'translate-y-4 opacity-0'}`}>Company</p>
 
-                        <Link href="/about" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">
+                        <Link href="/about" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[350ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             About Garud
                         </Link>
 
-                        <Link href="/contact" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">
+                        <Link href="/contact" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[400ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500 dark:bg-rose-400/10 dark:text-rose-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             </div>
                             Contact Us
                         </Link>
 
-                        <Link href="/enquire" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all group active:scale-[0.98]">
+                        <Link href="/enquire" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[450ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-blue-600/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             </div>
