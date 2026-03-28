@@ -279,6 +279,8 @@ export default function Navbar() {
                 style={{
                     paddingTop: "env(safe-area-inset-top, 0px)",
                     WebkitBackfaceVisibility: 'hidden',
+                    willChange: 'transform',
+                    contain: 'layout style',
                     viewTransitionName: 'mobile-nav-top'
                 }}
             >
@@ -324,7 +326,7 @@ export default function Navbar() {
             <div
                 ref={bottomNavRef}
                 className={`lg:hidden fixed left-0 right-0 z-100 pointer-events-none transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isNavbarHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
-                style={{ bottom: 0, WebkitBackfaceVisibility: 'hidden', viewTransitionName: 'mobile-nav-bottom' }}
+                style={{ bottom: 0, WebkitBackfaceVisibility: 'hidden', willChange: 'transform', contain: 'layout style', viewTransitionName: 'mobile-nav-bottom' }}
             >
                 {/* Visual background layer — no pointer events, explicit filter */}
                 <div
