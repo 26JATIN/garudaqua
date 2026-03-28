@@ -37,19 +37,19 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                             Latest Insights
                         </h2>
                     </div>
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
                         {categories.slice(0, 4).map((cat) => (
                             <Link
                                 key={cat.id}
                                 href={`/blogs/category/${cat.slug}`}
-                                className="px-3.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full hover:border-[#0EA5E9] hover:text-[#0EA5E9] transition-colors"
+                                className="px-4 py-2.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full hover:border-[#0EA5E9] hover:text-[#0EA5E9] transition-colors"
                             >
                                 {cat.name}
                             </Link>
                         ))}
                         <Link
                             href="/blogs"
-                            className="px-3.5 py-1.5 text-xs font-semibold text-[#0369A1] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors btn-shine"
+                            className="px-4 py-2.5 text-xs font-semibold text-[#0369A1] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors btn-shine"
                         >
                             View All
                         </Link>

@@ -250,11 +250,11 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
     const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <NavigationLink href={`/products/${productPath(relatedProduct)}`}>
+        <NavigationLink href={`/products/${productPath(relatedProduct)}`} className="block h-full">
             <div
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                className="relative group cursor-pointer p-2 rounded-2xl md:rounded-3xl"
+                className="relative group cursor-pointer p-2 rounded-2xl md:rounded-3xl h-full"
             >
                 {/* Hover spotlight background */}
                 {isHovered && (
@@ -265,10 +265,10 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
 
                 {/* Card content */}
                 <div className={cn(
-                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-shadow duration-300",
+                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-shadow duration-300 h-full flex flex-col",
                     isHovered && "shadow-xl"
                 )}>
-                    <div className="aspect-square relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                    <div className="aspect-4/5 relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
                         {relatedProduct.image ? (
                             <Image
                                 src={relatedProduct.image}
@@ -295,9 +295,9 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
                             <span className="text-white text-sm font-medium">View Details</span>
                         </div>
                     </div>
-                    <div className="p-3 md:p-4">
+                    <div className="p-3 md:p-4 flex-1 flex items-center">
                         <h3 className={cn(
-                            "text-sm md:text-base font-light text-[#2C2C2C] dark:text-gray-200 mb-1 md:mb-2 line-clamp-2 transition-colors leading-tight",
+                            "text-sm md:text-base font-light text-[#2C2C2C] dark:text-gray-200 line-clamp-2 transition-colors leading-tight",
                             isHovered && "text-[#0EA5E9]"
                         )}>
                             {relatedProduct.name}

@@ -45,32 +45,32 @@ export default function Footer() {
 
                     <div>
                         <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Explore</h4>
-                        <ul className="space-y-3">
-                            <li><NavigationLink href="/" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Home</NavigationLink></li>
-                            <li><NavigationLink href="/products" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Products</NavigationLink></li>
-                            <li><NavigationLink href="/blogs" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Blog</NavigationLink></li>
-                            <li><NavigationLink href="/about" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">About Us</NavigationLink></li>
-                            <li><NavigationLink href="/contact" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Contact</NavigationLink></li>
+                        <ul className="space-y-1">
+                            <li><NavigationLink href="/" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Home</NavigationLink></li>
+                            <li><NavigationLink href="/products" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Products</NavigationLink></li>
+                            <li><NavigationLink href="/blogs" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Blog</NavigationLink></li>
+                            <li><NavigationLink href="/about" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">About Us</NavigationLink></li>
+                            <li><NavigationLink href="/contact" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Contact</NavigationLink></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Our Categories</h4>
-                        <ul className="space-y-3">
-                            <li><NavigationLink href="/categories/blow-mould-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Blow Mould Tanks</NavigationLink></li>
-                            <li><NavigationLink href="/categories/roto-mould-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Roto Mould Tanks</NavigationLink></li>
-                            <li><NavigationLink href="/categories/agriculture-sprayer-tank" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Agriculture Sprayer Tanks</NavigationLink></li>
-                            <li><NavigationLink href="/categories/cpvc-pipes-and-fittings" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">CPVC Pipes & Fittings</NavigationLink></li>
+                        <ul className="space-y-1">
+                            <li><NavigationLink href="/categories/blow-mould-tank" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Blow Mould Tanks</NavigationLink></li>
+                            <li><NavigationLink href="/categories/roto-mould-tank" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Roto Mould Tanks</NavigationLink></li>
+                            <li><NavigationLink href="/categories/agriculture-sprayer-tank" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">Agriculture Sprayer Tanks</NavigationLink></li>
+                            <li><NavigationLink href="/categories/cpvc-pipes-and-fittings" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">CPVC Pipes & Fittings</NavigationLink></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-light text-lg mb-6 text-[#0EA5E9]">Blog Topics</h4>
-                        <ul className="space-y-3">
-                            <li><NavigationLink href="/blogs" className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">All Articles</NavigationLink></li>
+                        <ul className="space-y-1">
+                            <li><NavigationLink href="/blogs" className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light link-hover-slide">All Articles</NavigationLink></li>
                             {blogCategories.map((cat: any) => (
                                 <li key={cat.id}>
-                                    <NavigationLink href={`/blogs/category/${cat.slug}`} className="text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
+                                    <NavigationLink href={`/blogs/category/${cat.slug}`} className="inline-block py-1.5 text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
                                         {cat.name}
                                     </NavigationLink>
                                 </li>

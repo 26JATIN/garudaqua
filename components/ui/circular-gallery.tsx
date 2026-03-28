@@ -64,8 +64,14 @@ export default function ScrollGallery({
     return () => cancelAnimationFrame(animId);
   }, [isDragging]);
 
-  // Duplicate items for seamless looping
-  const displayItems = items.length < 8 ? [...items, ...items] : items;
+  // Build enough items to fill the scrollable area for seamless looping.
+  // We need at least ~12 visible cards so the loop reset isn't obvious.
+  const MIN_CARDS = 12;
+  let displayItems = items;
+  if (items.length > 0 && items.length < MIN_CARDS) {
+    const repeats = Math.ceil(MIN_CARDS / items.length);
+    displayItems = Array.from({ length: repeats }, () => items).flat();
+  }
 
   return (
     <div
