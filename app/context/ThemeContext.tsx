@@ -36,11 +36,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             root.classList.remove('dark');
         }
 
-        // Update theme-color meta to match navbar bg
-        const meta = document.getElementById('theme-color-meta');
-        if (meta) {
-            (meta as HTMLMetaElement).content = newTheme === 'dark' ? '#000000' : '#ffffff';
-        }
+        // Update theme-color meta tags to match navbar bg
+        const metaLight = document.getElementById('theme-color-light');
+        const metaDark = document.getElementById('theme-color-dark');
+        const color = newTheme === 'dark' ? '#000000' : '#ffffff';
+        if (metaLight) (metaLight as HTMLMetaElement).content = color;
+        if (metaDark) (metaDark as HTMLMetaElement).content = color;
 
         if (animate) {
             // Remove transition class after animation completes

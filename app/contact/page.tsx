@@ -271,6 +271,16 @@ export default function ContactPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Back link */}
+                <div className="text-center mt-6">
+                    <NavigationLink href="/" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full hover:border-[#0EA5E9] hover:text-[#0EA5E9] transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back to Home
+                    </NavigationLink>
+                </div>
             </div>
         </div>
     );

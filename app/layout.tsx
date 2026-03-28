@@ -121,7 +121,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-        <meta name="theme-color" content="#000000" id="theme-color-meta" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" id="theme-color-light" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" id="theme-color-dark" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }} />
         <script dangerouslySetInnerHTML={{
@@ -129,16 +130,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           (function() {
             try {
               var theme = localStorage.getItem('theme');
-              var meta = document.getElementById('theme-color-meta');
-              if (theme === 'dark') {
+              var metaLight = document.getElementById('theme-color-light');
+              var metaDark = document.getElementById('theme-color-dark');
+              var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+              if (isDark) {
                 document.documentElement.classList.add('dark');
-                if (meta) meta.content = '#000000';
+                if (metaLight) metaLight.content = '#000000';
+                if (metaDark) metaDark.content = '#000000';
               } else {
                 document.documentElement.classList.remove('dark');
-                if (meta) meta.content = '#ffffff';
+                if (metaLight) metaLight.content = '#ffffff';
+                if (metaDark) metaDark.content = '#ffffff';
               }
             } catch(e) {
-              document.documentElement.classList.remove('dark');
+              if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+              }
             }
             // iOS: overflow-x:clip on <html> breaks position:fixed.
             // Must run before first paint so Chrome locks in the correct context.
