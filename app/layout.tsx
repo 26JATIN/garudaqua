@@ -155,7 +155,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <NavbarProvider>
             <ConditionalNavbar />
             <PageTransitionProvider>
-              <main style={{ viewTransitionName: 'main-content' }}>
+              <main>
                 {children}
               </main>
             </PageTransitionProvider>

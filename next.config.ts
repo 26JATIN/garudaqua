@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   },
 
   experimental: {
-    viewTransition: true,
+    viewTransition: false,
     inlineCss: true,
     optimizePackageImports: ["lucide-react", "sonner", "framer-motion"],
     serverActions: {

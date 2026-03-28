@@ -102,8 +102,7 @@ export default function Navbar() {
                 style={{ paddingTop: "env(safe-area-inset-top, 0px)", viewTransitionName: 'desktop-nav' }}
             >
                 <div
-                    className={`border-b transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] transform-gpu ${visible ? 'bg-white/90 dark:bg-[#0A0A0A]/90 shadow-sm border-gray-200 dark:border-white/10' : 'bg-white/80 dark:bg-[#0A0A0A]/80 border-transparent shadow-none'}`}
-                    style={{ backdropFilter: "blur(24px) saturate(200%)", WebkitBackdropFilter: "blur(24px) saturate(200%)" }}
+                    className={`border-b backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] transform-gpu ${visible ? 'bg-white/95 dark:bg-[#0A0A0A]/95 shadow-sm border-gray-200 dark:border-white/10' : 'bg-white/95 dark:bg-[#0A0A0A]/95 border-transparent shadow-none'}`}
                 >
                     <div className="max-w-7xl mx-auto px-6 py-1">
                         <div className="flex items-center justify-between">
@@ -160,7 +159,7 @@ export default function Navbar() {
                                             {/* Invisible hover bridge to prevent mouse leaving */}
                                             <div className="absolute -top-8 left-0 right-0 h-8 bg-transparent"></div>
                                             
-                                            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-2xl border border-gray-100/80 dark:border-gray-800/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] p-2 flex flex-col gap-0.5">
+                                            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md border border-gray-100/80 dark:border-gray-800/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] p-2 flex flex-col gap-0.5">
                                                 {categories.slice(0, 8).map((cat) => (
                                                     <Link 
                                                         key={cat.id} 
@@ -213,7 +212,7 @@ export default function Navbar() {
                                         <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] origin-top scale-95 group-hover:scale-100 z-50 w-62.5">
                                             <div className="absolute -top-8 left-0 right-0 h-8 bg-transparent"></div>
 
-                                            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-2xl border border-gray-100/80 dark:border-gray-800/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] p-2 flex flex-col gap-0.5">
+                                            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md border border-gray-100/80 dark:border-gray-800/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] p-2 flex flex-col gap-0.5">
                                                 <Link
                                                     href="/blogs"
                                                     className="flex items-center gap-3 p-2.5 w-full rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group/item"
@@ -284,8 +283,7 @@ export default function Navbar() {
             >
                 {/* Visual background layer with explicit filter to ensure glass effect */}
                 <div
-                    className="absolute inset-0 bg-white/90 dark:bg-[#0A0A0A]/90 border-b border-gray-200/50 dark:border-white/10 shadow-sm transform-gpu"
-                    style={{ backdropFilter: "blur(24px) saturate(200%)", WebkitBackdropFilter: "blur(24px) saturate(200%)" }}
+                    className="absolute inset-0 bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md border-b border-gray-200/50 dark:border-white/10 shadow-sm transform-gpu"
                 />
                 <div className="relative px-4 py-2 flex items-center gap-2">
                     {/* Mobile Logo */}
@@ -329,8 +327,7 @@ export default function Navbar() {
             >
                 {/* Visual background layer — no pointer events, explicit filter */}
                 <div
-                    className="absolute inset-0 bg-white/90 dark:bg-[#0A0A0A]/90 border-t border-gray-200/50 dark:border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.04)] transform-gpu"
-                    style={{ backdropFilter: "blur(24px) saturate(200%)", WebkitBackdropFilter: "blur(24px) saturate(200%)" }}
+                    className="absolute inset-0 bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md border-t border-gray-200/50 dark:border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.04)] transform-gpu"
                 />
                 <div className="relative flex items-center justify-around py-1.5" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
                     {/* Home */}

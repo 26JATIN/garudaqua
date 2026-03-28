@@ -107,7 +107,7 @@ export default function BlogsClient({
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A]">
+        <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] md:py-4">
             {/* Hero Section */}
             <div className="relative bg-linear-to-br from-[#2C2C2C] via-[#3A3A3A] to-[#2C2C2C] text-white py-24 overflow-hidden">
                 <div className="absolute inset-0 opacity-5" aria-hidden="true">

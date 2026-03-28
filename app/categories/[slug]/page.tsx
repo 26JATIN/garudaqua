@@ -102,7 +102,7 @@ export default async function CategorySeoPage(
     const canonicalUrl = `https://garudaqua.in/categories/${categoryFull.slug || slug}`;
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-[#060606]">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#060606] md:py-4">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema({
                 name: categoryFull.name,
                 description: categoryFull.description || `Explore ${categoryFull.name} products at Garud Aqua Solutions.`,

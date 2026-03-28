@@ -30,9 +30,9 @@ export default async function CategoriesIndexPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-[#060606]">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#060606] md:py-4">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-linear-to-br from-[#0c1a2e] via-[#0f2440] to-[#0a1628]">
+            <div className="relative overflow-hidden bg-linear-to-br from-[#0c1a2e] via-[#0f2440] to-[#0a1628] ">
                 {/* Decorative elements */}
                 <div className="absolute inset-0">
                     <div className="absolute top-0 right-0 w-125 h-125 bg-[#0EA5E9]/8 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
