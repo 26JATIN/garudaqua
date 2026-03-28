@@ -16,7 +16,9 @@ export function usePageTransition() {
   return useContext(PageTransitionContext);
 }
 
-export function PageTransitionProvider({ children }: { children: React.ReactNode }) {
+import { Suspense } from "react";
+
+function PageTransitionInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -132,6 +134,16 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
     <PageTransitionContext.Provider value={{ navigate, isTransitioning }}>
       {children}
     </PageTransitionContext.Provider>
+  );
+}
+
+export function PageTransitionProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense>
+      <PageTransitionInner>
+        {children}
+      </PageTransitionInner>
+    </Suspense>
   );
 }
 
