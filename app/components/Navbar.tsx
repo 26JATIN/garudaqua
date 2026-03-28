@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import NavigationLink from './NavigationLink';
 import Image from "next/image";
 import { usePathname } from 'next/navigation';
 import { useNavbar } from '../context/NavbarContext';
@@ -108,7 +109,7 @@ export default function Navbar() {
                         <div className="flex items-center justify-between">
                             {/* Logo */}
                             <div className="transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]">
-                                <Link
+                                <NavigationLink
                                     href="/"
                                     className="flex items-center"
                                 >
@@ -120,7 +121,7 @@ export default function Navbar() {
                                         className="h-20 w-auto"
                                         priority
                                     />
-                                </Link>
+                                </NavigationLink>
                             </div>
 
                             {/* Center Search Bar */}
@@ -135,16 +136,16 @@ export default function Navbar() {
                             <div className="flex items-center gap-3">
                                 {/* Navigation Links */}
                                 <div className="flex items-center gap-2 lg:gap-4 mr-2">
-                                    <Link
+                                    <NavigationLink
                                         href="/products"
                                         className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300"
                                     >
                                         Products
-                                    </Link>
+                                    </NavigationLink>
 
                                     {/* Megamenu Dropdown Container */}
                                     <div className="relative group">
-                                        <Link
+                                        <NavigationLink
                                             href="/categories"
                                             className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300 flex items-center gap-1"
                                         >
@@ -152,7 +153,7 @@ export default function Navbar() {
                                             <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-all group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                             </svg>
-                                        </Link>
+                                        </NavigationLink>
 
                                         {/* Dropdown Panel - Classic List Style */}
                                         <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] origin-top scale-95 group-hover:scale-100 z-50 w-70">
@@ -161,7 +162,7 @@ export default function Navbar() {
                                             
                                             <div className="bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md border border-gray-100/80 dark:border-gray-800/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] p-2 flex flex-col gap-0.5">
                                                 {categories.slice(0, 8).map((cat) => (
-                                                    <Link 
+                                                    <NavigationLink 
                                                         key={cat.id} 
                                                         href={`/categories/${cat.slug}`}
                                                         className="flex items-center gap-3 p-2.5 w-full rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group/item"
@@ -178,15 +179,15 @@ export default function Navbar() {
                                                         <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 leading-tight group-hover/item:text-[#0EA5E9] transition-colors truncate">
                                                             {cat.name}
                                                         </span>
-                                                    </Link>
+                                                    </NavigationLink>
                                                 ))}
                                                 {categories.length > 8 && (
-                                                    <Link 
+                                                    <NavigationLink 
                                                         href="/categories"
                                                         className="flex items-center justify-center gap-2 p-3 mt-1 w-full rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group/item"
                                                     >
                                                         <span className="text-[13px] font-semibold text-gray-500 group-hover/item:text-[#0EA5E9] transition-colors">View all {categories.length} categories &rarr;</span>
-                                                    </Link>
+                                                    </NavigationLink>
                                                 )}
                                                 {categories.length === 0 && (
                                                     <div className="py-6 flex items-center justify-center">
@@ -199,7 +200,7 @@ export default function Navbar() {
 
                                     {/* Blog Dropdown */}
                                     <div className="relative group">
-                                        <Link
+                                        <NavigationLink
                                             href="/blogs"
                                             className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300 flex items-center gap-1"
                                         >
@@ -207,13 +208,13 @@ export default function Navbar() {
                                             <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-all group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                             </svg>
-                                        </Link>
+                                        </NavigationLink>
 
                                         <div className="absolute top-full mt-8 left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] origin-top scale-95 group-hover:scale-100 z-50 w-62.5">
                                             <div className="absolute -top-8 left-0 right-0 h-8 bg-transparent"></div>
 
                                             <div className="bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md border border-gray-100/80 dark:border-gray-800/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] p-2 flex flex-col gap-0.5">
-                                                <Link
+                                                <NavigationLink
                                                     href="/blogs"
                                                     className="flex items-center gap-3 p-2.5 w-full rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group/item"
                                                 >
@@ -223,12 +224,12 @@ export default function Navbar() {
                                                     <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 leading-tight group-hover/item:text-[#0EA5E9] transition-colors">
                                                         All Articles
                                                     </span>
-                                                </Link>
+                                                </NavigationLink>
                                                 {blogCategories.length > 0 && (
                                                     <div className="mx-2 my-1 border-t border-gray-100 dark:border-gray-800/60"></div>
                                                 )}
                                                 {blogCategories.map((cat) => (
-                                                    <Link
+                                                    <NavigationLink
                                                         key={cat.id}
                                                         href={`/blogs/category/${cat.slug}`}
                                                         className="flex items-center gap-3 p-2.5 w-full rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group/item"
@@ -239,7 +240,7 @@ export default function Navbar() {
                                                         <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 leading-tight group-hover/item:text-[#0EA5E9] transition-colors truncate">
                                                             {cat.name}
                                                         </span>
-                                                    </Link>
+                                                    </NavigationLink>
                                                 ))}
                                                 {blogCategories.length === 0 && (
                                                     <div className="py-4 flex items-center justify-center">
@@ -250,19 +251,19 @@ export default function Navbar() {
                                         </div>
                                     </div>
 
-                                    <Link
+                                    <NavigationLink
                                         href="/about"
                                         className="px-4 py-2 text-sm font-medium text-(--nav-text) hover:bg-(--nav-hover-bg) rounded-xl transition-all duration-300"
                                     >
                                         About
-                                    </Link>
+                                    </NavigationLink>
 
-                                    <Link
+                                    <NavigationLink
                                         href="/contact"
                                         className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-black dark:bg-white dark:text-black dark:hover:bg-gray-100 rounded-xl transition-all duration-300 ml-1 shadow-xs"
                                     >
                                         Contact Us
-                                    </Link>
+                                    </NavigationLink>
                                 </div>
                             </div>
                         </div>
@@ -287,7 +288,7 @@ export default function Navbar() {
                 />
                 <div className="relative px-4 py-2 flex items-center gap-2">
                     {/* Mobile Logo */}
-                    <Link href="/" className="shrink-0">
+                    <NavigationLink href="/" className="shrink-0">
                         <Image
                             src="/MobileLogo.webp"
                             alt="Garud"
@@ -296,7 +297,7 @@ export default function Navbar() {
                             className="h-12 w-12 object-contain scale-200"
                             priority
                         />
-                    </Link>
+                    </NavigationLink>
                     {/* Search Bar */}
                     <div className="flex-1">
                         <SearchBar placeholder="Search water tanks, pipes..." />
@@ -331,44 +332,44 @@ export default function Navbar() {
                 />
                 <div className="relative flex items-center justify-around py-1.5" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
                     {/* Home */}
-                    <Link href="/" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
+                    <NavigationLink href="/" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
                         <div className={`p-1.5 rounded-xl transition-colors ${pathname === '/' ? 'text-[#0EA5E9] bg-[#0EA5E9]/10' : 'text-gray-500 dark:text-gray-400'}`}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname === '/' ? 2.5 : 2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h1a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
                         </div>
                         <span className={`text-[10px] font-medium transition-colors ${pathname === '/' ? 'text-[#0EA5E9]' : 'text-gray-500 dark:text-gray-400'}`}>Home</span>
-                    </Link>
+                    </NavigationLink>
 
                     {/* Browse */}
-                    <Link href="/products" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
+                    <NavigationLink href="/products" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
                         <div className={`p-1.5 rounded-xl transition-colors ${pathname?.startsWith('/products') ? 'text-[#0EA5E9] bg-[#0EA5E9]/10' : 'text-gray-500 dark:text-gray-400'}`}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname?.startsWith('/products') ? 2.5 : 2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                             </svg>
                         </div>
                         <span className={`text-[10px] font-medium transition-colors ${pathname?.startsWith('/products') ? 'text-[#0EA5E9]' : 'text-gray-500 dark:text-gray-400'}`}>Products</span>
-                    </Link>
+                    </NavigationLink>
 
                     {/* Category */}
-                    <Link href="/categories" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
+                    <NavigationLink href="/categories" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
                         <div className={`p-1.5 rounded-xl transition-colors ${pathname?.startsWith('/categories') ? 'text-[#0EA5E9] bg-[#0EA5E9]/10' : 'text-gray-500 dark:text-gray-400'}`}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname?.startsWith('/categories') ? 2.5 : 2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                             </svg>
                         </div>
                         <span className={`text-[10px] font-medium transition-colors ${pathname?.startsWith('/categories') ? 'text-[#0EA5E9]' : 'text-gray-500 dark:text-gray-400'}`}>Category</span>
-                    </Link>
+                    </NavigationLink>
 
                     {/* Contact Us */}
-                    <Link href="/contact" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
+                    <NavigationLink href="/contact" className="pointer-events-auto flex flex-col items-center px-3 py-1 space-y-0.5 active:scale-[0.92]" style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
                         <div className={`p-1.5 rounded-xl transition-colors ${pathname?.startsWith('/contact') ? 'text-[#0EA5E9] bg-[#0EA5E9]/10' : 'text-gray-500 dark:text-gray-400'}`}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname?.startsWith('/contact') ? 2.5 : 2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                         </div>
                         <span className={`text-[10px] font-medium transition-colors ${pathname?.startsWith('/contact') ? 'text-[#0EA5E9]' : 'text-gray-500 dark:text-gray-400'}`}>Contact</span>
-                    </Link>
+                    </NavigationLink>
                 </div>
             </div>
 
@@ -416,19 +417,19 @@ export default function Navbar() {
                     <div className="space-y-1">
                         <p className={`px-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 transition-all duration-500 transform ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[100ms]' : 'translate-y-4 opacity-0'}`}>Explore</p>
 
-                        <Link href="/products" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[150ms]' : 'translate-y-4 opacity-0'}`}>
+                        <NavigationLink href="/products" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[150ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-[#0EA5E9]/10 text-[#0EA5E9] group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                             </div>
                             Products
-                        </Link>
+                        </NavigationLink>
 
-                        <Link href="/categories" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[200ms]' : 'translate-y-4 opacity-0'}`}>
+                        <NavigationLink href="/categories" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[200ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500 dark:bg-indigo-400/10 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                             </div>
                             Categories
-                        </Link>
+                        </NavigationLink>
 
                         {/* Blog Accordion */}
                         <div className={`transition-all duration-300 transform ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[250ms]' : 'translate-y-4 opacity-0'}`}>
@@ -455,16 +456,16 @@ export default function Navbar() {
                                 style={{ maxHeight: blogMenuOpen ? `${(blogCategories.length + 1) * 52}px` : "0px", opacity: blogMenuOpen ? 1 : 0 }}
                             >
                                 <div className="ml-14 mr-2 mt-1 mb-2 space-y-0.5">
-                                    <Link
+                                    <NavigationLink
                                         href="/blogs"
                                         onClick={() => setIsSidebarOpen(false)}
                                         className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-[#0EA5E9] transition-colors"
                                     >
                                         <svg className="w-4 h-4 text-[#0EA5E9] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
                                         All Articles
-                                    </Link>
+                                    </NavigationLink>
                                     {blogCategories.map((cat: any) => (
-                                        <Link
+                                        <NavigationLink
                                             key={cat.id}
                                             href={`/blogs/category/${cat.slug}`}
                                             onClick={() => setIsSidebarOpen(false)}
@@ -472,7 +473,7 @@ export default function Navbar() {
                                         >
                                             <svg className="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                                             {cat.name}
-                                        </Link>
+                                        </NavigationLink>
                                     ))}
                                 </div>
                             </div>
@@ -483,26 +484,26 @@ export default function Navbar() {
                     <div className="space-y-1">
                         <p className={`px-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 transition-all duration-300 transform ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[300ms]' : 'translate-y-4 opacity-0'}`}>Company</p>
 
-                        <Link href="/about" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[350ms]' : 'translate-y-4 opacity-0'}`}>
+                        <NavigationLink href="/about" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[350ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             About Garud
-                        </Link>
+                        </NavigationLink>
 
-                        <Link href="/contact" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[400ms]' : 'translate-y-4 opacity-0'}`}>
+                        <NavigationLink href="/contact" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[400ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500 dark:bg-rose-400/10 dark:text-rose-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             </div>
                             Contact Us
-                        </Link>
+                        </NavigationLink>
 
-                        <Link href="/enquire" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[450ms]' : 'translate-y-4 opacity-0'}`}>
+                        <NavigationLink href="/enquire" onClick={() => setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-300 transform group active:scale-[0.98] ${isSidebarOpen ? 'translate-y-0 opacity-100 delay-[450ms]' : 'translate-y-4 opacity-0'}`}>
                             <div className="p-2 rounded-xl bg-blue-600/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400 group-hover:scale-110 transition-transform">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             </div>
                             Enquiry
-                        </Link>
+                        </NavigationLink>
                     </div>
                 </div>
 

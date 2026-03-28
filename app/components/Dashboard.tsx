@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import NavigationLink from "@/app/components/NavigationLink";
 import { toast } from "sonner";
 import SeoMetaGeneratorButton from './admin/SeoMetaGeneratorButton';
 
@@ -78,7 +78,7 @@ export default function Dashboard() {
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                 {statCards.map((stat) => (
-                    <Link
+                    <NavigationLink
                         key={stat.label}
                         href={stat.href}
                         className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group"
@@ -95,7 +95,7 @@ export default function Dashboard() {
                         </div>
                         <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                         <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
-                    </Link>
+                    </NavigationLink>
                 ))}
             </div>
 
@@ -104,7 +104,7 @@ export default function Dashboard() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {quickLinks.map((link) => (
-                        <Link
+                        <NavigationLink
                             key={link.label}
                             href={link.href}
                             className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#0EA5E9]/30 transition-all group"
@@ -113,7 +113,7 @@ export default function Dashboard() {
                                 {link.label}
                             </h4>
                             <p className="text-sm text-gray-500 mt-1">{link.description}</p>
-                        </Link>
+                        </NavigationLink>
                     ))}
                 </div>
             </div>

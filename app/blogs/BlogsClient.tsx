@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import Link from "next/link";
+import NavigationLink from "@/app/components/NavigationLink";
 import Image from "next/image";
 import { toast } from "sonner";
 
@@ -152,7 +152,7 @@ export default function BlogsClient({
                 {/* Category Filter */}
                 <div className="mb-12">
                     <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-2 md:flex-wrap md:justify-center md:overflow-x-visible md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                        <Link
+                        <NavigationLink
                             href="/blogs"
                             onClick={(e) => { e.preventDefault(); setCategory("all"); }}
                             className={`shrink-0 snap-start whitespace-nowrap px-5 py-2.5 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 ${
@@ -162,9 +162,9 @@ export default function BlogsClient({
                             }`}
                         >
                             All Articles
-                        </Link>
+                        </NavigationLink>
                         {categories.map((cat) => (
-                            <Link
+                            <NavigationLink
                                 key={cat.id}
                                 href={`/blogs/category/${cat.slug}`}
                                 onClick={(e) => { e.preventDefault(); setCategory(cat.slug); }}
@@ -175,7 +175,7 @@ export default function BlogsClient({
                                 }`}
                             >
                                 {cat.name}
-                            </Link>
+                            </NavigationLink>
                         ))}
                     </div>
                 </div>
@@ -207,7 +207,7 @@ export default function BlogsClient({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {blogs.map((blog, index) => (
                             <div key={blog.id}>
-                                <Link
+                                <NavigationLink
                                     href={`/blogs/${blog.slug}`}
                                     className="group bg-white dark:bg-[#0A0A0A] rounded-3xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
                                 >
@@ -287,7 +287,7 @@ export default function BlogsClient({
                                             </div>
                                         )}
                                     </div>
-                                </Link>
+                                </NavigationLink>
                             </div>
                         ))}
                     </div>

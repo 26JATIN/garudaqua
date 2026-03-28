@@ -2,6 +2,7 @@
 import "@/app/styles/animations.css";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { usePageTransition } from './PageTransition';
 import { cloudinaryUrl } from '@/lib/utils';
 
 interface Suggestion {
@@ -26,6 +27,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
     const [isLoading, setIsLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const router = useRouter();
+    const { navigate } = usePageTransition();
     const searchRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
@@ -182,7 +184,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
     };
 
     const handleSuggestionClick = (suggestion: Suggestion) => {
-        router.push(suggestion.url);
+        navigate(suggestion.url);
         setIsOpen(false);
         setSelectedIndex(-1);
         setSearchQuery('');

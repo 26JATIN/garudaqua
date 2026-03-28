@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
+import NavigationLink from "@/app/components/NavigationLink";
 import { useAdminAuth, AdminAuthProvider } from "../context/AdminAuthContext";
 import { useState, useEffect, useRef, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -304,13 +304,13 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                                                 <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
                                                 <p className="text-xs text-gray-500 truncate">{user.email}</p>
                                             </div>
-                                            <Link
+                                            <NavigationLink
                                                 href="/"
                                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                 onClick={() => setIsProfileOpen(false)}
                                             >
                                                 View Website
-                                            </Link>
+                                            </NavigationLink>
                                             <button
                                                 onClick={logout}
                                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -347,7 +347,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                         {navItems.map((item) => {
                             const isActive = pathname === item.path;
                             return (
-                                <Link
+                                <NavigationLink
                                     key={item.path}
                                     href={item.path}
                                     className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
@@ -360,7 +360,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                                         {item.icon}
                                     </span>
                                     <span className="font-medium text-sm">{item.label}</span>
-                                </Link>
+                                </NavigationLink>
                             );
                         })}
                     </nav>
@@ -420,7 +420,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                                 {navItems.map((item) => {
                                     const isActive = pathname === item.path;
                                     return (
-                                        <Link
+                                        <NavigationLink
                                             key={item.path}
                                             href={item.path}
                                             onClick={() => setIsMobileSidebarOpen(false)}
@@ -441,14 +441,14 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                                                     </svg>
                                                 </span>
                                             )}
-                                        </Link>
+                                        </NavigationLink>
                                     );
                                 })}
                             </nav>
 
                             <div className="border-t border-gray-200 bg-linear-to-b from-gray-50 to-gray-100">
                                 <div className="px-4 py-3 space-y-2">
-                                    <Link
+                                    <NavigationLink
                                         href="/"
                                         onClick={() => setIsMobileSidebarOpen(false)}
                                         className="flex items-center justify-center space-x-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium"
@@ -457,7 +457,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                         </svg>
                                         <span>View Website</span>
-                                    </Link>
+                                    </NavigationLink>
                                     <button
                                         onClick={logout}
                                         className="flex items-center justify-center space-x-2 w-full px-4 py-2.5 bg-red-50 border border-red-200 text-red-600 rounded-xl hover:bg-red-100 transition-colors text-sm font-medium"

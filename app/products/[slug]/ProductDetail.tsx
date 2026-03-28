@@ -1,7 +1,7 @@
 "use client";
 import "@/app/styles/animations.css";
 import { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
+import NavigationLink from "@/app/components/NavigationLink";
 import Image from "next/image";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -250,7 +250,7 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
     const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <Link href={`/products/${productPath(relatedProduct)}`}>
+        <NavigationLink href={`/products/${productPath(relatedProduct)}`}>
             <div
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
@@ -305,7 +305,7 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
                     </div>
                 </div>
             </div>
-        </Link>
+        </NavigationLink>
     );
 }
 
@@ -419,13 +419,13 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         <p className="text-gray-600 dark:text-gray-400 font-light mb-6">
                             The product you&apos;re looking for doesn&apos;t exist or has been removed.
                         </p>
-                        <Link href="/products">
+                        <NavigationLink href="/products">
                             <button
                                 className="px-6 py-3 bg-[#0EA5E9] text-white rounded-full hover:bg-[#0369A1] hover:scale-105 active:scale-95 transition-all duration-200 font-light shadow-lg"
                             >
                                 Browse Products
                             </button>
-                        </Link>
+                        </NavigationLink>
                     </div>
                 </div>
             </div>
@@ -460,23 +460,23 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumb */}
                 <nav className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-8">
-                    <Link href="/" className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all font-medium border border-transparent dark:border-white/5 shadow-xs">
+                    <NavigationLink href="/" className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all font-medium border border-transparent dark:border-white/5 shadow-xs">
                         Home
-                    </Link>
+                    </NavigationLink>
                     <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    <Link href="/products" className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all font-medium border border-transparent dark:border-white/5 shadow-xs">
+                    <NavigationLink href="/products" className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all font-medium border border-transparent dark:border-white/5 shadow-xs">
                         Products
-                    </Link>
+                    </NavigationLink>
                     {categoryName && categorySlug && (
                         <>
                             <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
-                            <Link href={`/categories/${categorySlug}`} className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all font-medium border border-transparent dark:border-white/5 shadow-xs">
+                            <NavigationLink href={`/categories/${categorySlug}`} className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all font-medium border border-transparent dark:border-white/5 shadow-xs">
                                 {categoryName}
-                            </Link>
+                            </NavigationLink>
                         </>
                     )}
                     <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -555,13 +555,13 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                 <span className="bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium px-4 py-2 rounded-full inline-flex items-center gap-2">
                                     {categoryName}
                                     {typeof product.category === 'object' && product.category.hasSeoPage && (
-                                        <Link 
+                                        <NavigationLink 
                                             href={`/categories/${categorySlug}`}
                                             className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0EA5E9]/20 hover:bg-[#0EA5E9]/30 transition-colors"
                                             title="View Category Details"
                                         >
                                             <span className="text-xs font-bold font-serif leading-none">i</span>
-                                        </Link>
+                                        </NavigationLink>
                                     )}
                                 </span>
                                 {product.subcategory?.name && (
@@ -674,7 +674,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         )}
 
                         {/* Enquire Button */}
-                        <Link href={`/enquire?product=${encodeURIComponent(product.name)}`}>
+                        <NavigationLink href={`/enquire?product=${encodeURIComponent(product.name)}`}>
                             <button
                                 className="w-full py-4 px-8 rounded-full font-light text-lg flex items-center justify-center gap-3 transition-all duration-200 shadow-lg bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white hover:shadow-xl hover:scale-105 active:scale-95"
                             >
@@ -683,7 +683,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                 </svg>
                                 Enquire Now
                             </button>
-                        </Link>
+                        </NavigationLink>
 
                         {/* Features */}
                         <div className={`grid grid-cols-2 gap-3 pt-6 ${product.guarantee ? "sm:grid-cols-3" : ""}`}>
@@ -737,7 +737,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                     Explore more on {categoryName}
                                 </h2>
                             </div>
-                            <Link
+                            <NavigationLink
                                 href={`/categories/${categorySlug}`}
                                 className="hidden md:flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
@@ -745,7 +745,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
-                            </Link>
+                            </NavigationLink>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                             {relatedProducts.map((relatedProduct, index) => (
@@ -754,7 +754,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         </div>
                         {/* Mobile View All Button */}
                         <div className="md:hidden mt-6 text-center">
-                            <Link
+                            <NavigationLink
                                 href={`/categories/${categorySlug}`}
                                 className="inline-flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
                             >
@@ -762,7 +762,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
-                            </Link>
+                            </NavigationLink>
                         </div>
                     </div>
                 )}

@@ -2,7 +2,7 @@
 
 import "@/app/styles/blog-content.css";
 import "@/app/styles/animations.css";
-import Link from "next/link";
+import NavigationLink from "@/app/components/NavigationLink";
 import Image from "next/image";
 import { TransitionElement } from "../../components/PageTransition";
 
@@ -64,7 +64,7 @@ export default function BlogPostClient({
                     <div className="bg-white/0">
                         {/* Action Buttons (Back & Share) */}
                         <div className="flex items-center justify-between mb-8">
-                            <Link
+                            <NavigationLink
                                 href="/blogs"
                                 className="inline-flex items-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-medium border border-gray-200 dark:border-white/10 group text-sm"
                             >
@@ -72,7 +72,7 @@ export default function BlogPostClient({
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                 </svg>
                                 Back to Articles
-                            </Link>
+                            </NavigationLink>
 
                             <button
                                 onClick={() => {
@@ -167,13 +167,13 @@ export default function BlogPostClient({
                                 Looking for high-quality water management solutions? Discover our extensive range of durable products designed for everyday needs.
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <Link href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[#0369A1] hover:bg-[#0284C7] text-white rounded-full font-medium transition-colors shadow-xs">
+                                <NavigationLink href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-[#0369A1] hover:bg-[#0284C7] text-white rounded-full font-medium transition-colors shadow-xs">
                                     View All Products
-                                </Link>
+                                </NavigationLink>
                                 {categories.map(category => (
-                                    <Link key={category.slug} href={`/categories/${category.slug}`} className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white rounded-full font-medium transition-colors border border-gray-200 dark:border-transparent">
+                                    <NavigationLink key={category.slug} href={`/categories/${category.slug}`} className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white rounded-full font-medium transition-colors border border-gray-200 dark:border-transparent">
                                         {category.name}
-                                    </Link>
+                                    </NavigationLink>
                                 ))}
                             </div>
                         </div>
@@ -186,7 +186,7 @@ export default function BlogPostClient({
                         <h2 className="text-3xl font-light tracking-wide mb-8 text-gray-900 dark:text-gray-100">You May Also Like</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {relatedBlogs.map((relatedBlog) => (
-                                <Link
+                                <NavigationLink
                                     key={relatedBlog.id}
                                     href={`/blogs/${relatedBlog.slug}`}
                                     className="group bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1"
@@ -225,7 +225,7 @@ export default function BlogPostClient({
                                             </span>
                                         </div>
                                     </div>
-                                </Link>
+                                </NavigationLink>
                             ))}
                         </div>
                     </div>

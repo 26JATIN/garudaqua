@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavigationLink from "@/app/components/NavigationLink";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import { Timeline } from "@/components/ui/timeline";
 import { useAnimateOnView } from "@/lib/useAnimateOnView";
@@ -36,16 +36,16 @@ export default function AboutPage() {
                         </p>
 
                         <div className="flex flex-wrap gap-3">
-                            <Link href="/products"
+                            <NavigationLink href="/products"
                                 className="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-black text-sm font-semibold rounded-full hover:bg-gray-800 dark:hover:bg-white/90 transition-colors"
                             >
                                 View Products
-                            </Link>
-                            <Link href="/contact"
+                            </NavigationLink>
+                            <NavigationLink href="/contact"
                                 className="px-6 py-3 bg-gray-100 dark:bg-white/8 border border-gray-200 dark:border-white/15 text-gray-900 dark:text-white text-sm font-medium rounded-full hover:bg-gray-200 dark:hover:bg-white/12 transition-colors"
                             >
                                 Contact Us
-                            </Link>
+                            </NavigationLink>
                         </div>
                     </div>
 
@@ -212,13 +212,13 @@ export default function AboutPage() {
 
                                 {/* Button — bottom right, white pill with × */}
                                 <div className="flex justify-end">
-                                    <Link
+                                    <NavigationLink
                                         href={item.link}
                                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-white shadow-sm border border-gray-200 dark:border-transparent text-black text-xs font-semibold hover:bg-gray-50 dark:hover:bg-white/90 transition-colors"
                                     >
                                         {item.cta}
                                         <span className="text-black/40 font-normal">✕</span>
-                                    </Link>
+                                    </NavigationLink>
                                 </div>
                             </div>
                         ))}
@@ -396,12 +396,12 @@ export default function AboutPage() {
                                         <span key={t} className="px-3 py-1 rounded-full bg-neutral-100 dark:bg-white/8 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-white/60 text-xs">{t}</span>
                                     ))}
                                 </div>
-                                <Link
+                                <NavigationLink
                                     href="/contact"
                                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-900 dark:bg-white text-white dark:text-black text-xs font-semibold hover:bg-gray-800 dark:hover:bg-white/90 transition-colors"
                                 >
                                     Get in Touch →
-                                </Link>
+                                </NavigationLink>
                             </div>
                         ),
                     },
@@ -441,18 +441,18 @@ export default function AboutPage() {
                                 Whether you&apos;re a farmer, contractor, distributor, or household customer — our team is ready to help you find the right water management solution.
                             </p>
                             <div className="flex flex-wrap gap-3 justify-center">
-                                <Link
+                                <NavigationLink
                                     href="/contact"
                                     className="px-7 py-3 rounded-full bg-white dark:bg-white text-black dark:text-black text-sm font-semibold hover:bg-white/90 transition-colors shadow-sm"
                                 >
                                     Contact Us →
-                                </Link>
-                                <Link
+                                </NavigationLink>
+                                <NavigationLink
                                     href="/products"
                                     className="px-7 py-3 rounded-full bg-white/10 dark:bg-white/15 border border-white/20 dark:border-white/25 text-white dark:text-white text-sm font-medium hover:bg-white/20 dark:hover:bg-white/25 transition-colors"
                                 >
                                     Browse Products
-                                </Link>
+                                </NavigationLink>
                             </div>
                         </div>
                     </WobbleCard>

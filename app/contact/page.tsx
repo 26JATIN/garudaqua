@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import NavigationLink from "@/app/components/NavigationLink";
 import { toast } from "sonner";
 
 export default function ContactPage() {
@@ -64,9 +64,9 @@ export default function ContactPage() {
                     </p>
                     <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-[#0369A1] dark:text-[#0EA5E9] hover:underline font-medium">View Our Location on Google Maps</a>
                     <div className="flex gap-3 justify-center mt-6">
-                        <Link href="/" className="px-6 py-2.5 bg-[#0369A1] text-white rounded-full hover:bg-[#0284C7] transition text-sm font-medium">
+                        <NavigationLink href="/" className="px-6 py-2.5 bg-[#0369A1] text-white rounded-full hover:bg-[#0284C7] transition text-sm font-medium">
                             Back to Home
-                        </Link>
+                        </NavigationLink>
                         <button
                             onClick={() => {
                                 setSubmitted(false);
@@ -165,24 +165,24 @@ export default function ContactPage() {
                         <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 p-6">
                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4">Looking for something specific?</p>
                             <div className="space-y-2">
-                                <Link href="/products" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
+                                <NavigationLink href="/products" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                     </svg>
                                     Browse our Products
-                                </Link>
-                                <Link href="/enquire" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
+                                </NavigationLink>
+                                <NavigationLink href="/enquire" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                     </svg>
                                     Product Enquiry Form
-                                </Link>
-                                <Link href="/blogs" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
+                                </NavigationLink>
+                                <NavigationLink href="/blogs" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-colors font-light">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                     </svg>
                                     Read our Blog
-                                </Link>
+                                </NavigationLink>
                             </div>
                         </div>
                     </div>

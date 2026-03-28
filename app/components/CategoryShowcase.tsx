@@ -686,9 +686,9 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                       onClick={() => {
                         if (selectedCategory !== 'ALL') {
                           const cat = categories.find(c => c.name === selectedCategory);
-                          router.push(`/products?category=${cat?.id || ''}`);
+                          navigate(`/products?category=${cat?.id || ''}`);
                         } else {
-                          router.push('/products');
+                          navigate('/products');
                         }
                       }}
                       className="group relative px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 font-medium tracking-wide overflow-hidden btn-shine"

@@ -278,6 +278,15 @@ textarea:focus-visible {
   to { opacity: 1; }
 }
 
+/* ── Template Page Entry (fast, won't delay skeletons) ───────── */
+@keyframes template-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-template-in {
+  animation: template-in 100ms ease-out both;
+}
+
 /* ── Card Press Microinteraction ───────── */
 .card-interactive {
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);

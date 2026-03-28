@@ -1,7 +1,7 @@
 "use client";
 import "@/app/styles/animations.css";
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import Image from "next/image";
 import { toast } from "sonner";
 import { TransitionElement } from "./PageTransition";
@@ -627,7 +627,7 @@ export default function ProductsPage({
                                 );
                                 if (selectedCat && selectedCat.hasSeoPage) {
                                     return (
-                                        <Link
+                                        <NavigationLink
                                             href={`/categories/${selectedCat.slug || slugify(selectedCat.name)}`}
                                             className="ml-2 inline-flex items-center justify-center w-6 h-6 md:w-7 md:h-7 rounded-full bg-[#0EA5E9]/10 hover:bg-[#0EA5E9]/20 text-[#0EA5E9] transition-colors duration-200"
                                             title={`View ${selectedCat.name} category details`}
@@ -636,7 +636,7 @@ export default function ProductsPage({
                                             <svg className="w-4 h-4 md:w-4.5 md:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                        </Link>
+                                        </NavigationLink>
                                     );
                                 }
                                 return null;
@@ -743,7 +743,7 @@ function ProductCard({ product, index }: ProductCardProps) {
         <div
             className="group h-full"
         >
-            <Link href={productHref} className="block h-full">
+            <NavigationLink href={productHref} className="block h-full">
                 <TransitionElement name={`product-${product.slug}`} className="h-full">
                     <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm h-full flex flex-col card-interactive">
                         <div className="relative w-full aspect-4/5 overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
@@ -790,7 +790,7 @@ function ProductCard({ product, index }: ProductCardProps) {
                         </div>
                     </div>
                 </TransitionElement>
-            </Link>
+            </NavigationLink>
         </div>
     );
 }
@@ -803,7 +803,7 @@ function ProductListItem({ product, index = 0 }: ProductCardProps) {
         <div
             className="group"
         >
-            <Link href={productHref} className="block w-full">
+            <NavigationLink href={productHref} className="block w-full">
                 <TransitionElement name={`product-${product.slug}`}>
                     <div className="bg-white dark:bg-[#0A0A0A] rounded-xl border border-gray-100 dark:border-white/6 overflow-hidden shadow-sm flex flex-col sm:flex-row card-interactive">
                         <div className="flex gap-3 md:gap-4 lg:gap-6 w-full p-3 md:p-4 lg:p-6">
@@ -849,7 +849,7 @@ function ProductListItem({ product, index = 0 }: ProductCardProps) {
                         </div>
                     </div>
                 </TransitionElement>
-            </Link>
+            </NavigationLink>
         </div>
     );
 }

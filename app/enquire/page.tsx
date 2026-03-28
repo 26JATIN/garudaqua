@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import NavigationLink from "@/app/components/NavigationLink";
 import { toast } from "sonner";
 
 export default function EnquirePage() {
@@ -78,9 +78,9 @@ function EnquireForm() {
                     </p>
                     <a href="https://maps.app.goo.gl/LH69FP4CLybZSRAX7" target="_blank" rel="noopener noreferrer" className="inline-block mb-6 text-[#0369A1] dark:text-[#0EA5E9] hover:underline font-medium">View Our Location on Google Maps</a>
                     <div className="flex gap-3 justify-center">
-                        <Link href="/products" className="px-6 py-2.5 bg-[#0369A1] text-white rounded-full hover:bg-[#0284C7] transition text-sm font-medium">
+                        <NavigationLink href="/products" className="px-6 py-2.5 bg-[#0369A1] text-white rounded-full hover:bg-[#0284C7] transition text-sm font-medium">
                             Browse Products
-                        </Link>
+                        </NavigationLink>
                         <button
                             onClick={() => {
                                 setSubmitted(false);
@@ -215,9 +215,9 @@ function EnquireForm() {
 
                 {/* Back link */}
                 <div className="text-center mt-6">
-                    <Link href="/products" className="text-sm text-[#0369A1] dark:text-[#0EA5E9] hover:text-[#0284C7] transition">
+                    <NavigationLink href="/products" className="text-sm text-[#0369A1] dark:text-[#0EA5E9] hover:text-[#0284C7] transition">
                         &larr; Back to Products
-                    </Link>
+                    </NavigationLink>
                 </div>
             </div>
         </div>
