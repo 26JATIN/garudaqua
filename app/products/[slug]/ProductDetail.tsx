@@ -757,7 +757,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         <div className="md:hidden mt-6 text-center">
                             <NavigationLink
                                 href={`/categories/${categorySlug}`}
-                                className="inline-flex items-center gap-2 text-sm text-[#0EA5E9] hover:text-[#0369A1] transition-colors font-medium"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full hover:border-[#0EA5E9] hover:text-[#0EA5E9] transition-colors"
                             >
                                 Explore All {categoryName}
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

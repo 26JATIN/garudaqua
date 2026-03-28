@@ -59,6 +59,11 @@
   --pwa-bottom-bg: #ffffff;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+
+  /* Skeleton loading colors */
+  --skeleton-base: #f0f0f0;
+  --skeleton-peak: #e8e8e8;
+  --skeleton-shine: rgba(255, 255, 255, 0.6);
 }
 
 /* Pitch Black Dark Theme */
@@ -97,6 +102,11 @@
   --nav-icon-color: #d1d5db;
   --pwa-bottom-bg: #000000;
 
+  /* Skeleton loading colors */
+  --skeleton-base: #111;
+  --skeleton-peak: #1a1a1a;
+  --skeleton-shine: rgba(255, 255, 255, 0.06);
+
   color-scheme: dark;
 }
 
@@ -124,10 +134,11 @@ body {
     min-height: calc(100dvh - var(--mobile-top-navbar-height) - var(--mobile-navbar-height));
   }
 
-  /* Extend footer background into the body padding gap */
-  footer {
-    margin-bottom: calc(-1 * var(--mobile-navbar-height) - env(safe-area-inset-bottom, 0px));
+  /* Extend every page's background into the body padding gap.
+     Selector: main > template-wrapper > page-wrapper */
+  main > * > * {
     padding-bottom: calc(var(--mobile-navbar-height) + env(safe-area-inset-bottom, 0px));
+    margin-bottom: calc(-1 * var(--mobile-navbar-height) - env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -373,22 +384,15 @@ textarea:focus-visible {
 .skeleton-shimmer {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(90deg, #f0f0f0 0%, #e8e8e8 50%, #f0f0f0 100%);
+  background: linear-gradient(90deg, var(--skeleton-base) 0%, var(--skeleton-peak) 50%, var(--skeleton-base) 100%);
   border-radius: 8px;
 }
 .skeleton-shimmer::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
   animation: skeleton-wave 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-/* Class-based dark mode */
-.dark .skeleton-shimmer {
-  background: linear-gradient(90deg, #111 0%, #1a1a1a 50%, #111 100%);
-}
-.dark .skeleton-shimmer::after {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
 }
 
 /* ── Native View Transitions (Morph Effects) ───────── */

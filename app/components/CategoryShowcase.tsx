@@ -736,14 +736,14 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
         .skeleton-loader {
           position: relative;
           overflow: hidden;
-          background: #f0f0f0;
+          background: var(--skeleton-base, #f0f0f0);
         }
 
         .skeleton-loader::after {
           content: '';
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+          background: linear-gradient(90deg, transparent, var(--skeleton-shine, #e0e0e0), transparent);
           animation: skeleton-loading 1.5s infinite;
           will-change: transform;
         }
@@ -751,14 +751,6 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
         @keyframes skeleton-loading {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
-        }
-
-        .dark .skeleton-loader {
-          background: #0A0A0A;
-        }
-
-        .dark .skeleton-loader::after {
-          background: linear-gradient(90deg, transparent, #111, transparent);
         }
       ` }} />
     </section>
