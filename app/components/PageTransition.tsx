@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useCallback, useState, useEffect, useRef, useTransition } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface PageTransitionContextType {
   navigate: (href: string) => void;
@@ -19,6 +19,7 @@ export function usePageTransition() {
 export function PageTransitionProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [, startTransition] = useTransition();
   const pendingHref = useRef<string | null>(null);
@@ -101,11 +102,21 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
     return () => document.removeEventListener("click", handleGlobalClick, true);
   }, []);
 
-  // Reset transitioning state when pathname changes (route completed)
+  // Reset transitioning state when pathname or search parameters change (route completed)
   useEffect(() => {
     setIsTransitioning(false);
     pendingHref.current = null;
-  }, [pathname]);
+  }, [pathname, searchParams]);
+
+  // Reset on browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setIsTransitioning(false);
+      pendingHref.current = null;
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   // Safety timeout: if route takes too long, reset the loading state
   useEffect(() => {
