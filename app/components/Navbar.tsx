@@ -5,16 +5,14 @@ import NavigationLink from './NavigationLink';
 import Image from "next/image";
 import { usePathname } from 'next/navigation';
 import { useNavbar } from '../context/NavbarContext';
-import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
 
-// Lazy load SearchBar on /blogs to defer hydration past LCP
+// Lazy load SearchBar globally to defer hydration past LCP window
 const LazySearchBar = lazy(() => import('./SearchBar'));
 
 export default function Navbar() {
     const { isNavbarHidden } = useNavbar();
     const pathname = usePathname();
-    const isBlogsRoute = pathname?.startsWith('/blogs') ?? false;
     const [visible, setVisible] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const ref = useRef<HTMLElement>(null);
@@ -134,13 +132,9 @@ export default function Navbar() {
                             {/* Center Search Bar */}
                             <div className="flex-1 max-w-xl mx-12 flex items-center gap-2">
                                 <div className="flex-1">
-                                    {isBlogsRoute ? (
-                                        <Suspense fallback={<div className="h-12 bg-white/60 dark:bg-white/6 rounded-2xl" />}>
-                                            <LazySearchBar />
-                                        </Suspense>
-                                    ) : (
-                                        <SearchBar />
-                                    )}
+                                    <Suspense fallback={<div className="h-12 bg-white/60 dark:bg-white/6 rounded-2xl" />}>
+                                        <LazySearchBar />
+                                    </Suspense>
                                 </div>
                                 <ThemeToggle />
                             </div>
@@ -318,13 +312,9 @@ export default function Navbar() {
                     </NavigationLink>
                     {/* Search Bar */}
                     <div className="flex-1">
-                        {isBlogsRoute ? (
-                            <Suspense fallback={<div className="h-12 bg-white/60 dark:bg-white/6 rounded-2xl" />}>
-                                <LazySearchBar placeholder="Search water tanks, pipes..." />
-                            </Suspense>
-                        ) : (
-                            <SearchBar placeholder="Search water tanks, pipes..." />
-                        )}
+                        <Suspense fallback={<div className="h-12 bg-white/60 dark:bg-white/6 rounded-2xl" />}>
+                            <LazySearchBar placeholder="Search water tanks, pipes..." />
+                        </Suspense>
                     </div>
                     {/* Hamburger Menu */}
                     <button
