@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import Link from "next/link";
 import NavigationLink from './NavigationLink';
 import Image from "next/image";
@@ -8,9 +8,13 @@ import { useNavbar } from '../context/NavbarContext';
 import SearchBar from './SearchBar';
 import ThemeToggle from './ThemeToggle';
 
+// Lazy load SearchBar on /blogs to defer hydration past LCP
+const LazySearchBar = lazy(() => import('./SearchBar'));
+
 export default function Navbar() {
     const { isNavbarHidden } = useNavbar();
     const pathname = usePathname();
+    const isBlogsRoute = pathname?.startsWith('/blogs') ?? false;
     const [visible, setVisible] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const ref = useRef<HTMLElement>(null);
@@ -130,7 +134,13 @@ export default function Navbar() {
                             {/* Center Search Bar */}
                             <div className="flex-1 max-w-xl mx-12 flex items-center gap-2">
                                 <div className="flex-1">
-                                    <SearchBar />
+                                    {isBlogsRoute ? (
+                                        <Suspense fallback={<div className="h-12 bg-white/60 dark:bg-white/6 rounded-2xl" />}>
+                                            <LazySearchBar />
+                                        </Suspense>
+                                    ) : (
+                                        <SearchBar />
+                                    )}
                                 </div>
                                 <ThemeToggle />
                             </div>
@@ -308,7 +318,13 @@ export default function Navbar() {
                     </NavigationLink>
                     {/* Search Bar */}
                     <div className="flex-1">
-                        <SearchBar placeholder="Search water tanks, pipes..." />
+                        {isBlogsRoute ? (
+                            <Suspense fallback={<div className="h-12 bg-white/60 dark:bg-white/6 rounded-2xl" />}>
+                                <LazySearchBar placeholder="Search water tanks, pipes..." />
+                            </Suspense>
+                        ) : (
+                            <SearchBar placeholder="Search water tanks, pipes..." />
+                        )}
                     </div>
                     {/* Hamburger Menu */}
                     <button
