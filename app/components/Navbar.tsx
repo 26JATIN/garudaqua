@@ -120,6 +120,9 @@ export default function Navbar() {
                                         height={80}
                                         className="h-20 w-auto"
                                         priority
+                                        loading="eager"
+                                        fetchPriority="high"
+                                        decoding="sync"
                                     />
                                 </NavigationLink>
                             </div>
@@ -298,6 +301,9 @@ export default function Navbar() {
                             height={48}
                             className="h-12 w-12 object-contain scale-200"
                             priority
+                            loading="eager"
+                            fetchPriority="high"
+                            decoding="sync"
                         />
                     </NavigationLink>
                     {/* Search Bar */}
