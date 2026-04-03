@@ -121,6 +121,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link
+          rel="preload"
+          as="image"
+          href="/MobileLogo.webp"
+          fetchPriority="high"
+          media="(max-width: 1024px)"
+        />
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" id="theme-color-light" />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" id="theme-color-dark" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }} />

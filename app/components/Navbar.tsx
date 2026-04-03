@@ -299,11 +299,11 @@ export default function Navbar() {
                             alt="Garud"
                             width={48}
                             height={48}
-                            className="h-12 w-12 object-contain scale-200"
+                            className="h-12 w-12 object-contain"
                             priority
                             loading="eager"
                             fetchPriority="high"
-                            decoding="sync"
+                            decoding="async"
                         />
                     </NavigationLink>
                     {/* Search Bar */}
