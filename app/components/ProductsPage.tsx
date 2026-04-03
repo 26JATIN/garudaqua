@@ -1,5 +1,4 @@
 "use client";
-import "@/app/styles/animations.css";
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import NavigationLink from "./NavigationLink";
 import Image from "next/image";
@@ -80,7 +79,7 @@ export default function ProductsPage({
     initialSearchParams,
 }: ProductsPageProps) {
     const [selectedCategory, setSelectedCategory] = useState(initialSearchParams?.category || "all");
-    const [selectedSubcategory, setSelectedSubcategory] = useState(initialSearchParams?.subcategory || "All");
+    const [selectedSubcategory, setSelectedSubcategory] = useState(initialSearchParams?.subcategory || "");
     const [searchTerm, setSearchTerm] = useState(initialSearchParams?.search || "");
     const [sortBy, setSortBy] = useState(initialSearchParams?.sort || "featured");
     const [viewMode, setViewMode] = useState("grid");
@@ -168,7 +167,7 @@ export default function ProductsPage({
         const handlePopState = () => {
             const params = new URLSearchParams(window.location.search);
             setSelectedCategory(params.get("category") || "all");
-            setSelectedSubcategory(params.get("subcategory") || "All");
+            setSelectedSubcategory(params.get("subcategory") || "");
             setSearchTerm(params.get("search") || "");
             setSortBy(params.get("sort") || "featured");
         };
@@ -190,7 +189,7 @@ export default function ProductsPage({
         }
 
         // Filter by subcategory
-        if (selectedSubcategory !== "All") {
+        if (selectedSubcategory) {
             filtered = filtered.filter((p) => {
                 if (!p.subcategory) return false;
                 const subSlug = p.subcategory.slug || slugify(p.subcategory.name);
@@ -261,18 +260,30 @@ export default function ProductsPage({
 
     // Filtered subcategories based on selected category (matched by slug)
     const visibleSubcategories = useMemo(() => {
-        if (selectedCategory === "all") return subcategories;
+        if (selectedCategory === "all") return [];
         return subcategories.filter((sub) => {
             const catSlug = sub.category.slug || slugify(sub.category.name);
             return catSlug === selectedCategory;
         });
     }, [selectedCategory, subcategories]);
 
+    // Clear stale subcategory selection when category changes or has no matching subcategories
+    useEffect(() => {
+        if (!selectedSubcategory) return;
+        const hasSelectedSubcategory = visibleSubcategories.some((sub) => {
+            const subSlug = sub.slug || slugify(sub.name);
+            return subSlug === selectedSubcategory;
+        });
+        if (!hasSelectedSubcategory) {
+            setSelectedSubcategory("");
+        }
+    }, [selectedSubcategory, visibleSubcategories]);
+
     // Sync URL
     useEffect(() => {
         const params = new URLSearchParams();
         if (selectedCategory !== "all") params.set("category", selectedCategory);
-        if (selectedSubcategory !== "All") params.set("subcategory", selectedSubcategory);
+        if (selectedSubcategory) params.set("subcategory", selectedSubcategory);
         if (searchTerm) params.set("search", searchTerm);
         if (sortBy !== "featured") params.set("sort", sortBy);
 
@@ -292,7 +303,7 @@ export default function ProductsPage({
 
     const handleCategoryClick = useCallback((categorySlug: string) => {
         setSelectedCategory(categorySlug);
-        setSelectedSubcategory("All");
+        setSelectedSubcategory("");
     }, []);
 
     const handleSubcategoryClick = useCallback((subcategorySlug: string) => {
@@ -390,9 +401,11 @@ export default function ProductsPage({
                             </button>
 
                             <div ref={categoryScrollRef} className="flex gap-3 md:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
-                                {categories.map((category) => {
+                                {categories.map((category, index) => {
                                     const catSlug = category.slug || slugify(category.name);
                                     const isSelected = selectedCategory === catSlug;
+                                    const shouldEagerLoad = isSelected || index < 8;
+                                    const shouldPrioritize = isSelected || index < 8;
                                     return (
                                     <button
                                         key={category.id}
@@ -410,7 +423,17 @@ export default function ProductsPage({
                                             <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
                                                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
                                                     {category.image ? (
-                                                        <Image src={category.image} alt={category.name} className="w-full h-full object-cover" loading="lazy" width={64} height={64} quality={50} />
+                                                        <Image
+                                                            src={category.image}
+                                                            alt={category.name}
+                                                            className="w-full h-full object-cover"
+                                                            loading={shouldEagerLoad ? "eager" : "lazy"}
+                                                            fetchPriority={shouldPrioritize ? "high" : "auto"}
+                                                            decoding={shouldEagerLoad ? "sync" : "async"}
+                                                            width={64}
+                                                            height={64}
+                                                            quality={50}
+                                                        />
                                                     ) : (
                                                         <svg className="w-6 h-6 md:w-7 md:h-7 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -478,9 +501,9 @@ export default function ProductsPage({
                                     )}
                                 </h2>
                             </div>
-                            {selectedSubcategory !== "All" && (
+                            {selectedSubcategory && (
                                 <button
-                                    onClick={() => handleSubcategoryClick("All")}
+                                    onClick={() => handleSubcategoryClick("")}
                                     className="text-xs md:text-sm text-[#0EA5E9] hover:text-[#0369A1] font-medium transition-colors flex items-center gap-1"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -503,47 +526,12 @@ export default function ProductsPage({
                             </button>
 
                             <div ref={subcategoryScrollRef} className="flex gap-3 md:gap-4 lg:gap-5 overflow-x-auto scrollbar-hide py-2 px-1 lg:px-10">
-                                {/* All badge */}
-                                <button
-                                    onClick={() => handleSubcategoryClick("All")}
-                                    data-subcategory-selected={selectedSubcategory === "All" ? "true" : undefined}
-                                    className="flex flex-col items-center gap-1.5 md:gap-2 min-w-17.5 md:min-w-20 lg:min-w-22.5 group transition-transform duration-200 hover:scale-105 hover:-translate-y-0.5 active:scale-95"
-                                >
-                                    <div
-                                        className={`relative rounded-full p-0.75 transition-all duration-300 ${
-                                            selectedSubcategory === "All"
-                                                ? "bg-linear-to-tr from-[#0EA5E9] via-[#38BDF8] to-[#0369A1]"
-                                                : "bg-linear-to-tr from-gray-200 to-gray-300 group-hover:from-[#0EA5E9]/50 group-hover:to-[#0369A1]/50"
-                                        }`}
-                                    >
-                                        <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
-                                            <div className="w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
-                                                <svg className="w-7 h-7 md:w-8 md:h-8 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        {selectedSubcategory === "All" && (
-                                            <div
-                                                className="absolute -inset-0.5 rounded-full animate-pulse"
-                                                style={{ background: "linear-gradient(135deg, #0EA5E9, #0369A1)", filter: "blur(4px)", opacity: 0.4 }}
-                                            />
-                                        )}
-                                    </div>
-                                    <span
-                                        className={`text-[10px] md:text-xs font-light tracking-wide transition-colors duration-300 text-center ${
-                                            selectedSubcategory === "All"
-                                                ? "text-[#0EA5E9] font-medium"
-                                                : "text-[#2C2C2C] dark:text-gray-100 group-hover:text-[#0EA5E9]"
-                                        }`}
-                                    >
-                                        All
-                                    </span>
-                                </button>
                                 {/* Subcategory badges */}
-                                {visibleSubcategories.map((subcategory) => {
+                                {visibleSubcategories.map((subcategory, index) => {
                                     const subSlug = subcategory.slug || slugify(subcategory.name);
                                     const isSubSelected = selectedSubcategory === subSlug;
+                                    const shouldEagerLoad = isSubSelected || index < 10;
+                                    const shouldPrioritize = isSubSelected || index < 10;
                                     return (
                                     <button
                                         key={subcategory.id}
@@ -561,7 +549,17 @@ export default function ProductsPage({
                                             <div className="bg-white dark:bg-gray-900 rounded-full p-0.75">
                                                 <div className="w-16 h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-gray-800 dark:to-gray-900 flex items-center justify-center shadow-sm">
                                                     {subcategory.image ? (
-                                                        <Image src={subcategory.image} alt={subcategory.name} className="w-full h-full object-cover" loading="lazy" width={80} height={80} quality={50} />
+                                                        <Image
+                                                            src={subcategory.image}
+                                                            alt={subcategory.name}
+                                                            className="w-full h-full object-cover"
+                                                            loading={shouldEagerLoad ? "eager" : "lazy"}
+                                                            fetchPriority={shouldPrioritize ? "high" : "auto"}
+                                                            decoding={shouldEagerLoad ? "sync" : "async"}
+                                                            width={80}
+                                                            height={80}
+                                                            quality={50}
+                                                        />
                                                     ) : (
                                                         <svg className="w-7 h-7 md:w-8 md:h-8 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -738,6 +736,7 @@ export default function ProductsPage({
 function ProductCard({ product, index }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
     const productHref = `/products/${productPath(product)}`;
+    const isLikelyLcpImage = index === 0;
 
     return (
         <div
@@ -755,9 +754,10 @@ function ProductCard({ product, index }: ProductCardProps) {
                                     className="object-cover transform group-hover:scale-110 transition-transform duration-700"
                                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                     quality={50}
-                                    priority={index < 4}
-                                    fetchPriority={index < 4 ? "high" : "auto"}
-                                    decoding={index < 4 ? "sync" : "async"}
+                                    priority={isLikelyLcpImage}
+                                    loading={isLikelyLcpImage ? "eager" : "lazy"}
+                                    fetchPriority={isLikelyLcpImage ? "high" : "auto"}
+                                    decoding={isLikelyLcpImage ? "sync" : "async"}
                                 />
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center">
@@ -799,6 +799,7 @@ function ProductCard({ product, index }: ProductCardProps) {
 function ProductListItem({ product, index = 0 }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
     const productHref = `/products/${productPath(product)}`;
+    const isLikelyLcpImage = index === 0;
     return (
         <div
             className="group"
@@ -816,9 +817,10 @@ function ProductListItem({ product, index = 0 }: ProductCardProps) {
                                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                                         sizes="(max-width: 640px) 64px, 192px"
                                         quality={70}
-                                        priority={index < 4}
-                                        fetchPriority={index < 4 ? "high" : "auto"}
-                                        decoding={index < 4 ? "sync" : "async"}
+                                        priority={isLikelyLcpImage}
+                                        loading={isLikelyLcpImage ? "eager" : "lazy"}
+                                        fetchPriority={isLikelyLcpImage ? "high" : "auto"}
+                                        decoding={isLikelyLcpImage ? "sync" : "async"}
                                     />
                                 ) : (
                                     <div className="absolute inset-0 flex items-center justify-center">
