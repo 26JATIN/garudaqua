@@ -2,7 +2,7 @@ const SITE_URL = "https://garudaqua.in";
 const SITE_NAME = "Garud Aqua Solutions";
 const LOGO_URL = `${SITE_URL}/DesktopLogo.png`;
 const PHONE = "+91-94625-94603";
-const EMAIL = "rkg210@gmail.com";
+const EMAIL = "contact@garudaqua.in";
 
 // ─── Organization (global, enhanced with E-E-A-T signals) ────────────────────
 
