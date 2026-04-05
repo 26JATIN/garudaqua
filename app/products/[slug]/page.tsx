@@ -27,6 +27,31 @@ export async function generateStaticParams() {
 /** 24-char hex string = MongoDB ObjectId (kept only for legacy inbound links that may still exist in the wild) */
 const isObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s);
 
+function shouldRenderProductRichResult(product: unknown): boolean {
+  if (!product || typeof product !== "object") return false;
+
+  const p = product as Record<string, unknown>;
+  const price = p.price;
+  const hasPrice =
+    price !== null &&
+    price !== undefined &&
+    String(price).trim() !== "" &&
+    Number.isFinite(Number(price));
+
+  const review = p.review;
+  const hasReview = Array.isArray(review)
+    ? review.length > 0
+    : !!review;
+
+  const aggregateRating = p.aggregateRating;
+  const hasAggregateRating =
+    !!aggregateRating &&
+    typeof aggregateRating === "object" &&
+    "ratingValue" in (aggregateRating as Record<string, unknown>);
+
+  return hasPrice || hasReview || hasAggregateRating;
+}
+
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
@@ -141,6 +166,7 @@ async function getProductData(slug: string) {
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { product, related, canonicalSlug } = await getProductData(slug);
+  const renderProductSchema = shouldRenderProductRichResult(product);
 
   // No product or inactive product → proper 404 response
   if (!product) {
@@ -154,7 +180,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(product)) }} />
+      {renderProductSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(product)) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
         { name: "Home", url: "https://www.garudaqua.in" },
         { name: "Products", url: "https://www.garudaqua.in/products" },
