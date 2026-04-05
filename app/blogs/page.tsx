@@ -10,9 +10,9 @@ export const metadata: Metadata = {
   title: 'Blog — Tips, Guides & Insights | Garud Aqua Solutions',
   description:
     'Expert tips, guides, and insights on water tanks, pipes & plumbing solutions from Garud Aqua Solutions.',
-  alternates: { canonical: 'https://garudaqua.in/blogs' },
+  alternates: { canonical: 'https://www.garudaqua.in/blogs' },
   openGraph: {
-    url: 'https://garudaqua.in/blogs',
+    url: 'https://www.garudaqua.in/blogs',
     title: 'Blog — Tips, Guides & Insights | Garud Aqua Solutions',
     description:
       'Expert tips, guides, and insights on water tanks, pipes & plumbing solutions.',
@@ -60,7 +60,7 @@ export default async function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema({
         name: "Blog — Tips, Guides & Insights",
         description: "Expert tips, guides, and insights on water tanks, pipes & plumbing solutions from Garud Aqua Solutions.",
-        url: "https://garudaqua.in/blogs",
+        url: "https://www.garudaqua.in/blogs",
       })) }} />
       <Suspense fallback={
         <div className="min-h-screen bg-gray-50 dark:bg-black">

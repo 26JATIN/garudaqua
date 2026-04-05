@@ -55,7 +55,7 @@ export async function generateMetadata(
     const description =
       product.description?.slice(0, 155) ||
       `Buy ${product.name} — ${categoryName} from Garud Aqua Solutions. Quality water management products in Rajasthan.`;
-    const url = `https://garudaqua.in/products/${canonicalSlug}`;
+    const url = `https://www.garudaqua.in/products/${canonicalSlug}`;
 
     return {
       title,
@@ -156,9 +156,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(product)) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
-        { name: "Home", url: "https://garudaqua.in" },
-        { name: "Products", url: "https://garudaqua.in/products" },
-        { name: product.name, url: `https://garudaqua.in/products/${canonicalSlug}` },
+        { name: "Home", url: "https://www.garudaqua.in" },
+        { name: "Products", url: "https://www.garudaqua.in/products" },
+        { name: product.name, url: `https://www.garudaqua.in/products/${canonicalSlug}` },
       ])) }} />
       <Suspense
         fallback={

@@ -48,7 +48,7 @@ export async function generateMetadata(
 
     // Always use canonical (current) slug for metadata URL
     const canonicalSlug = blog.slug;
-    const url = blog.metaUrl || `https://garudaqua.in/blogs/${canonicalSlug}`;
+    const url = blog.metaUrl || `https://www.garudaqua.in/blogs/${canonicalSlug}`;
     const description =
       blog.metaDesc ||
       blog.excerpt?.slice(0, 155) ||
@@ -172,9 +172,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         updatedAt: blogData.updatedAt?.toISOString() ?? null,
       })) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
-        { name: "Home", url: "https://garudaqua.in" },
-        { name: "Blog", url: "https://garudaqua.in/blogs" },
-        { name: blog.title, url: `https://garudaqua.in/blogs/${blog.slug}` },
+        { name: "Home", url: "https://www.garudaqua.in" },
+        { name: "Blog", url: "https://www.garudaqua.in/blogs" },
+        { name: blog.title, url: `https://www.garudaqua.in/blogs/${blog.slug}` },
       ])) }} />
       <BlogPostClient blog={blog} relatedBlogs={relatedBlogs} categories={allCategories} />
     </>

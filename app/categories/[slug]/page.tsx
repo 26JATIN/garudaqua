@@ -60,7 +60,7 @@ export async function generateMetadata(
     }
 
     const canonicalSlug = category.slug || slug;
-    const canonicalUrl = `https://garudaqua.in/categories/${canonicalSlug}`;
+    const canonicalUrl = `https://www.garudaqua.in/categories/${canonicalSlug}`;
 
     return {
         title: category.metaTitle || `${category.name} | Garud Aqua Solutions`,
@@ -99,7 +99,7 @@ export default async function CategorySeoPage(
         ?.replace(/<h4(\s|>)/g, "<h3$1").replace(/<\/h4>/g, "</h3>")
         .replace(/<h3(\s|>)/g, "<h2$1").replace(/<\/h3>/g, "</h2>");
 
-    const canonicalUrl = `https://garudaqua.in/categories/${categoryFull.slug || slug}`;
+    const canonicalUrl = `https://www.garudaqua.in/categories/${categoryFull.slug || slug}`;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#060606] md:py-4">
@@ -109,8 +109,8 @@ export default async function CategorySeoPage(
                 url: canonicalUrl,
             })) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
-                { name: "Home", url: "https://garudaqua.in" },
-                { name: "Categories", url: "https://garudaqua.in/categories" },
+                { name: "Home", url: "https://www.garudaqua.in" },
+                { name: "Categories", url: "https://www.garudaqua.in/categories" },
                 { name: categoryFull.name, url: canonicalUrl },
             ])) }} />
             {/* Hero Section */}

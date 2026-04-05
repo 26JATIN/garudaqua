@@ -14,12 +14,10 @@ export async function purgeCloudflareCache(paths?: string[]) {
   try {
     let body;
 
-    // If specific paths are provided, purge only those URLs
+    // If specific paths are provided, purge only canonical www URLs
     if (paths && paths.length > 0) {
       const filesToPurge: string[] = [];
       for (const path of paths) {
-        // Purge both non-www and www variants to be safe
-        filesToPurge.push(`https://garudaqua.in${path}`);
         filesToPurge.push(`https://www.garudaqua.in${path}`);
       }
       body = { files: filesToPurge };

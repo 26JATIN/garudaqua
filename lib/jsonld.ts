@@ -1,4 +1,4 @@
-const SITE_URL = "https://garudaqua.in";
+const SITE_URL = "https://www.garudaqua.in";
 const SITE_NAME = "Garud Aqua Solutions";
 const LOGO_URL = `${SITE_URL}/DesktopLogo.png`;
 const PHONE = "+91-94625-94603";

@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       disallow: ["/admin/", "/api/"],
     },
-    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || "https://garudaqua.in"}/sitemap.xml`,
+    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.garudaqua.in"}/sitemap.xml`,
   };
 }

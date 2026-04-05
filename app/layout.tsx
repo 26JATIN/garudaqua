@@ -9,7 +9,7 @@ import PWARegister from "./components/PWARegister";
 import LazyToaster from "./components/LazyToaster";
 import type { Metadata } from "next";
 import { organizationSchema, websiteSchema } from "@/lib/jsonld";
-const SITE_URL = "https://garudaqua.in";
+const SITE_URL = "https://www.garudaqua.in";
 
 export const viewport = {
   width: "device-width",

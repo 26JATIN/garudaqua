@@ -15,7 +15,7 @@ export async function generateStaticParams() {
     return categories.filter(c => c.slug).map(c => ({ slug: c.slug! }));
 }
 
-const SITE_URL = "https://garudaqua.in";
+const SITE_URL = "https://www.garudaqua.in";
 
 async function getBlogCategory(slug: string) {
     return prisma.blogCategory.findFirst({

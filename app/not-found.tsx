@@ -14,7 +14,7 @@ export default function NotFound() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema({
         name: "Page Not Found — Garud Aqua Solutions",
         description: "The page you are looking for could not be found. Browse our products or read our blog.",
-        url: "https://garudaqua.in/404",
+        url: "https://www.garudaqua.in/404",
       })) }} />
       {/* Icon / Graphics */}
       <div className="mb-8 text-[#0EA5E9] dark:text-[#38bdf8] opacity-80">

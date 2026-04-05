@@ -24,7 +24,7 @@ export async function generateMetadata({
 
   let title = "Products — Water Tanks, Pipes & Fittings | Garud Aqua Solutions";
   let description = "Browse Garud Aqua Solutions' full range of HDPE water tanks, PVC pipes, pipe fittings & water management products.";
-  let url = "https://garudaqua.in/products";
+  let url = "https://www.garudaqua.in/products";
 
   try {
     if (subcategoryParam) {
@@ -35,7 +35,7 @@ export async function generateMetadata({
       if (subcategory) {
         title = subcategory.metaTitle && subcategory.metaTitle.trim() !== "" ? subcategory.metaTitle : `Buy ${subcategory.name} Online | Best Price - Garud`;
         description = subcategory.metaDesc && subcategory.metaDesc.trim() !== "" ? subcategory.metaDesc : `Shop the best quality ${subcategory.name} in Rajasthan. Browse top-rated products at Garud Aqua Solutions.`;
-        url = `https://garudaqua.in/products?category=${subcategory.category?.slug}&subcategory=${subcategoryParam}`;
+        url = `https://www.garudaqua.in/products?category=${subcategory.category?.slug}&subcategory=${subcategoryParam}`;
       }
     } else if (categoryParam) {
       const category = await prisma.category.findFirst({
@@ -45,7 +45,7 @@ export async function generateMetadata({
       if (category) {
         title = category.metaTitle && category.metaTitle.trim() !== "" ? category.metaTitle : `Buy ${category.name} Online | Top Quality - Garud`;
         description = category.metaDesc && category.metaDesc.trim() !== "" ? category.metaDesc : `Explore our premium range of ${category.name}. Guaranteed quality & best prices at Garud Aqua Solutions.`;
-        url = `https://garudaqua.in/products?category=${category.slug}`;
+        url = `https://www.garudaqua.in/products?category=${category.slug}`;
       }
     }
   } catch (e) {
@@ -241,7 +241,7 @@ export default async function Page({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema({
         name: "Products — Water Tanks, Pipes & Fittings",
         description: "Browse Garud Aqua Solutions' full range of HDPE water tanks, PVC pipes, pipe fittings & water management products.",
-        url: "https://garudaqua.in/products",
+        url: "https://www.garudaqua.in/products",
       })) }} />
       {/* Preload LCP images — browser starts fetching immediately, before JS hydration */}
       {products.slice(0, 4).map((product: { id: string; image?: string }, i: number) =>

@@ -9,10 +9,10 @@ export const metadata: Metadata = {
     title: "All Categories | Garud Aqua Solutions",
     description: "Browse all our high-quality water management products, from overhead water tanks to agriculture sprayer tanks and CPVC pipes.",
     alternates: {
-        canonical: "https://garudaqua.in/categories",
+        canonical: "https://www.garudaqua.in/categories",
     },
     openGraph: {
-        url: "https://garudaqua.in/categories",
+        url: "https://www.garudaqua.in/categories",
         title: "All Categories | Garud Aqua Solutions",
         description: "Browse all our high-quality water management products, from overhead water tanks to agriculture sprayer tanks and CPVC pipes.",
     },
@@ -102,7 +102,17 @@ export default async function CategoriesIndexPage() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 lg:gap-8">
-                    {categories.map((category, index) => (
+                    {categories.map((
+                        category: {
+                            id: string;
+                            slug: string;
+                            image: string | null;
+                            name: string;
+                            description: string | null;
+                            _count: { products: number };
+                        },
+                        index: number
+                    ) => (
                         <Link
                             key={category.id}
                             href={`/categories/${category.slug}`}
