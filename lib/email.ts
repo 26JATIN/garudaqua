@@ -12,10 +12,12 @@ function getTransporter() {
       "[email] SMTP env vars not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD."
     );
   }
+  const port = parseInt(SMTP_PORT || "587", 10);
+
   return nodemailer.createTransport({
     host: SMTP_HOST,
-    port: parseInt(SMTP_PORT || "587"),
-    secure: false,
+    port,
+    secure: port === 465,
     auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
   });
 }
@@ -26,7 +28,7 @@ export async function sendEnquiryConfirmation(
   product: string
 ) {
   await getTransporter().sendMail({
-    from: `"Garud Aqua Solutions" <${process.env.SMTP_USER}>`,
+    from: `"Garud Aqua Solutions" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
     subject: "Thank you for your enquiry — Garud Aqua Solutions",
     html: `
@@ -65,7 +67,7 @@ export async function sendEnquiryNotificationToAdmin(enquiry: {
   message: string;
 }) {
   await getTransporter().sendMail({
-    from: `"GarudAqua" <${process.env.SMTP_USER}>`,
+    from: `"GarudAqua" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to: process.env.ADMIN_EMAIL,
     subject: `New Enquiry from ${enquiry.name}${enquiry.product ? ` — ${enquiry.product}` : ""}`,
     html: `

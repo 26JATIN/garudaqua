@@ -28,8 +28,8 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send emails asynchronously — don't block the response
-    Promise.all([
+    // Await email attempts so serverless runtimes do not drop in-flight SMTP work.
+    const emailResults = await Promise.allSettled([
       body.email
         ? sendEnquiryConfirmation(body.email.trim(), body.name.trim(), body.product || "")
         : Promise.resolve(),
@@ -42,7 +42,14 @@ export async function POST(request: Request) {
         quantity: body.quantity || "",
         message: body.message || "",
       }),
-    ]).catch((err) => console.error("Email send error:", err));
+    ]);
+
+    emailResults.forEach((result, index) => {
+      if (result.status === "rejected") {
+        const label = index === 0 ? "customer-confirmation" : "admin-notification";
+        console.error(`[email] Failed to send ${label}:`, result.reason);
+      }
+    });
 
     return NextResponse.json(
       { success: true, id: enquiry.id },
