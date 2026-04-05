@@ -155,6 +155,9 @@ export function productSchema(product: {
   slug?: string;
   category?: { name: string } | null;
   guarantee?: string;
+  price?: number | string | null;
+  priceCurrency?: string;
+  priceValidUntil?: string;
 }) {
   const allImages = [
     ...(product.image ? [product.image] : []),
@@ -162,6 +165,13 @@ export function productSchema(product: {
   ];
   // Prefer slug for the canonical URL — falls back to id for legacy records
   const productPath = product.slug || product.id;
+  const rawPrice = product.price;
+  const hasValidPrice =
+    rawPrice !== null &&
+    rawPrice !== undefined &&
+    String(rawPrice).trim() !== "" &&
+    Number.isFinite(Number(rawPrice));
+  const normalizedPrice = hasValidPrice ? Number(rawPrice).toFixed(2) : undefined;
 
   return {
     "@context": "https://schema.org",
@@ -189,17 +199,22 @@ export function productSchema(product: {
           },
         }
       : {}),
-    offers: {
-      "@type": "Offer",
-      availability: "https://schema.org/InStock",
-      itemCondition: "https://schema.org/NewCondition",
-      seller: { "@id": `${SITE_URL}/#organization` },
-      url: `${SITE_URL}/products/${productPath}`,
-      priceSpecification: {
-        "@type": "PriceSpecification",
-        priceCurrency: "INR",
-      },
-    },
+    ...(hasValidPrice
+      ? {
+          offers: {
+            "@type": "Offer",
+            availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+            seller: { "@id": `${SITE_URL}/#organization` },
+            url: `${SITE_URL}/products/${productPath}`,
+            price: normalizedPrice,
+            priceCurrency: product.priceCurrency || "INR",
+            ...(product.priceValidUntil
+              ? { priceValidUntil: product.priceValidUntil }
+              : {}),
+          },
+        }
+      : {}),
   };
 }
 
@@ -274,18 +289,20 @@ export function faqSchema(
 export function videoSchema(video: {
   name: string;
   description: string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
   uploadDate: string;
   contentUrl?: string;
   embedUrl?: string;
   duration?: string;
 }) {
+  const thumbnailUrl = video.thumbnailUrl?.trim() || LOGO_URL;
+
   return {
     "@context": "https://schema.org",
     "@type": "VideoObject",
     name: video.name,
     description: video.description,
-    thumbnailUrl: video.thumbnailUrl,
+    thumbnailUrl,
     uploadDate: video.uploadDate,
     ...(video.contentUrl ? { contentUrl: video.contentUrl } : {}),
     ...(video.embedUrl ? { embedUrl: video.embedUrl } : {}),

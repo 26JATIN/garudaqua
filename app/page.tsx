@@ -183,14 +183,18 @@ export default async function Home() {
       })) }} />
       {videoData.length > 0 && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(
-          videoData.map(v => videoSchema({
-            name: v.title,
-            description: v.description || `${v.title} — product showcase by Garud Aqua Solutions`,
-            thumbnailUrl: v.thumbnailUrl,
-            uploadDate: new Date().toISOString(),
-            contentUrl: v.videoUrl,
-            duration: v.duration ? `PT${v.duration}S` : undefined,
-          }))
+          videoData.map(v => {
+            const safeThumbnail = v.thumbnailUrl?.trim() || "https://www.garudaqua.in/DesktopLogo.png";
+
+            return videoSchema({
+              name: v.title,
+              description: v.description || `${v.title} — product showcase by Garud Aqua Solutions`,
+              thumbnailUrl: safeThumbnail,
+              uploadDate: new Date().toISOString(),
+              contentUrl: v.videoUrl,
+              duration: v.duration ? `PT${v.duration}S` : undefined,
+            });
+          })
         ) }} />
       )}
 
