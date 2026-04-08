@@ -49,7 +49,16 @@ function shouldRenderProductRichResult(product: unknown): boolean {
     typeof aggregateRating === "object" &&
     "ratingValue" in (aggregateRating as Record<string, unknown>);
 
-  return hasPrice || hasReview || hasAggregateRating;
+  const pricingOptions = p.pricingOptions;
+  const hasPricingOptions = Array.isArray(pricingOptions)
+    ? pricingOptions.some((option) => {
+        if (!option || typeof option !== "object") return false;
+        const candidate = option as { price?: number | string | null; isAvailable?: boolean };
+        return candidate.isAvailable !== false && candidate.price !== null && candidate.price !== undefined && String(candidate.price).trim() !== "" && Number.isFinite(Number(candidate.price));
+      })
+    : false;
+
+  return hasPrice || hasReview || hasAggregateRating || hasPricingOptions;
 }
 
 export async function generateMetadata(

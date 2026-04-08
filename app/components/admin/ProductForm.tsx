@@ -39,8 +39,16 @@ interface ProductData {
     guarantee?: string;
     hasVariants: boolean;
     variantOptions: VariantOption[];
+    pricingOptions?: PricingOption[];
     metaTitle?: string;
     metaDesc?: string;
+}
+
+interface PricingOption {
+    unit: "litre" | "kg" | "piece";
+    label: string;
+    price: string;
+    isAvailable: boolean;
 }
 
 interface Category {
@@ -66,6 +74,7 @@ interface FormState {
     guarantee: string;
     hasVariants: boolean;
     variantOptions: VariantOption[];
+    pricingOptions: PricingOption[];
     metaTitle: string;
     metaDesc: string;
 }
@@ -75,6 +84,22 @@ interface ProductFormProps {
     onSubmit: (data: Record<string, unknown>) => void;
     onCancel: () => void;
     categories?: Category[];
+}
+
+const defaultPricingOptions = [
+    { unit: "litre" as const, label: "Price per Litre", price: "", isAvailable: true },
+    { unit: "kg" as const, label: "Price per Kg", price: "", isAvailable: true },
+    { unit: "piece" as const, label: "Price per Piece", price: "", isAvailable: true },
+];
+
+function normalizePricingOptions(options?: Array<{ unit: string; label?: string; price?: number | string | null; isAvailable?: boolean }>): PricingOption[] {
+    const source = options && options.length > 0 ? options : defaultPricingOptions;
+    return source.map((option) => ({
+        unit: option.unit === "kg" || option.unit === "piece" || option.unit === "litre" ? option.unit : "piece",
+        label: option.label || (option.unit === "kg" ? "Price per Kg" : option.unit === "piece" ? "Price per Piece" : "Price per Litre"),
+        price: option.price === null || option.price === undefined ? "" : String(option.price),
+        isAvailable: option.isAvailable ?? true,
+    }));
 }
 
 export default function ProductForm({
@@ -96,6 +121,7 @@ export default function ProductForm({
         guarantee: "",
         hasVariants: false,
         variantOptions: [],
+        pricingOptions: defaultPricingOptions,
         metaTitle: "",
         metaDesc: "",
     });
@@ -138,6 +164,7 @@ export default function ProductForm({
                 guarantee: product.guarantee || "",
                 hasVariants: product.hasVariants || false,
                 variantOptions: product.variantOptions || [],
+                pricingOptions: normalizePricingOptions(product.pricingOptions as Array<{ unit: string; label?: string; price?: number | string | null; isAvailable?: boolean }> | undefined),
                 metaTitle: product.metaTitle || "",
                 metaDesc: product.metaDesc || "",
             });
@@ -321,6 +348,13 @@ export default function ProductForm({
             guarantee: formData.guarantee,
             hasVariants: formData.hasVariants,
             variantOptions: formData.variantOptions,
+            pricingOptions: formData.pricingOptions.map((option) => ({
+                ...option,
+                price: (() => {
+                    const numeric = Number(option.price);
+                    return option.price.trim() === "" || !Number.isFinite(numeric) ? null : numeric;
+                })(),
+            })),
             metaTitle: formData.metaTitle,
             metaDesc: formData.metaDesc,
         });
@@ -634,6 +668,64 @@ export default function ProductForm({
                 >
                     + Add Specification
                 </button>
+            </div>
+
+            {/* Pricing */}
+            <div className="bg-gray-50 dark:bg-gray-800/30 p-4 rounded-xl border border-gray-100 dark:border-gray-800 space-y-4">
+                <div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <svg className="w-4 h-4 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 12v-2m-6 0a9 9 0 1112 0H6z" /></svg>
+                        Pricing
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-1">Set any or all unit prices. Leave a price empty to hide that unit from the product page.</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {formData.pricingOptions.map((option, index) => (
+                        <div key={option.unit} className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 space-y-3">
+                            <div className="flex items-center justify-between gap-3">
+                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{option.label}</span>
+                                <label className="inline-flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={option.isAvailable}
+                                        onChange={(e) => {
+                                            const updated = [...formData.pricingOptions];
+                                            updated[index] = { ...updated[index], isAvailable: e.target.checked };
+                                            setFormData((prev) => ({ ...prev, pricingOptions: updated }));
+                                        }}
+                                        className="w-4 h-4 text-[#0EA5E9] border-gray-300 rounded focus:ring-[#0EA5E9]"
+                                    />
+                                    Visible
+                                </label>
+                            </div>
+                            <input
+                                type="text"
+                                value={option.price}
+                                onChange={(e) => {
+                                    const updated = [...formData.pricingOptions];
+                                    updated[index] = { ...updated[index], price: e.target.value };
+                                    setFormData((prev) => ({ ...prev, pricingOptions: updated }));
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
+                                placeholder="e.g., 1250"
+                            />
+                            <div className="flex items-center justify-between gap-3">
+                                <span className="text-xs text-gray-500">Unit: {option.unit}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const updated = [...formData.pricingOptions];
+                                        updated[index] = { ...updated[index], price: "", isAvailable: false };
+                                        setFormData((prev) => ({ ...prev, pricingOptions: updated }));
+                                    }}
+                                    className="text-xs text-[#0EA5E9] hover:text-[#0369A1]"
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Guarantee / Warranty */}

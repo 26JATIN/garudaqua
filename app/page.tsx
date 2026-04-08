@@ -22,20 +22,20 @@ const Footer = dynamicImports(() => import('./components/Footer'));
 export const metadata: Metadata = {
   title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings | Sriganganagar",
   description:
-    "Garud Aqua Solutions is Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes, pipe fittings & agricultural water management products. A Bond of Trust & Quality.",
+    "Garud Aqua Solutions is Sriganganagar's trusted supplier of HDPE, LLDPE water tanks, PVC pipes, pipe fittings & agricultural water management products. A Bond of Trust & Quality.",
   alternates: { canonical: "https://www.garudaqua.in" },
   openGraph: {
     url: "https://www.garudaqua.in",
     title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
     description:
-      "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products.",
+      "Sriganganagar's trusted supplier of HDPE, LLDPE water tanks, PVC pipes & agricultural water management products.",
     images: [{ url: "https://www.garudaqua.in/DesktopLogo.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
     description:
-      "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products.",
+      "Sriganganagar's trusted supplier of HDPE, LLDPE water tanks, PVC pipes & agricultural water management products.",
     images: ["https://www.garudaqua.in/DesktopLogo.png"],
   },
 };
@@ -178,7 +178,7 @@ export default async function Home() {
     <main className="min-h-screen relative overflow-x-clip">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema({
         name: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
-        description: "Sriganganagar's trusted supplier of HDPE water tanks, PVC pipes, fittings & agricultural water management products.",
+        description: "Sriganganagar's trusted supplier of HDPE, LLDPE water tanks, PVC pipes, fittings & agricultural water management products.",
         url: "https://www.garudaqua.in",
       })) }} />
       {videoData.length > 0 && (

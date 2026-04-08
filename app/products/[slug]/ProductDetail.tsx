@@ -44,6 +44,12 @@ interface Product {
     specs?: { label: string; value: string }[];
     hasVariants?: boolean;
     variantOptions?: VariantOption[];
+    pricingOptions?: Array<{
+        unit: "litre" | "kg" | "piece" | string;
+        label: string;
+        price?: number | string | null;
+        isAvailable?: boolean;
+    }>;
     variants?: unknown[];
     guarantee?: string;
     createdAt?: string;
@@ -53,6 +59,15 @@ interface Product {
 function getCategoryName(category: Product["category"]): string {
     if (typeof category === "string") return category;
     return category?.name || "";
+}
+
+function formatPriceValue(price?: number | string | null): string | null {
+    if (price === null || price === undefined) return null;
+    const numeric = Number(price);
+    if (!Number.isFinite(numeric)) return null;
+    return new Intl.NumberFormat("en-IN", {
+        maximumFractionDigits: numeric % 1 === 0 ? 0 : 2,
+    }).format(numeric);
 }
 
 
@@ -228,6 +243,21 @@ function ProductDetailSkeleton() {
                             <div className="h-4 w-full bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                             <div className="h-4 w-full bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                             <div className="h-4 w-2/3 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                        </div>
+                        <div className="rounded-2xl border border-gray-200 dark:border-white/6 p-6 space-y-4 bg-white/70 dark:bg-white/3">
+                            <div className="space-y-2">
+                                <div className="h-4 w-20 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                                <div className="h-6 w-2/3 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={i} className="rounded-2xl border border-gray-200 dark:border-white/6 p-4 space-y-3">
+                                        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                                        <div className="h-7 w-3/4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                                        <div className="h-4 w-full bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         <div className="bg-gray-100 dark:bg-gray-900 rounded-2xl p-6 space-y-3">
                             <div className="h-5 w-28 bg-gray-200 dark:bg-gray-800 rounded animate-pulse mb-4" />
@@ -439,6 +469,19 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
         ? (product.category.slug || slugify(product.category.name))
         : slugify(categoryName);
     const displayImages = product.images && product.images.length > 0 ? product.images : product.image ? [product.image] : [];
+    const pricingMetaByUnit = {
+        litre: { label: "Price per Litre", hint: "Best for storage tanks and liquid products" },
+        kg: { label: "Price per Kg", hint: "Best for bulk weight-based orders" },
+        piece: { label: "Price per Piece", hint: "Best for single-item purchases" },
+    } as const;
+    const normalizedPricingOptions = (product.pricingOptions || []).filter(
+        (option): option is NonNullable<Product["pricingOptions"]>[number] =>
+            !!option &&
+            (option.unit === "litre" || option.unit === "kg" || option.unit === "piece")
+    );
+    const visiblePricingOptions = normalizedPricingOptions.filter((option) => option.isAvailable !== false);
+    const visiblePricedOptions = visiblePricingOptions.filter((option) => Number.isFinite(Number(option.price)));
+    const primaryPricingOption = visiblePricedOptions[0] || visiblePricingOptions[0] || null;
 
     // Pre-calculate image alt tags based on variant mapping
     const imageAlts = displayImages.map((img, idx) => {
@@ -597,6 +640,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                             </div>
                         )}
 
+
                         {/* Available Options */}
                         {product.hasVariants && product.variantOptions && product.variantOptions.length > 0 && (
                             <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-5 border border-gray-200 dark:border-white/6">
@@ -660,6 +704,30 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                 })}
                             </div>
                         )}
+                                                {/* Pricing */}
+                        {primaryPricingOption && (
+                            <section
+                                aria-labelledby="product-pricing-heading"
+                                className="rounded-2xl border border-[#0EA5E9]/15 dark:border-[#0EA5E9]/25 bg-linear-to-r from-[#0EA5E9]/10 to-[#F4FAFF] dark:from-[#0EA5E9]/15 dark:to-[#111] p-5"
+                            >
+                                <div className="flex flex-col gap-1.5">
+                                    <div>
+                                        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#0EA5E9]">Pricing</p>
+                                        <h2 id="product-pricing-heading" className="text-base md:text-lg font-medium text-[#1f2937] dark:text-gray-100 mt-1">
+                                            Starting from
+                                        </h2>
+                                    </div>
+                                    <p className="text-2xl md:text-3xl font-semibold text-[#1f2937] dark:text-gray-100 leading-tight">
+                                        ₹{formatPriceValue(primaryPricingOption.price) || "___"}
+                                        <span className="text-base md:text-lg font-medium text-gray-500 dark:text-gray-400"> / {primaryPricingOption.unit}</span>
+                                    </p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Exact quote on enquiry.
+                                    </p>
+                                </div>
+                            </section>
+                        )}
+
 
                         {/* Specifications */}
                         {product.specs && product.specs.length > 0 && (

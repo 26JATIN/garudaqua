@@ -18,7 +18,7 @@ export function organizationSchema() {
     telephone: PHONE,
     email: EMAIL,
     description:
-      "Garud Aqua Solutions is a trusted manufacturer, retailer, and wholesale supplier of HDPE water tanks, PVC pipes, fittings, and agricultural water management products in Sriganganagar, Rajasthan, India.",
+      "Garud Aqua Solutions is a trusted manufacturer, retailer, and wholesale supplier of HDPE, LLDPE water tanks, PVC pipes, fittings, and agricultural water management products in Sriganganagar, Rajasthan, India.",
     foundingDate: "2014",
     founder: {
       "@type": "Person",
@@ -64,6 +64,7 @@ export function organizationSchema() {
     ],
     knowsAbout: [
       "HDPE Water Tanks",
+      "LLDPE Water Tanks",
       "PVC Pipes",
       "CPVC Pipes",
       "Water Fittings",
@@ -158,6 +159,11 @@ export function productSchema(product: {
   price?: number | string | null;
   priceCurrency?: string;
   priceValidUntil?: string;
+  pricingOptions?: Array<{
+    unit: string;
+    price?: number | string | null;
+    isAvailable?: boolean;
+  }>;
 }) {
   const allImages = [
     ...(product.image ? [product.image] : []),
@@ -166,12 +172,80 @@ export function productSchema(product: {
   // Prefer slug for the canonical URL — falls back to id for legacy records
   const productPath = product.slug || product.id;
   const rawPrice = product.price;
+  const availablePricing = (product.pricingOptions || []).filter(
+    (option) => option && option.isAvailable !== false && option.price !== null && option.price !== undefined && String(option.price).trim() !== "" && Number.isFinite(Number(option.price))
+  );
   const hasValidPrice =
     rawPrice !== null &&
     rawPrice !== undefined &&
     String(rawPrice).trim() !== "" &&
     Number.isFinite(Number(rawPrice));
-  const normalizedPrice = hasValidPrice ? Number(rawPrice).toFixed(2) : undefined;
+  const lowestPricingOption = availablePricing.reduce<typeof availablePricing[number] | null>((lowest, option) => {
+    const value = Number(option.price);
+    if (!Number.isFinite(value)) return lowest;
+    if (!lowest) return option;
+    return value < Number(lowest.price) ? option : lowest;
+  }, null);
+  const lowestPricing = lowestPricingOption ? Number(lowestPricingOption.price) : null;
+  const unitCodeByUnit: Record<string, string> = {
+    litre: "LTR",
+    kg: "KGM",
+    piece: "H87",
+  };
+  const selectedUnit = lowestPricingOption?.unit;
+  const selectedUnitCode = selectedUnit ? unitCodeByUnit[selectedUnit] : undefined;
+
+  const normalizedPrice = hasValidPrice
+    ? Number(rawPrice).toFixed(2)
+    : lowestPricing !== null
+      ? lowestPricing.toFixed(2)
+      : undefined;
+  const normalizedPriceCurrency = product.priceCurrency || "INR";
+
+  const offer = (hasValidPrice || lowestPricing !== null)
+    ? {
+        "@type": "Offer",
+        availability: "https://schema.org/InStock",
+        itemCondition: "https://schema.org/NewCondition",
+        seller: { "@id": `${SITE_URL}/#organization` },
+        url: `${SITE_URL}/products/${productPath}`,
+        price: normalizedPrice,
+        priceCurrency: normalizedPriceCurrency,
+        ...(product.priceValidUntil
+          ? { priceValidUntil: product.priceValidUntil }
+          : {}),
+        ...(selectedUnitCode
+          ? {
+              priceSpecification: {
+                "@type": "UnitPriceSpecification",
+                price: normalizedPrice,
+                priceCurrency: normalizedPriceCurrency,
+                referenceQuantity: {
+                  "@type": "QuantitativeValue",
+                  value: 1,
+                  unitCode: selectedUnitCode,
+                },
+              },
+            }
+          : {}),
+        shippingDetails: {
+          "@type": "OfferShippingDetails",
+          shippingDestination: {
+            "@type": "DefinedRegion",
+            addressCountry: "IN",
+          },
+          description: "Shipping charges and delivery timeline are provided on enquiry.",
+        },
+        hasMerchantReturnPolicy: {
+          "@type": "MerchantReturnPolicy",
+          applicableCountry: "IN",
+          returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
+          merchantReturnLink: `${SITE_URL}/enquire`,
+          description:
+            "Only manufacturing defects are eligible for return/replacement after verification. For full policy details, please enquire.",
+        },
+      }
+    : undefined;
 
   return {
     "@context": "https://schema.org",
@@ -199,22 +273,7 @@ export function productSchema(product: {
           },
         }
       : {}),
-    ...(hasValidPrice
-      ? {
-          offers: {
-            "@type": "Offer",
-            availability: "https://schema.org/InStock",
-            itemCondition: "https://schema.org/NewCondition",
-            seller: { "@id": `${SITE_URL}/#organization` },
-            url: `${SITE_URL}/products/${productPath}`,
-            price: normalizedPrice,
-            priceCurrency: product.priceCurrency || "INR",
-            ...(product.priceValidUntil
-              ? { priceValidUntil: product.priceValidUntil }
-              : {}),
-          },
-        }
-      : {}),
+    ...(offer ? { offers: offer } : {}),
   };
 }
 

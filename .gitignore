@@ -44,3 +44,6 @@ next-env.d.ts
 prisma/seed.ts
 scripts/migrate-db.ts
 .env*.local
+
+.vercel
+.env*.local

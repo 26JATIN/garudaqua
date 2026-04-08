@@ -82,6 +82,7 @@ model Product {
   hasVariants    Boolean      @default(false)
   variantOptions Json         @default("[]")
   variants       Json         @default("[]")
+  pricingOptions  Json         @default("[]")
   specs          Json         @default("[]")
   guarantee      String       @default("")
   categoryId     String       @db.ObjectId

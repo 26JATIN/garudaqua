@@ -23,7 +23,7 @@ export async function generateMetadata({
   const subcategoryParam = typeof params.subcategory === "string" ? params.subcategory : undefined;
 
   let title = "Products — Water Tanks, Pipes & Fittings | Garud Aqua Solutions";
-  let description = "Browse Garud Aqua Solutions' full range of HDPE water tanks, PVC pipes, pipe fittings & water management products.";
+  let description = "Browse Garud Aqua Solutions' full range of HDPE, LLDPE water tanks, PVC pipes, pipe fittings & water management products.";
   let url = "https://www.garudaqua.in/products";
 
   try {
@@ -240,7 +240,7 @@ export default async function Page({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema({
         name: "Products — Water Tanks, Pipes & Fittings",
-        description: "Browse Garud Aqua Solutions' full range of HDPE water tanks, PVC pipes, pipe fittings & water management products.",
+        description: "Browse Garud Aqua Solutions' full range of HDPE, LLDPE water tanks, PVC pipes, pipe fittings & water management products.",
         url: "https://www.garudaqua.in/products",
       })) }} />
       {/* Preload LCP images — browser starts fetching immediately, before JS hydration */}

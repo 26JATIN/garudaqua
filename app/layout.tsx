@@ -29,10 +29,11 @@ export const metadata: Metadata = {
     template: "%s | Garud Aqua Solutions",
   },
   description:
-    "Garud Aqua Solutions — Sriganganagar's trusted supplier of high-quality HDPE water tanks, PVC pipes, fittings & agricultural water management products. A Bond of Trust & Quality since establishment.",
+    "Garud Aqua Solutions — Sriganganagar's trusted supplier of high-quality HDPE, LLDPE water tanks, PVC pipes, fittings & agricultural water management products. A Bond of Trust & Quality since establishment.",
   keywords: [
     "water tanks",
     "HDPE water tanks",
+    "LLDPE water tanks",
     "PVC pipes",
     "pipe fittings",
     "agricultural water tanks",
@@ -74,7 +75,7 @@ export const metadata: Metadata = {
     siteName: "Garud Aqua Solutions",
     title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings | Sriganganagar",
     description:
-      "Trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products in Rajasthan. Quality products, reliable service.",
+      "Trusted supplier of HDPE, LLDPE water tanks, PVC pipes & agricultural water management products in Rajasthan. Quality products, reliable service.",
     images: [
       {
         url: `${SITE_URL}/DesktopLogo.png`,
@@ -88,7 +89,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Garud Aqua Solutions — Water Tanks, Pipes & Fittings",
     description:
-      "Trusted supplier of HDPE water tanks, PVC pipes & agricultural water management products in Rajasthan.",
+      "Trusted supplier of HDPE, LLDPE water tanks, PVC pipes & agricultural water management products in Rajasthan.",
     images: [`${SITE_URL}/DesktopLogo.png`],
     creator: "@garudaqua",
   },

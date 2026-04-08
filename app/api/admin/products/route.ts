@@ -10,6 +10,38 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+function normalizePricingOptions(pricingOptions: unknown) {
+  if (!Array.isArray(pricingOptions)) return [];
+
+  return pricingOptions
+    .map((option) => {
+      if (!option || typeof option !== "object") return null;
+      const candidate = option as {
+        unit?: string;
+        label?: string;
+        price?: number | string | null;
+        isAvailable?: boolean;
+      };
+
+      const unit = candidate.unit === "litre" || candidate.unit === "kg" || candidate.unit === "piece"
+        ? candidate.unit
+        : null;
+      if (!unit) return null;
+
+      const numericPrice = candidate.price === null || candidate.price === undefined || String(candidate.price).trim() === ""
+        ? null
+        : Number(candidate.price);
+
+      return {
+        unit,
+        label: candidate.label || `Price per ${unit === "piece" ? "Piece" : unit === "kg" ? "Kg" : "Litre"}`,
+        price: Number.isFinite(numericPrice as number) ? numericPrice : null,
+        isAvailable: candidate.isAvailable !== false,
+      };
+    })
+    .filter(Boolean);
+}
+
 export async function GET() {
   try {
     const products = await prisma.product.findMany({
@@ -73,6 +105,7 @@ export async function POST(request: Request) {
         hasVariants: body.hasVariants || false,
         variantOptions: body.variantOptions || [],
         variants: body.variants || [],
+        pricingOptions: normalizePricingOptions(body.pricingOptions),
         specs: body.specs || [],
         guarantee: body.guarantee || "",
         categoryId: body.categoryId,

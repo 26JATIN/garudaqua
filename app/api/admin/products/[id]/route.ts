@@ -11,6 +11,38 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+function normalizePricingOptions(pricingOptions: unknown) {
+  if (!Array.isArray(pricingOptions)) return [];
+
+  return pricingOptions
+    .map((option) => {
+      if (!option || typeof option !== "object") return null;
+      const candidate = option as {
+        unit?: string;
+        label?: string;
+        price?: number | string | null;
+        isAvailable?: boolean;
+      };
+
+      const unit = candidate.unit === "litre" || candidate.unit === "kg" || candidate.unit === "piece"
+        ? candidate.unit
+        : null;
+      if (!unit) return null;
+
+      const numericPrice = candidate.price === null || candidate.price === undefined || String(candidate.price).trim() === ""
+        ? null
+        : Number(candidate.price);
+
+      return {
+        unit,
+        label: candidate.label || `Price per ${unit === "piece" ? "Piece" : unit === "kg" ? "Kg" : "Litre"}`,
+        price: Number.isFinite(numericPrice as number) ? numericPrice : null,
+        isAvailable: candidate.isAvailable !== false,
+      };
+    })
+    .filter(Boolean);
+}
+
 /** Generates a unique slug. If `base` is already taken by a different product (not `excludeId`), appends -2, -3 … */
 async function uniqueSlug(base: string, excludeId: string): Promise<string> {
   let candidate = base;
@@ -90,6 +122,7 @@ export async function PUT(
         hasVariants: body.hasVariants,
         variantOptions: body.variantOptions,
         variants: body.variants,
+        pricingOptions: body.pricingOptions !== undefined ? normalizePricingOptions(body.pricingOptions) : existing.pricingOptions ?? [],
         specs: body.specs,
         guarantee: body.guarantee ?? "",
         categoryId: body.categoryId,
