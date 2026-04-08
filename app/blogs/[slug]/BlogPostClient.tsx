@@ -3,6 +3,7 @@
 import "@/app/styles/blog-content.css";
 import "@/app/styles/animations.css";
 import NavigationLink from "@/app/components/NavigationLink";
+import Image from "next/image";
 import { TransitionElement } from "../../components/PageTransition";
 
 // ===== Type Definitions =====
