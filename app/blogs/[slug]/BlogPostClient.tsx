@@ -3,7 +3,6 @@
 import "@/app/styles/blog-content.css";
 import "@/app/styles/animations.css";
 import NavigationLink from "@/app/components/NavigationLink";
-import Image from "next/image";
 import { TransitionElement } from "../../components/PageTransition";
 
 // ===== Type Definitions =====
@@ -44,17 +43,13 @@ export default function BlogPostClient({
                 <div className="relative w-full">
                     {/* Featured Image */}
                     {blog.featuredImage && (
-                        <TransitionElement name={`blog-${blog.slug}`} className="relative block w-full overflow-hidden rounded-none bg-gray-100 dark:bg-[#111111] aspect-video">
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-transparent to-black/10 dark:from-white/5 dark:via-transparent dark:to-white/5" />
-                            <Image
+                        <TransitionElement name={`blog-${blog.slug}`} className="relative block w-full bg-gray-100 dark:bg-[#111111]">
+                            <img
                                 src={blog.featuredImage}
                                 alt={blog.title}
-                                fill
-                                sizes="100vw"
-                                className="object-contain"
-                                priority
-                                fetchPriority="high"
-                                decoding="sync"
+                                className="block w-full h-auto"
+                                loading="eager"
+                                decoding="async"
                             />
                         </TransitionElement>
                     )}
