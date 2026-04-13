@@ -744,14 +744,14 @@ function ProductCard({ product, index }: ProductCardProps) {
         >
             <NavigationLink href={productHref} className="block h-full">
                 <TransitionElement name={`product-${product.slug}`} className="h-full">
-                    <div className="bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl overflow-hidden shadow-sm h-full flex flex-col card-interactive">
-                        <div className="relative w-full aspect-square overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] shrink-0 p-4 sm:p-5 flex items-center justify-center">
+                    <div className="bg-white dark:bg-[#0A0A0A] rounded-[16px_16px_2px_16px] sm:rounded-[24px_24px_4px_24px] overflow-hidden shadow-sm h-full flex flex-col group-hover:scale-[1.03] transition-all duration-700 ease-out border border-gray-100 dark:border-white/6">
+                        <div className="relative w-full aspect-square overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] shrink-0">
                             {product.image ? (
                                 <Image
                                     src={product.image}
                                     alt={product.name}
                                     fill
-                                    className="object-contain group-hover:scale-105 transition-transform duration-500 p-4 sm:p-5"
+                                    className="object-cover object-top transition-transform duration-500"
                                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                     quality={50}
                                     priority={isLikelyLcpImage}
@@ -766,16 +766,7 @@ function ProductCard({ product, index }: ProductCardProps) {
                                     </svg>
                                 </div>
                             )}
-                            <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1 z-10">
-                                <span className="bg-white/90 backdrop-blur-sm text-[#0EA5E9] text-[10px] md:text-xs px-2 py-1 rounded-full font-medium shadow-sm">
-                                    {categoryName}
-                                </span>
-                                {product.subcategory?.name && (
-                                    <span className="bg-[#0EA5E9]/90 backdrop-blur-sm text-white text-[10px] md:text-xs px-2 py-1 rounded-full font-medium shadow-sm">
-                                        {product.subcategory.name}
-                                    </span>
-                                )}
-                            </div>
+                            <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                         </div>
                         <div className="p-3 md:p-4 lg:p-6 flex flex-col flex-1 relative bg-white dark:bg-[#0A0A0A]">
                             <h3 className="text-[#2C2C2C] dark:text-gray-100 font-medium text-[13px] sm:text-sm md:text-base lg:text-lg mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors leading-tight line-clamp-2 min-h-10 md:min-h-12 lg:min-h-14 flex items-start">
@@ -814,9 +805,9 @@ function ProductListItem({ product, index = 0 }: ProductCardProps) {
                                         src={product.image}
                                         alt={product.name}
                                         fill
-                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                        sizes="(max-width: 640px) 64px, 192px"
-                                        quality={70}
+                                        className="object-cover object-top"
+                                        sizes="(max-width: 640px) 100px, 200px"
+                                        quality={50}
                                         priority={isLikelyLcpImage}
                                         loading={isLikelyLcpImage ? "eager" : "lazy"}
                                         fetchPriority={isLikelyLcpImage ? "high" : "auto"}
@@ -830,20 +821,7 @@ function ProductListItem({ product, index = 0 }: ProductCardProps) {
                                     </div>
                                 )}
                             </div>
-                            <div className="flex-1 flex flex-col justify-center min-w-0">
-                                <div className="flex items-center gap-2 mb-1 sm:mb-2">
-                                    <p className="text-[10px] sm:text-xs text-[#0EA5E9] font-medium tracking-wide uppercase">
-                                        {categoryName}
-                                    </p>
-                                    {product.subcategory?.name && (
-                                        <>
-                                            <span className="text-gray-300">•</span>
-                                            <p className="text-[10px] sm:text-xs text-[#0369A1] font-medium tracking-wide uppercase">
-                                                {product.subcategory.name}
-                                            </p>
-                                        </>
-                                    )}
-                                </div>
+                            <div className="flex-1 flex flex-col justify-center min-w-0 flex items-center h-full">
                                 <h3 className="text-sm sm:text-base md:text-lg lg:text-xl text-[#2C2C2C] dark:text-gray-100 font-light mb-1 sm:mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors line-clamp-2">
                                     {product.name}
                                 </h3>

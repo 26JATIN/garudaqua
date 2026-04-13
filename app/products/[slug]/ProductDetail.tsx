@@ -296,19 +296,16 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
 
                 {/* Card content */}
                 <div className={cn(
-                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-shadow duration-300 h-full flex flex-col",
-                    isHovered && "shadow-xl"
+                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-[16px_16px_2px_16px] sm:rounded-[24px_24px_4px_24px] shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-all duration-500 ease-out h-full flex flex-col",
+                    isHovered && "shadow-xl scale-[1.03]"
                 )}>
-                    <div className="aspect-square relative overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] p-3 flex items-center justify-center">
+                    <div className="aspect-square relative overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] flex items-center justify-center">
                         {relatedProduct.image ? (
                             <Image
                                 src={relatedProduct.image}
                                 alt={relatedProduct.name}
                                 fill
-                                className={cn(
-                                    "object-contain transition-transform duration-500 p-3",
-                                    isHovered && "scale-105"
-                                )}
+                                className="object-cover object-top transition-transform duration-500"
                                 sizes="(max-width: 768px) 50vw, 25vw"
                                 quality={70}
                             />
@@ -320,10 +317,9 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
                             </div>
                         )}
                         <div className={cn(
-                            "absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300 flex items-end justify-center pb-4",
+                            "absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent transition-opacity duration-300 flex items-end justify-center pb-4",
                             isHovered ? "opacity-100" : "opacity-0"
                         )}>
-                            <span className="text-white text-sm font-medium">View Details</span>
                         </div>
                     </div>
                     <div className="p-3 md:p-4 flex-1 flex items-center">
