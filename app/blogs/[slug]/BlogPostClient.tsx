@@ -44,11 +44,11 @@ export default function BlogPostClient({
                 <div className="relative w-full">
                     {/* Featured Image */}
                     {blog.featuredImage && (
-                        <TransitionElement name={`blog-${blog.slug}`} className="relative flex justify-center w-full bg-gray-50 dark:bg-[#050505] overflow-hidden">
+                        <TransitionElement name={`blog-${blog.slug}`} className="relative w-full bg-gray-50 dark:bg-[#050505]">
                             <img
                                 src={blog.featuredImage}
                                 alt={blog.title}
-                                className="block max-w-full h-auto"
+                                className="w-full h-auto block"
                                 loading="eager"
                                 decoding="async"
                             />
@@ -194,7 +194,7 @@ export default function BlogPostClient({
                                                 src={relatedBlog.featuredImage}
                                                 alt={relatedBlog.title}
                                                 fill
-                                                className="object-fill group-hover:scale-110 transition-transform duration-700"
+                                                className="object-contain group-hover:scale-110 transition-transform duration-700"
                                                 sizes="(max-width: 768px) 100vw, 33vw"
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
