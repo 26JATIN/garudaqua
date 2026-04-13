@@ -142,11 +142,11 @@ export default async function CategorySeoPage(
                         <span className="text-white font-medium">{categoryFull.name}</span>
                     </nav>
 
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1] mb-3 sm:mb-4 drop-shadow-lg">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1] mb-3 sm:mb-4 drop-shadow-lg pointer-events-auto select-text">
                         {categoryFull.name}
                     </h1>
                     {categoryFull.description && (
-                        <p className="text-sm sm:text-base md:text-lg text-gray-200/90 max-w-2xl leading-relaxed font-light">
+                        <p className="text-sm sm:text-base md:text-lg text-gray-200/90 max-w-2xl leading-relaxed font-light pointer-events-auto select-text">
                             {categoryFull.description}
                         </p>
                     )}
