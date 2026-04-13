@@ -67,8 +67,8 @@ export default function BlogsClient({
             const params = new URLSearchParams();
             if (category !== "all") params.set("category", category);
             if (searchTerm.trim()) params.set("search", searchTerm.trim());
-            params.set("page", String(page));
-            params.set("limit", "10");
+            params.set("page", "1");
+            params.set("limit", "1000");
 
             const res = await fetch(`/api/blogs?${params.toString()}`);
             if (!res.ok) throw new Error("Failed to fetch blogs");
@@ -109,20 +109,18 @@ export default function BlogsClient({
     return (
         <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] md:py-4">
             {/* Hero Section */}
-            <div className="relative bg-linear-to-br from-[#2C2C2C] via-[#3A3A3A] to-[#2C2C2C] text-white py-24 overflow-hidden">
+            <div className="relative bg-linear-to-br from-[#2C2C2C] via-[#3A3A3A] to-[#2C2C2C] text-white py-14 md:py-24 overflow-hidden">
                 <div className="absolute inset-0 opacity-5" aria-hidden="true">
-                    <div className="absolute top-0 left-0 w-96 h-96 bg-[#2C2C2C] rounded-full filter blur-3xl"></div>
-                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#2C2C2C] rounded-full filter blur-3xl"></div>
+                    <div className="absolute top-0 left-0 w-64 h-64 md:w-96 md:h-96 bg-[#2C2C2C] rounded-full filter blur-3xl"></div>
+                    <div className="absolute bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-[#2C2C2C] rounded-full filter blur-3xl"></div>
                 </div>
 
-                <div className="container mx-auto px-4 relative z-10">
-                    <div
-                        className="text-center mb-12"
-                    >
-                        <h1 className="text-5xl md:text-6xl font-normal tracking-wide mb-6 text-white">
+                <div className="container mx-auto px-4 relative z-10 mt-6 md:mt-0">
+                    <div className="text-center mb-8 md:mb-12">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-wide mb-4 md:mb-6 text-white">
                             Our <span className="text-[#7DD3FC]">Blog</span>
                         </h1>
-                        <p className="text-xl font-light text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-base sm:text-lg md:text-xl font-light text-gray-300 max-w-2xl mx-auto leading-relaxed px-2 md:px-0">
                             Expert tips, guides, and insights on water tanks, pipes & plumbing solutions
                         </p>
                     </div>
@@ -130,10 +128,10 @@ export default function BlogsClient({
                     {/* Search Bar */}
                     <form
                         onSubmit={(e) => e.preventDefault()}
-                        className="max-w-2xl mx-auto"
+                        className="max-w-2xl mx-auto px-2 md:px-0"
                     >
                         <div className="relative">
-                            <svg className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="absolute left-5 md:left-6 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                             <input
@@ -141,21 +139,21 @@ export default function BlogsClient({
                                 placeholder="Search articles, tips, guides..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-14 pr-6 py-5 text-gray-900 dark:text-gray-100 bg-white/95 dark:bg-white/10 backdrop-blur-sm rounded-full shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] transition-all font-light dark:placeholder-gray-500"
+                                className="w-full pl-12 pr-5 py-3.5 md:pl-14 md:pr-6 md:py-5 text-gray-900 dark:text-gray-100 bg-white/95 dark:bg-white/10 backdrop-blur-sm rounded-full shadow-xl md:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] transition-all font-light dark:placeholder-gray-500 text-sm md:text-base border border-gray-100/10 dark:border-white/10"
                             />
                         </div>
                     </form>
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-16">
+            <div className="container mx-auto px-4 py-8 md:py-16">
                 {/* Category Filter */}
-                <div className="mb-12">
-                    <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-2 md:flex-wrap md:justify-center md:overflow-x-visible md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="mb-8 md:mb-12 relative">
+                    <div className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-2.5 md:gap-3 pb-6 pt-3 px-2 -mx-2 md:px-4 md:-mx-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                         <NavigationLink
                             href="/blogs"
                             onClick={(e) => { e.preventDefault(); setCategory("all"); }}
-                            className={`shrink-0 snap-start whitespace-nowrap px-5 py-2.5 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 ${
+                            className={`shrink-0 snap-start whitespace-nowrap px-4 py-2 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 text-sm md:text-base ${
                                 category === "all"
                                     ? "bg-[#0369A1] text-white shadow-lg md:scale-105"
                                     : "bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 hover:shadow-md border border-gray-200 dark:border-white/6"
@@ -168,7 +166,7 @@ export default function BlogsClient({
                                 key={cat.id}
                                 href={`/blogs/category/${cat.slug}`}
                                 onClick={(e) => { e.preventDefault(); setCategory(cat.slug); }}
-                                className={`shrink-0 snap-start whitespace-nowrap px-5 py-2.5 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 ${
+                                className={`shrink-0 snap-start whitespace-nowrap px-4 py-2 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 text-sm md:text-base ${
                                     category === cat.slug
                                         ? "bg-[#0369A1] text-white shadow-lg md:scale-105"
                                         : "bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 hover:shadow-md border border-gray-200 dark:border-white/6"
@@ -209,7 +207,7 @@ export default function BlogsClient({
                             <div key={blog.id}>
                                 <NavigationLink
                                     href={`/blogs/${blog.slug}`}
-                                    className="group bg-white dark:bg-[#0A0A0A] rounded-3xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
+                                    className="group bg-white dark:bg-[#0A0A0A] rounded-2xl md:rounded-3xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
                                 >
                                     {/* Featured Image */}
                                     {blog.featuredImage ? (
@@ -293,28 +291,7 @@ export default function BlogsClient({
                     </div>
                 )}
 
-                {/* Pagination */}
-                {!loading && totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-3 mt-12">
-                        <button
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="px-5 py-2.5 rounded-full font-light transition-all duration-300 bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 border border-gray-200 dark:border-white/6 disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                            Previous
-                        </button>
-                        <span className="text-sm text-gray-600 dark:text-gray-400 font-light">
-                            Page {page} of {totalPages}
-                        </span>
-                        <button
-                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                            disabled={page === totalPages}
-                            className="px-5 py-2.5 rounded-full font-light transition-all duration-300 bg-white dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/15 border border-gray-200 dark:border-white/6 disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                            Next
-                        </button>
-                    </div>
-                )}
+                {/* Pagination Removed */}
             </div>
         </div>
     );

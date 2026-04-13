@@ -33,7 +33,7 @@ async function getInitialData() {
       where: { isPublished: true },
       include: { blogCategory: { select: { name: true } } },
       orderBy: { publishedAt: 'desc' },
-      take: 10,
+      take: 1000,
     }),
   ]);
 
@@ -48,7 +48,7 @@ async function getInitialData() {
       publishedAt: b.publishedAt ? b.publishedAt.toISOString() : new Date().toISOString(),
     })),
     total,
-    totalPages: Math.ceil(total / 10),
+    totalPages: Math.ceil(total / 1000),
   };
 }
 

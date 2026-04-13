@@ -44,11 +44,11 @@ export default function BlogPostClient({
                 <div className="relative w-full">
                     {/* Featured Image */}
                     {blog.featuredImage && (
-                        <TransitionElement name={`blog-${blog.slug}`} className="relative flex justify-center w-full h-[50vh] md:h-[60vh] bg-gray-50 dark:bg-[#050505]">
+                        <TransitionElement name={`blog-${blog.slug}`} className="relative flex justify-center w-full bg-gray-50 dark:bg-[#050505] overflow-hidden">
                             <img
                                 src={blog.featuredImage}
                                 alt={blog.title}
-                                className="block w-full h-full object-fill"
+                                className="block max-w-full h-auto"
                                 loading="eager"
                                 decoding="async"
                             />
