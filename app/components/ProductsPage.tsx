@@ -744,7 +744,7 @@ function ProductCard({ product, index }: ProductCardProps) {
         >
             <NavigationLink href={productHref} className="block h-full">
                 <TransitionElement name={`product-${product.slug}`} className="h-full">
-                    <div className="bg-white dark:bg-[#0A0A0A] rounded-[16px_16px_2px_16px] sm:rounded-[24px_24px_4px_24px] overflow-hidden shadow-sm h-full flex flex-col group-hover:scale-[1.03] transition-all duration-700 ease-out border border-gray-100 dark:border-white/6">
+                    <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm h-full flex flex-col group-hover:scale-[1.03] transition-all duration-700 ease-out border border-gray-100 dark:border-white/6">
                         <div className="relative w-full aspect-square overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] shrink-0">
                             {product.image ? (
                                 <Image

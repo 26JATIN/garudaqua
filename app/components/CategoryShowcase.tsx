@@ -205,7 +205,7 @@ export const Card = React.memo(({
     
     return (
       <div
-        className="bg-white dark:bg-[#0A0A0A] shadow-lg relative overflow-hidden transition-all duration-700 ease-out group-hover:scale-[1.03] aspect-square rounded-[16px_16px_2px_16px] sm:rounded-[24px_24px_4px_24px]"
+        className="bg-white dark:bg-[#0A0A0A] shadow-lg relative overflow-hidden transition-all duration-700 ease-out group-hover:scale-[1.03] aspect-square rounded-2xl sm:rounded-3xl"
       >
         {transitionName ? (
            <TransitionElement name={transitionName} className="w-full h-full block relative">

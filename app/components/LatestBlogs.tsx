@@ -66,13 +66,13 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                         >
                             {/* Image */}
                             {blog.featuredImage ? (
-                                <div className="relative aspect-video overflow-hidden w-full shrink-0">
+                                <div className="relative aspect-video overflow-hidden w-full shrink-0 bg-gray-50 dark:bg-[#050505]">
                                     <TransitionElement name={`blog-${blog.slug}`} className="absolute inset-0">
                                         <Image
                                             src={blog.featuredImage}
                                             alt={blog.title}
                                             fill
-                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                            className="object-fill group-hover:scale-105 transition-transform duration-500"
                                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                             loading="lazy"
                                         />

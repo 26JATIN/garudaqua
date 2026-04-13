@@ -44,11 +44,11 @@ export default function BlogPostClient({
                 <div className="relative w-full">
                     {/* Featured Image */}
                     {blog.featuredImage && (
-                        <TransitionElement name={`blog-${blog.slug}`} className="relative block w-full bg-gray-100 dark:bg-[#111111]">
+                        <TransitionElement name={`blog-${blog.slug}`} className="relative flex justify-center w-full h-[50vh] md:h-[60vh] bg-gray-50 dark:bg-[#050505]">
                             <img
                                 src={blog.featuredImage}
                                 alt={blog.title}
-                                className="block w-full h-auto"
+                                className="block w-full h-full object-fill"
                                 loading="eager"
                                 decoding="async"
                             />
@@ -189,12 +189,12 @@ export default function BlogPostClient({
                                     className="group bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1"
                                 >
                                     {relatedBlog.featuredImage ? (
-                                        <div className="relative h-44 w-full overflow-hidden">
+                                        <div className="relative h-44 w-full overflow-hidden bg-gray-50 dark:bg-[#050505]">
                                             <Image
                                                 src={relatedBlog.featuredImage}
                                                 alt={relatedBlog.title}
                                                 fill
-                                                className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                className="object-fill group-hover:scale-110 transition-transform duration-700"
                                                 sizes="(max-width: 768px) 100vw, 33vw"
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>

@@ -296,7 +296,7 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
 
                 {/* Card content */}
                 <div className={cn(
-                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-[16px_16px_2px_16px] sm:rounded-[24px_24px_4px_24px] shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-all duration-500 ease-out h-full flex flex-col",
+                    "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-2xl sm:rounded-3xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-all duration-500 ease-out h-full flex flex-col",
                     isHovered && "shadow-xl scale-[1.03]"
                 )}>
                     <div className="aspect-square relative overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] flex items-center justify-center">

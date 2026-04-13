@@ -213,12 +213,12 @@ export default function BlogsClient({
                                 >
                                     {/* Featured Image */}
                                     {blog.featuredImage ? (
-                                        <div className="relative aspect-video w-full overflow-hidden">
+                                        <div className="relative aspect-video w-full overflow-hidden bg-gray-50 dark:bg-[#050505]">
                                             <Image
                                                 src={blog.featuredImage}
                                                 alt={blog.title}
                                                 fill
-                                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                                className="object-fill group-hover:scale-105 transition-transform duration-500"
                                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                                 quality={30}
                                                 priority={index < 3}

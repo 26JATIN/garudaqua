@@ -106,16 +106,16 @@ export default async function CategoriesIndexPage() {
                         <Link
                             key={category.id}
                             href={`/categories/${category.slug}`}
-                            className="group relative bg-white dark:bg-[#111111] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-none transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-white/8 hover:border-[#0EA5E9]/30 dark:hover:border-[#0EA5E9]/40 flex flex-col"
+                            className="group relative bg-white dark:bg-[#111111] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl dark:shadow-none transition-all duration-500 ease-out hover:-translate-y-1 border border-gray-100 dark:border-white/8 hover:border-[#0EA5E9]/30 dark:hover:border-[#0EA5E9]/40 flex flex-col"
                         >
                             {/* Image */}
-                            <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] p-4 sm:p-6 flex items-center justify-center">
+                            <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] flex items-center justify-center">
                                 {category.image ? (
                                     <Image
                                         src={category.image}
                                         alt={category.name}
                                         fill
-                                        className="object-contain group-hover:scale-105 transition-transform duration-500 p-3 sm:p-5"
+                                        className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-700"
                                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                         priority={index < 4}
                                         fetchPriority={index < 4 ? "high" : "auto"}
@@ -127,10 +127,11 @@ export default async function CategoriesIndexPage() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                     </svg>
                                 )}
+                                <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                                 {/* Product count badge */}
                                 {category._count.products > 0 && (
-                                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 py-0.5 sm:px-2.5 sm:py-1 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 shadow-sm">
+                                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 py-0.5 sm:px-2.5 sm:py-1 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full text-[10px] sm:text-xs font-semibold text-gray-600 dark:text-gray-300 shadow-sm z-10">
                                         {category._count.products} {category._count.products === 1 ? "Product" : "Products"}
                                     </div>
                                 )}
