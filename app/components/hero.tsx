@@ -112,6 +112,8 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
 
     return (
         <section className="relative w-full overflow-hidden bg-black text-white lg:mt-4.25">
+            <h1 className="sr-only">Garud Aqua Solutions — Premium Water Tanks, Agriculture Sprayer Tanks, and CPVC Pipes & Fittings Supplier in India</h1>
+            
             {/* STAGE 1: Guaranteed Static LCP Image. Renders instantly without React JS */}
             <div className="relative w-full z-0">
                 {LCPImage}

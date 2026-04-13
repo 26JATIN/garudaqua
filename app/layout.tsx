@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s | Garud Aqua Solutions",
   },
   description:
-    "Garud Aqua Solutions — Sriganganagar's trusted supplier of high-quality HDPE, LLDPE water tanks, PVC pipes, fittings & agricultural water management products. A Bond of Trust & Quality since establishment.",
+    "Garud Aqua Solutions — Sriganganagar's trusted supplier of high-quality HDPE, LLDPE water tanks, PVC pipes & agricultural water management products.",
   keywords: [
     "water tanks",
     "HDPE water tanks",
@@ -79,8 +79,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${SITE_URL}/DesktopLogo.png`,
-        width: 1200,
-        height: 630,
+        width: 750,
+        height: 332,
         alt: "Garud Aqua Solutions — Water Tanks and Pipe Fittings",
       },
     ],
@@ -118,7 +118,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-IN" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />

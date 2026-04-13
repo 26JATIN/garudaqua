@@ -84,8 +84,8 @@ export async function generateMetadata(
 
     // Use the canonical slug for all metadata URLs
     const canonicalSlug = product.slug ?? slug;
-    const title = product.name;
     const categoryName = product.category?.name ?? "Product";
+    const title = `${product.name} — Buy ${categoryName} in Rajasthan`;
     const description =
       product.description?.slice(0, 155) ||
       `Buy ${product.name} — ${categoryName} from Garud Aqua Solutions. Quality water management products in Rajasthan.`;

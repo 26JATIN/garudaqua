@@ -58,6 +58,7 @@ export function organizationSchema() {
       opens: "09:00",
       closes: "18:00",
     },
+    hasMap: "https://maps.app.goo.gl/LH69FP4CLybZSRAX7",
     areaServed: [
       { "@type": "State", name: "Rajasthan" },
       { "@type": "Country", name: "India" },
@@ -73,7 +74,11 @@ export function organizationSchema() {
       "Sprayer Tanks",
       "Drip Irrigation Systems",
     ],
-    sameAs: [],
+    sameAs: [
+      "https://maps.app.goo.gl/LH69FP4CLybZSRAX7",
+      "https://www.facebook.com/garudaqua",
+      "https://wa.me/919462594603"
+    ],
   };
 }
 
@@ -233,16 +238,47 @@ export function productSchema(product: {
           shippingDestination: {
             "@type": "DefinedRegion",
             addressCountry: "IN",
+            addressRegion: ["Rajasthan", "Punjab", "Haryana", "Gujarat",
+              "Uttar Pradesh", "Himachal Pradesh", "Uttarakhand"],
           },
-          description: "Shipping charges and delivery timeline are provided on enquiry.",
+          // Shipping is by quote — direct buyers to the enquiry form
+          shippingRate: {
+            "@type": "MonetaryAmount",
+            currency: "INR",
+            value: "0",
+            description:
+              "Shipping charges vary by location and order size. Contact us for a quote — garudaqua.in/enquire",
+          },
+          // Delivery window is indicative; actual timeline confirmed on enquiry
+          deliveryTime: {
+            "@type": "ShippingDeliveryTime",
+            handlingTime: {
+              "@type": "QuantitativeValue",
+              minValue: 1,
+              maxValue: 3,
+              unitCode: "DAY",
+            },
+            transitTime: {
+              "@type": "QuantitativeValue",
+              minValue: 2,
+              maxValue: 7,
+              unitCode: "DAY",
+            },
+            description:
+              "Estimated delivery 3–10 business days. Exact timeline confirmed on order. Contact us at garudaqua.in/enquire",
+          },
+          description:
+            "Shipping available across Rajasthan and neighbouring states. Charges and exact delivery dates provided on enquiry.",
         },
         hasMerchantReturnPolicy: {
           "@type": "MerchantReturnPolicy",
           applicableCountry: "IN",
           returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
           merchantReturnLink: `${SITE_URL}/enquire`,
+          returnFees: "https://schema.org/FreeReturn",
+          returnMethod: "https://schema.org/ReturnByMail",
           description:
-            "Only manufacturing defects are eligible for return/replacement after verification. For full policy details, please enquire.",
+            "Returns accepted only for manufacturing defects after verification. Contact us via the enquiry form for return requests.",
         },
       }
     : undefined;
@@ -293,7 +329,7 @@ export function articleSchema(blog: {
 }) {
   return {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: blog.title,
     description:
       blog.excerpt ||

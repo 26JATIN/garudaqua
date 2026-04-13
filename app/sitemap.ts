@@ -61,7 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const products = await prisma.product.findMany({
       where: { isActive: true },
-      select: { slug: true, updatedAt: true },
+      select: { slug: true, updatedAt: true, image: true },
       orderBy: { updatedAt: "desc" },
     });
     productRoutes = products.map((p) => ({
@@ -69,6 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: p.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,
+      images: p.image ? [p.image] : undefined,
     }));
   } catch {
     // DB unavailable at build time — skip dynamic routes
