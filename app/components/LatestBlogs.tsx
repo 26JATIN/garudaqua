@@ -66,19 +66,21 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                         >
                             {/* Image */}
                             {blog.featuredImage ? (
-                                <TransitionElement name={`blog-${blog.slug}`} className="relative h-48 sm:h-52 overflow-hidden w-full block">
-                                    <Image
-                                        src={blog.featuredImage}
-                                        alt={blog.title}
-                                        fill
-                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                        loading="lazy"
-                                    />
-                                    <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                </TransitionElement>
+                                <div className="relative aspect-video overflow-hidden w-full shrink-0">
+                                    <TransitionElement name={`blog-${blog.slug}`} className="absolute inset-0">
+                                        <Image
+                                            src={blog.featuredImage}
+                                            alt={blog.title}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                            loading="lazy"
+                                        />
+                                        <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    </TransitionElement>
+                                </div>
                             ) : (
-                                <div className="h-48 sm:h-52 bg-linear-to-br from-[#0EA5E9]/10 to-[#0369A1]/10 flex items-center justify-center">
+                                <div className="aspect-video bg-linear-to-br from-[#0EA5E9]/10 to-[#0369A1]/10 flex items-center justify-center shrink-0">
                                     <svg className="w-12 h-12 text-[#0EA5E9]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                                     </svg>

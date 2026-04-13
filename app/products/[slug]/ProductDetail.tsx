@@ -299,15 +299,15 @@ function RelatedProductCard({ product: relatedProduct }: { product: Product; ind
                     "relative z-10 bg-white dark:bg-[#0A0A0A] rounded-xl md:rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 transition-shadow duration-300 h-full flex flex-col",
                     isHovered && "shadow-xl"
                 )}>
-                    <div className="aspect-4/5 relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                    <div className="aspect-square relative overflow-hidden bg-gray-50 dark:bg-[#0A0A0A] p-3 flex items-center justify-center">
                         {relatedProduct.image ? (
                             <Image
                                 src={relatedProduct.image}
                                 alt={relatedProduct.name}
                                 fill
                                 className={cn(
-                                    "object-cover transition-transform duration-700",
-                                    isHovered && "scale-110"
+                                    "object-contain transition-transform duration-500 p-3",
+                                    isHovered && "scale-105"
                                 )}
                                 sizes="(max-width: 768px) 50vw, 25vw"
                                 quality={70}
