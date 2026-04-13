@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect, notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import BlogPostClient from "./BlogPostClient";
 import { articleSchema, breadcrumbSchema } from "@/lib/jsonld";
@@ -110,9 +110,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     },
   }).catch(() => null);
 
-  // 301 redirect if slug is an old formerSlug
+  // If blog accessed via a former slug, 301 permanent redirect to the canonical URL
   if (blogData && blogData.slug !== slug) {
-    redirect(`/blogs/${blogData.slug}`);
+    permanentRedirect(`/blogs/${blogData.slug}`);
   }
 
   if (!blogData) {

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { redirect, notFound } from 'next/navigation';
+import { permanentRedirect, notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ProductsPage from "../components/ProductsPage";
 import { collectionPageSchema } from '@/lib/jsonld';
@@ -233,7 +233,7 @@ export default async function Page({
     if (resolvedSubcategory) newParams.set("subcategory", resolvedSubcategory);
     if (search) newParams.set("search", search);
     if (sort) newParams.set("sort", sort);
-    redirect(`/products?${newParams.toString()}`);
+    permanentRedirect(`/products?${newParams.toString()}`);
   }
 
   return (
