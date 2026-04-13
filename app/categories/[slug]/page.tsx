@@ -1,5 +1,5 @@
 import "@/app/styles/blog-content.css";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -86,9 +86,9 @@ export default async function CategorySeoPage(
         notFound();
     }
 
-    // If accessed via a former slug, 301 redirect to the canonical URL
+    // If accessed via a former slug, 301 permanent redirect to the canonical URL
     if (categoryFull.slug && categoryFull.slug !== slug) {
-        redirect(`/categories/${categoryFull.slug}`);
+        permanentRedirect(`/categories/${categoryFull.slug}`);
     }
 
     const productPath = (p: { slug?: string; id: string }) => p.slug || p.id;

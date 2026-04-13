@@ -1,6 +1,6 @@
 import "@/app/styles/animations.css";
 import { Suspense } from "react";
-import { redirect, notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import ProductDetail from "./ProductDetail";
@@ -182,9 +182,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
-  // If an ObjectId was used in the URL and the product has a slug, 301 redirect to the clean URL
   if (canonicalSlug !== slug) {
-    redirect(`/products/${canonicalSlug}`);
+    permanentRedirect(`/products/${canonicalSlug}`);
   }
 
   return (
