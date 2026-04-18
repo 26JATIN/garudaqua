@@ -91,7 +91,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
     if (loading) {
         return (
             <section className="py-20 bg-linear-to-b from-gray-50 to-white dark:from-black dark:to-[#0A0A0A]">
-                <div className="container mx-auto px-4">
+                <div className="max-w-screen-2xl mx-auto px-4">
                     <div className="text-center mb-10">
                         <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-32 mx-auto mb-4 animate-pulse" />
                         <div className="h-8 bg-gray-200 dark:bg-white/10 rounded-lg w-64 mx-auto mb-3 animate-pulse" />
@@ -117,7 +117,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
 
     return (
         <section ref={ref as React.RefObject<HTMLElement>} className="py-20 bg-linear-to-b from-gray-50 to-white dark:from-black dark:to-[#0A0A0A] overflow-hidden">
-            <div className="container mx-auto px-4">
+            <div className="max-w-screen-2xl mx-auto px-4">
                 {/* Section Header */}
                 <div className="animate-on-view text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-light text-gray-900 dark:text-gray-100 mb-4">

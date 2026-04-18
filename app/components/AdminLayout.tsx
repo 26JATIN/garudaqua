@@ -4,6 +4,7 @@ import NavigationLink from "@/app/components/NavigationLink";
 import { useAdminAuth, AdminAuthProvider } from "../context/AdminAuthContext";
 import { useState, useEffect, useRef, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import AdminPushNotifications from "./AdminPushNotifications";
 
 // ===== Admin Login Screen =====
 function AdminLoginScreen() {
@@ -281,6 +282,7 @@ function AdminLayoutInner({ children }: { children: ReactNode }) {
                             <div className="hidden lg:flex items-center space-x-4 text-sm text-gray-600">
                                 <span>Welcome back, {user.name}</span>
                             </div>
+                            <AdminPushNotifications />
                             <div className="relative">
                                 <button
                                     onClick={() => setIsProfileOpen(!isProfileOpen)}

@@ -1,7 +1,7 @@
 export default function BlogsLoading() {
   return (
     <div className="min-h-screen bg-white dark:bg-black py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-screen-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 md:mb-12">
           <div className="h-3 w-24 mx-auto mb-2 skeleton-shimmer" />

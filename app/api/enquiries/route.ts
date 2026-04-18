@@ -4,6 +4,7 @@ import {
   sendEnquiryConfirmation,
   sendEnquiryNotificationToAdmin,
 } from "@/lib/email";
+import { sendPushNotifications } from "@/lib/webpush";
 
 export async function POST(request: Request) {
   try {
@@ -51,6 +52,14 @@ export async function POST(request: Request) {
       }
     });
 
+    // Fire push notifications to all registered admin devices (non-blocking)
+    const productLabel = body.product?.trim() ? ` — ${body.product.trim()}` : "";
+    sendPushNotifications({
+      title: "🔔 New Enquiry Received",
+      body: `${body.name.trim()}${productLabel}`,
+      url: "/admin/enquiries",
+    }).catch((err) => console.error("[push] Failed:", err));
+
     return NextResponse.json(
       { success: true, id: enquiry.id },
       { status: 201 }
@@ -63,3 +72,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

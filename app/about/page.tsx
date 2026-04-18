@@ -10,7 +10,7 @@ export default function AboutPage() {
 
     return (
         <main ref={ref as React.RefObject<HTMLElement>} className="min-h-screen bg-white dark:bg-[#0A0A0A] overflow-x-clip">
-            <section className="about-hero max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-4 sm:pt-18 pb-20">
+            <section className="about-hero max-w-screen-2xl mx-auto px-4 sm:px-8 lg:px-12 pt-4 sm:pt-18 pb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
                     {/* Left — headline */}
@@ -116,7 +116,7 @@ export default function AboutPage() {
             </section>
 
             {/* Mission statement — full-width teal card */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pb-6">
+            <section className="max-w-screen-2xl mx-auto px-4 sm:px-8 lg:px-12 pb-6">
                 <div className="animate-on-view">
                     <WobbleCard containerClassName="bg-[linear-gradient(135deg,#0a7c6e,#0e7490,#0e6fa5)] w-full">
                         <p className="text-white font-bold text-2xl sm:text-3xl lg:text-[2.6rem] leading-[1.2] max-w-4xl">
@@ -128,7 +128,7 @@ export default function AboutPage() {
             </section>
 
             {/* How We Help — left heading + right service cards */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-14">
+            <section className="max-w-screen-2xl mx-auto px-4 sm:px-8 lg:px-12 py-14">
                 <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10 items-start">
 
                     {/* Left heading */}
@@ -409,7 +409,7 @@ export default function AboutPage() {
             />
 
             {/* Final CTA */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pb-24">
+            <section className="max-w-screen-2xl mx-auto px-4 sm:px-8 lg:px-12 pb-24">
 
                 {/* Eyebrow + heading */}
                 <div className="animate-on-view text-center mb-12">

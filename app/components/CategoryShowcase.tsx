@@ -489,7 +489,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
   }, [displayedProducts, selectedCategory, handleProductClick]);
 
   return (
-    <section ref={sectionRef} className="bg-white dark:bg-black py-6 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+    <section ref={sectionRef} className="bg-white dark:bg-black py-6 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-24">
       {/* Mobile: "Explore Categories" heading — scrolls away naturally */}
       <div className={`lg:hidden flex items-end justify-between mb-4 transform transition-all duration-300 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 hover:text-[#0EA5E9] transition-colors cursor-default leading-tight">
@@ -655,7 +655,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
 
             {/* Categories Grid */}
             {isLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i} className="rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-white/50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-white/6 h-full flex flex-col">
                     <div className="aspect-square rounded-xl sm:rounded-2xl skeleton-loader" />
@@ -670,7 +670,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
               <>
                 <div
                   key={selectedCategory}
-                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
+                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
                 >
                   {renderedProducts}
                 </div>

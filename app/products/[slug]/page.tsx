@@ -199,7 +199,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <Suspense
         fallback={
           <div className="min-h-screen pt-4 md:pt-6 lg:pt-8 bg-linear-to-b from-white to-[#FAFAFA] dark:from-black dark:to-[#0A0A0A]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                 <div className="aspect-square bg-gray-200 dark:bg-gray-800 rounded-2xl shimmer"></div>
                 <div className="space-y-4 py-4">

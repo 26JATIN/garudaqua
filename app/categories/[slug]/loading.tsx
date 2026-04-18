@@ -4,7 +4,7 @@ export default function CategoryDetailLoading() {
       {/* Hero banner */}
       <div className="relative min-h-72 sm:min-h-96 lg:min-h-[55vh] skeleton-shimmer rounded-none" />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 lg:py-14">
+      <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 lg:py-14">
         {/* Category title & description */}
         <div className="mb-8 space-y-3">
           <div className="h-8 w-56 skeleton-shimmer rounded-lg" />

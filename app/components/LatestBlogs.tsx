@@ -28,7 +28,7 @@ interface LatestBlogsProps {
 export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
     return (
         <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-[#060606]">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-screen-2xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 sm:mb-12">
                     <div>

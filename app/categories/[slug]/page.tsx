@@ -132,7 +132,7 @@ export default async function CategorySeoPage(
                 <div className="absolute inset-0 bg-linear-to-r from-black/40 via-transparent to-transparent pointer-events-none" />
 
                 {/* Content overlay — also pointer-events-none, links get pointer-events back */}
-                <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 lg:pb-16 pt-28 sm:pt-36 pointer-events-none">
+                <div className="relative w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 lg:pb-16 pt-28 sm:pt-36 pointer-events-none">
                     {/* Breadcrumb */}
                     <nav className="flex flex-wrap items-center gap-1.5 text-xs sm:text-sm text-gray-300/90 mb-5 sm:mb-6 pointer-events-auto">
                         <Link href="/" className="hover:text-white transition-colors">Home</Link>
@@ -175,7 +175,7 @@ export default async function CategorySeoPage(
 
             {/* Products Section */}
             {categoryFull.products.length > 0 && (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
                     <div className="flex items-center gap-3 mb-6 sm:mb-8">
                         <div className="w-1 h-7 rounded-full bg-linear-to-b from-[#0EA5E9] to-[#0284C7]" />
                         <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
@@ -226,7 +226,7 @@ export default async function CategorySeoPage(
 
             {/* SEO Content Section */}
             {promotedSeoContent && (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 lg:pb-28">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 lg:pb-28">
                     <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 lg:p-14 shadow-sm border border-gray-100 dark:border-white/6">
                         <div className="flex items-center gap-3 mb-6 sm:mb-8 max-w-4xl mx-auto">
                             <div className="w-1 h-7 rounded-full bg-linear-to-b from-[#0EA5E9] to-[#0284C7]" />
@@ -243,7 +243,7 @@ export default async function CategorySeoPage(
 
             {/* No SEO content & no products fallback */}
             {!categoryFull.seoContent && categoryFull.products.length === 0 && (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
                     <div className="text-center py-16 bg-white dark:bg-[#111] rounded-2xl border border-dashed border-gray-200 dark:border-gray-800 max-w-xl mx-auto">
                         <div className="w-16 h-16 bg-[#0EA5E9]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <svg className="w-8 h-8 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

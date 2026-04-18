@@ -344,7 +344,7 @@ export default function ProductsPage({
 
     return (
         <div className="min-h-screen bg-linear-to-b from-white via-[#FAFAFA] to-white dark:from-black dark:via-[#050505] dark:to-black pt-4 md:pt-6 lg:pt-8 pb-6 md:pb-8 lg:pb-12">
-            <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+            <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
                 {/* Header */}
                 <div
                     className="text-center mb-6 md:mb-8 lg:mb-10"
@@ -713,7 +713,7 @@ export default function ProductsPage({
                         <div
                             className={
                                     viewMode === "grid"
-                                        ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8"
+                                        ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 lg:gap-8"
                                         : "space-y-4"
                                 }
                             >

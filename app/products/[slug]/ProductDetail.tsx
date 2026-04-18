@@ -163,7 +163,7 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
                                     src={img}
                                     alt={imageAlts !== undefined && imageAlts[index] ? imageAlts[index] : `${productName} ${index + 1}`}
                                     fill
-                                    className="object-cover"
+                                    className="object-contain"
                                     priority={index === 0}
                                     fetchPriority={index === 0 ? "high" : "auto"}
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -182,23 +182,35 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
                 )}
             </div>
 
-            {/* Dot indicators */}
+            {/* Thumbnail strip — replaces dots for cleaner mobile UX */}
             {images.length > 1 && (
-                <div className="flex justify-center gap-0 mt-3">
-                    {images.map((_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => { setActiveIndex(index); onIndexChange?.(index); }}
-                            className="p-3 flex items-center justify-center"
-                            aria-label={`View image ${index + 1}`}
-                        >
-                            <span className={`block rounded-full transition-all duration-300 ${
-                                activeIndex === index
-                                    ? "w-6 h-2 bg-[#0EA5E9]"
-                                    : "w-2 h-2 bg-gray-300 dark:bg-gray-600"
-                            }`} />
-                        </button>
-                    ))}
+                <div className="relative mt-3">
+                    {/* Fade hints on left/right when strip overflows */}
+                    <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-r from-white dark:from-black to-transparent z-10 rounded-l-xl" />
+                    <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-5 bg-gradient-to-l from-white dark:from-black to-transparent z-10 rounded-r-xl" />
+                    <div
+                        className="flex gap-2 overflow-x-auto px-1 pb-0.5"
+                        style={{ scrollbarWidth: 'none', scrollSnapType: 'x mandatory' }}
+                    >
+                        {images.map((img, index) => (
+                            <button
+                                key={index}
+                                onClick={() => { setActiveIndex(index); onIndexChange?.(index); }}
+                                style={{ scrollSnapAlign: 'center', flexShrink: 0 }}
+                                className={`w-14 h-14 rounded-xl overflow-hidden transition-transform duration-200 active:scale-95 bg-white dark:bg-[#0A0A0A] hover:scale-105 ${
+                                    activeIndex === index ? 'scale-[1.08]' : ''
+                                }`}
+                                aria-label={`View image ${index + 1}`}
+                            >
+                                <img
+                                    src={img}
+                                    alt={imageAlts?.[index] ?? `${productName} ${index + 1}`}
+                                    className="w-full h-full object-contain"
+                                    loading={index < 3 ? 'eager' : 'lazy'}
+                                />
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
 
@@ -210,7 +222,7 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
 function ProductDetailSkeleton() {
     return (
         <div className="min-h-screen bg-linear-to-b from-white via-[#FAFAFA] to-white dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] pt-4 md:pt-6 lg:pt-8 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumb skeleton */}
                 <div className="flex items-center space-x-2 mb-8">
                     <div className="h-4 w-12 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
@@ -347,6 +359,26 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
     const hasInitialData = !!(initialProduct);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
+
+    // Bidirectional image ↔ variant sync
+    // When an image is selected (thumbnail click or swipe), also auto-select the
+    // variant (color swatch) whose imageUrl maps to that image.
+    const handleImageSelect = (index: number, product_ref?: typeof product) => {
+        const p = product_ref ?? product;
+        setActiveImageIndex(index);
+        if (!p || !p.hasVariants || !p.variantOptions) return;
+        const img = (p.images && p.images.length > 0 ? p.images : p.image ? [p.image] : [])[index];
+        if (!img) return;
+        for (const option of p.variantOptions) {
+            const matched = option.values?.find(v => v.imageUrl === img);
+            if (matched) {
+                setSelectedColor(matched.name);
+                return; // Only update for the first matching option (color)
+            }
+        }
+        // No specific variant maps to this image — clear color selection
+        setSelectedColor(null);
+    };
     const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
     const [relatedProducts, setRelatedProducts] = useState<Product[]>(initialRelated ?? []);
     const [loading, setLoading] = useState(!hasInitialData);
@@ -433,7 +465,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
     if (notFound || !product) {
         return (
             <div className="min-h-screen pt-4 md:pt-6 lg:pt-8 bg-linear-to-b from-white to-[#FAFAFA] dark:from-black dark:to-[#0A0A0A]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div
                         className="text-center py-20"
                     >
@@ -497,7 +529,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
 
     return (
         <div className="min-h-screen bg-linear-to-b from-white via-[#FAFAFA] to-white dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] pt-4 md:pt-6 lg:pt-8 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Breadcrumb */}
                 <nav className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-8">
                     <NavigationLink href="/" className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all font-medium border border-transparent dark:border-white/5 shadow-xs">
@@ -528,109 +560,134 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                 </nav>
 
                 {/* Product Details */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-[44%_1fr] gap-8 md:gap-10 lg:gap-16 xl:gap-20 mb-16">
                     {/* Images Section */}
                     <TransitionElement
                         name={`product-${productSlug}`}
-                        className="space-y-4"
+                        className=""
                     >
-                        {/* Unified Image Gallery */}
+                        {/* ── Mobile: swipeable gallery ───────────────────── */}
                         {displayImages.length > 0 && (
-                            <div className="w-full">
+                            <div className="md:hidden w-full">
                                 <MobileImageGallery
                                     images={displayImages}
                                     imageAlts={imageAlts}
                                     productName={product.name}
                                     controlledIndex={activeImageIndex}
-                                    onIndexChange={setActiveImageIndex}
+                                    onIndexChange={(idx) => handleImageSelect(idx)}
                                 />
                             </div>
                         )}
-
-
-
-                        {/* Desktop Thumbnail Images */}
-                        {displayImages.length > 1 && (
-                            <div className="hidden lg:grid grid-cols-4 gap-4">
-                                {displayImages.map((img, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setActiveImageIndex(index)}
-                                        className={`aspect-square rounded-2xl overflow-hidden transition-all duration-200 hover:scale-105 active:scale-95 ${
-                                            activeImageIndex === index
-                                                ? "ring-4 ring-[#0EA5E9] shadow-lg"
-                                                : "ring-2 ring-gray-200 dark:ring-white/6 hover:ring-[#0EA5E9]/50"
-                                        }`}
-                                    >
-                                        <Image
-                                            src={img}
-                                            alt={imageAlts[index] || `${product.name} ${index + 1}`}
-                                            width={200}
-                                            height={200}
-                                            className="object-cover w-full h-full"
-                                            quality={60}
-                                        />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* No-image fallback for mobile */}
                         {displayImages.length === 0 && (
-                            <div className="lg:hidden aspect-square rounded-3xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                            <div className="md:hidden aspect-square rounded-3xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                                 <svg className="w-20 h-20 text-[#0EA5E9] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                 </svg>
                             </div>
                         )}
+
+                        {/* ── Desktop: vertical thumbnail rail + main image ─ */}
+                        <div
+                            className="hidden md:flex gap-3 xl:gap-4 items-start md:sticky md:self-start"
+                            style={{ top: 'max(5.5rem, calc(50svh - 50%))' }}
+                        >
+                            {/* Vertical thumbnail strip */}
+                            {displayImages.length > 1 && (
+                                <div className="flex flex-col gap-2.5 w-[72px] xl:w-[84px] shrink-0">
+                                    {displayImages.slice(0, 6).map((img, index) => {
+                                        const isActive = activeImageIndex === index;
+                                        // Last visible slot: show +N overlay if more images exist beyond 6
+                                        const isLastSlot = index === 5 && displayImages.length > 6;
+                                        const overflowCount = displayImages.length - 6;
+                                        return (
+                                            <button
+                                                key={index}
+                                                onClick={() => handleImageSelect(index)}
+                                                className={`relative aspect-square w-full rounded-xl xl:rounded-2xl overflow-hidden transition-transform duration-200 hover:scale-105 active:scale-95 shrink-0 bg-white dark:bg-[#0A0A0A] ${
+                                                    isActive ? 'scale-[1.08]' : ''
+                                                }`}
+                                            >
+                                                <Image
+                                                    src={img}
+                                                    alt={imageAlts[index] || `${product.name} ${index + 1}`}
+                                                    width={84}
+                                                    height={84}
+                                                    className="object-contain w-full h-full"
+                                                    quality={55}
+                                                />
+                                                {/* +N overlay on the 6th thumbnail */}
+                                                {isLastSlot && (
+                                                    <div className="absolute inset-0 bg-black/55 flex items-center justify-center rounded-xl xl:rounded-2xl">
+                                                        <span className="text-white text-sm font-semibold leading-none">+{overflowCount}</span>
+                                                    </div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {/* Main large image */}
+                            <div className="flex-1 relative aspect-square rounded-3xl overflow-hidden bg-white dark:bg-[#0A0A0A] border border-gray-100 dark:border-white/6 shadow-sm">
+                                {displayImages.length > 0 ? (
+                                    <Image
+                                        src={displayImages[activeImageIndex]}
+                                        alt={imageAlts[activeImageIndex] || product.name}
+                                        fill
+                                        className="object-contain transition-opacity duration-300"
+                                        priority
+                                        sizes="(min-width: 1280px) 45vw, (min-width: 1024px) 52vw, 100vw"
+                                        quality={85}
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <svg className="w-24 h-24 text-[#0EA5E9] opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                    </div>
+                                )}
+                                {/* Image counter badge */}
+                                {displayImages.length > 1 && (
+                                    <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
+                                        {activeImageIndex + 1} / {displayImages.length}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </TransitionElement>
 
                     {/* Product Info Section */}
-                    <div
-                        className="space-y-6"
-                    >
-                        {/* Category & Share */}
-                        <div className="flex items-center justify-between">
-                            <div className="inline-flex items-center gap-2">
-                                <span className="bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium px-4 py-2 rounded-full inline-flex items-center gap-2">
-                                    {categoryName}
-                                    {typeof product.category === 'object' && product.category.hasSeoPage && (
-                                        <NavigationLink 
-                                            href={`/categories/${categorySlug}`}
-                                            className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0EA5E9]/20 hover:bg-[#0EA5E9]/30 transition-colors"
-                                            title="View Category Details"
-                                        >
-                                            <span className="text-xs font-bold font-serif leading-none">i</span>
-                                        </NavigationLink>
-                                    )}
-                                </span>
-                                {product.subcategory?.name && (
-                                    <span className="bg-[#0369A1]/10 text-[#0369A1] text-sm font-medium px-4 py-2 rounded-full">
-                                        {product.subcategory.name}
-                                    </span>
+                    <div className="space-y-6">
+                        {/* Category badges */}
+                        <div className="flex items-center flex-wrap gap-2">
+                            <span className="bg-[#0EA5E9]/10 text-[#0EA5E9] text-sm font-medium px-4 py-1.5 rounded-full inline-flex items-center gap-2">
+                                {categoryName}
+                                {typeof product.category === 'object' && product.category.hasSeoPage && (
+                                    <NavigationLink
+                                        href={`/categories/${categorySlug}`}
+                                        className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#0EA5E9]/20 hover:bg-[#0EA5E9]/30 transition-colors"
+                                        title="View Category Details"
+                                    >
+                                        <span className="text-xs font-bold font-serif leading-none">i</span>
+                                    </NavigationLink>
                                 )}
-                            </div>
-                            <button
-                                onClick={handleShare}
-                                className="p-2.5 rounded-xl bg-gray-100 dark:bg-white/8 hover:bg-[#0EA5E9]/15 text-gray-600 dark:text-gray-400 hover:text-[#0EA5E9] transition-all duration-200"
-                                aria-label="Share product"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                </svg>
-                            </button>
+                            </span>
+                            {product.subcategory?.name && (
+                                <span className="bg-[#0369A1]/10 text-[#0369A1] text-sm font-medium px-4 py-1.5 rounded-full">
+                                    {product.subcategory.name}
+                                </span>
+                            )}
                         </div>
 
                         {/* Product Name */}
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-[#2C2C2C] dark:text-gray-100 leading-tight">
+                        <h1 className="text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-semibold text-[#2C2C2C] dark:text-gray-100 leading-tight tracking-tight">
                             {product.name}
                         </h1>
 
                         {/* Description */}
                         {product.description && (
-                            <div>
-                                <h2 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100 mb-3">Description</h2>
-                                <p className="text-gray-600 dark:text-gray-400 font-light leading-relaxed">
+                            <div className="border-t border-gray-100 dark:border-white/6 pt-5">
+                                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-[15px]">
                                     {product.description}
                                 </p>
                             </div>
@@ -727,65 +784,87 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
 
                         {/* Specifications */}
                         {product.specs && product.specs.length > 0 && (
-                            <div className="bg-linear-to-br from-[#FAFAFA] to-white dark:from-[#0A0A0A] dark:to-[#111] rounded-2xl p-6 space-y-3 border border-gray-200 dark:border-white/6">
-                                <h2 className="text-lg font-light text-[#2C2C2C] dark:text-gray-100 mb-4">Specifications</h2>
-                                {product.specs.map((spec, i) => (
-                                    <div key={i} className="flex justify-between items-center">
-                                        <span className="text-gray-600 dark:text-gray-400 font-light">{spec.label}:</span>
-                                        <span className="text-[#2C2C2C] dark:text-gray-200 font-medium">{spec.value}</span>
-                                    </div>
-                                ))}
+                            <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-white/6">
+                                <div className="px-5 py-3.5 bg-gray-50 dark:bg-white/3 border-b border-gray-200 dark:border-white/6">
+                                    <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Specifications</h2>
+                                </div>
+                                <div className="divide-y divide-gray-100 dark:divide-white/5">
+                                    {product.specs.map((spec, i) => (
+                                        <div
+                                            key={i}
+                                            className={`flex justify-between items-center px-5 py-3 ${
+                                                i % 2 === 1 ? "bg-gray-50/60 dark:bg-white/[0.02]" : ""
+                                            }`}
+                                        >
+                                            <span className="text-[13px] text-gray-500 dark:text-gray-400 font-medium">{spec.label}</span>
+                                            <span className="text-[13px] text-[#2C2C2C] dark:text-gray-200 font-semibold text-right max-w-[60%]">{spec.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
-                        {/* Enquire Button */}
-                        <NavigationLink href={`/enquire?product=${encodeURIComponent(product.name)}`}>
+                        {/* CTA Row: Enquire + Share */}
+                        <div className="flex gap-3 pt-1">
+                            <NavigationLink href={`/enquire?product=${encodeURIComponent(product.name)}`} className="flex-1">
+                                <button className="w-full h-14 rounded-2xl font-medium text-base flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-[#0EA5E9]/25 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white hover:shadow-xl hover:shadow-[#0EA5E9]/30 hover:scale-[1.02] active:scale-[0.98]">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    Enquire Now
+                                </button>
+                            </NavigationLink>
                             <button
-                                className="w-full py-4 px-8 rounded-full font-light text-lg flex items-center justify-center gap-3 transition-all duration-200 shadow-lg bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white hover:shadow-xl hover:scale-105 active:scale-95"
+                                onClick={handleShare}
+                                className="h-14 w-14 shrink-0 rounded-2xl bg-gray-100 dark:bg-white/8 hover:bg-[#0EA5E9]/10 text-gray-500 dark:text-gray-400 hover:text-[#0EA5E9] transition-all duration-200 flex items-center justify-center"
+                                aria-label="Share product"
                             >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                                 </svg>
-                                Enquire Now
                             </button>
-                        </NavigationLink>
+                        </div>
 
-                        {/* Features */}
-                        <div className={`grid grid-cols-2 gap-3 pt-6 ${product.guarantee ? "sm:grid-cols-3" : ""}`}>
-                            <div className="flex items-center gap-2.5">
-                                <div className="w-10 h-10 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-                                    <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        {/* Trust badges strip */}
+                        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100 dark:border-white/6">
+                            <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gray-50/70 dark:bg-white/[0.03]">
+                                <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <div>
-                                    <p className="text-xs sm:text-sm font-medium text-[#2C2C2C] dark:text-gray-200">ISI Certified</p>
-                                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-light">Quality Assured</p>
-                                </div>
+                                <p className="text-[11px] font-semibold text-[#2C2C2C] dark:text-gray-200 text-center">ISI Certified</p>
+                                <p className="text-[10px] text-gray-400 font-light text-center">Quality Assured</p>
                             </div>
-                            {product.guarantee && (
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-10 h-10 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-                                        <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {product.guarantee ? (
+                                <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gray-50/70 dark:bg-white/[0.03]">
+                                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                        <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                         </svg>
                                     </div>
-                                    <div>
-                                        <p className="text-xs sm:text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Guarantee</p>
-                                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-light">{product.guarantee}</p>
+                                    <p className="text-[11px] font-semibold text-[#2C2C2C] dark:text-gray-200 text-center">Guarantee</p>
+                                    <p className="text-[10px] text-gray-400 font-light text-center">{product.guarantee}</p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gray-50/70 dark:bg-white/[0.03]">
+                                    <div className="w-8 h-8 rounded-full bg-violet-500/10 flex items-center justify-center">
+                                        <svg className="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
                                     </div>
+                                    <p className="text-[11px] font-semibold text-[#2C2C2C] dark:text-gray-200 text-center">Fast Supply</p>
+                                    <p className="text-[10px] text-gray-400 font-light text-center">Quick Delivery</p>
                                 </div>
                             )}
-                            <div className="flex items-center gap-2.5">
-                                <div className="w-10 h-10 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-                                    <svg className="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gray-50/70 dark:bg-white/[0.03]">
+                                <div className="w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center">
+                                    <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                 </div>
-                                <div>
-                                    <p className="text-xs sm:text-sm font-medium text-[#2C2C2C] dark:text-gray-200">Trusted Brand</p>
-                                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-light">A Bond of Trust</p>
-                                </div>
+                                <p className="text-[11px] font-semibold text-[#2C2C2C] dark:text-gray-200 text-center">Trusted Brand</p>
+                                <p className="text-[10px] text-gray-400 font-light text-center">Since Inception</p>
                             </div>
                         </div>
                     </div>
