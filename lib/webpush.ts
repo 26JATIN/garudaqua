@@ -11,6 +11,7 @@ interface PushPayload {
   title: string;
   body: string;
   url?: string;
+  tag?: string;
 }
 
 export async function sendPushNotifications(payload: PushPayload): Promise<void> {
@@ -26,7 +27,12 @@ export async function sendPushNotifications(payload: PushPayload): Promise<void>
             endpoint: sub.endpoint,
             keys: { p256dh: sub.p256dh, auth: sub.auth },
           },
-          JSON.stringify(payload)
+          JSON.stringify({
+            ...payload,
+            // Unique tag per notification so browser never deduplicates/replaces;
+            // without this, tag:"new-enquiry" collapses rapid submissions into one.
+            tag: payload.tag ?? `enquiry-${Date.now()}`,
+          })
         );
       } catch (err: unknown) {
         const status = (err as { statusCode?: number }).statusCode;

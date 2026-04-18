@@ -1,4 +1,4 @@
-// Garud Aqua Admin — Push Notification Service Worker v1
+// Garud Aqua Admin — Push Notification Service Worker v2
 // Handles Web Push events only. Does NOT cache anything.
 
 self.addEventListener("install", (event) => {
@@ -24,7 +24,7 @@ self.addEventListener("push", (event) => {
       body: data.body,
       icon: "/icons/admin-icon-192x192.png",
       badge: "/icons/admin-icon-72x72.png",
-      tag: "new-enquiry",
+      tag: data.tag || `enquiry-${Date.now()}`,
       renotify: true,
       data: { url: data.url || "/admin/enquiries" },
       actions: [
@@ -38,25 +38,29 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
+  // Dismiss action: do nothing
   if (event.action === "dismiss") return;
 
-  const targetUrl = (event.notification.data && event.notification.data.url) || "/admin/enquiries";
+  // Build absolute URL — relative paths don't work reliably in SW context
+  const relativePath = (event.notification.data && event.notification.data.url) || "/admin/enquiries";
+  const targetUrl = relativePath.startsWith("http")
+    ? relativePath
+    : self.location.origin + relativePath;
 
   event.waitUntil(
     self.clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((clientList) => {
-        // Focus an existing admin window if one is open
+        // If an admin window is already open, navigate it and focus
         for (const client of clientList) {
-          if (client.url.includes("/admin") && "focus" in client) {
-            client.navigate(targetUrl);
-            return client.focus();
+          if (client.url.startsWith(self.location.origin) && "navigate" in client) {
+            return client.navigate(targetUrl).then((navigatedClient) => {
+              return navigatedClient ? navigatedClient.focus() : null;
+            });
           }
         }
-        // Otherwise open a new window
-        if (self.clients.openWindow) {
-          return self.clients.openWindow(targetUrl);
-        }
+        // No window open → open a new tab directly to the enquiries page
+        return self.clients.openWindow(targetUrl);
       })
   );
 });

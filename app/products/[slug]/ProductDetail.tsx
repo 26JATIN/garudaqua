@@ -589,7 +589,7 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                         {/* ── Desktop: vertical thumbnail rail + main image ─ */}
                         <div
                             className="hidden md:flex gap-3 xl:gap-4 items-start md:sticky md:self-start"
-                            style={{ top: 'max(5.5rem, calc(50svh - 50%))' }}
+                            style={{ top: 'max(7rem, calc(50svh - 50%))' }}
                         >
                             {/* Vertical thumbnail strip */}
                             {displayImages.length > 1 && (
