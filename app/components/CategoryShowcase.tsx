@@ -655,7 +655,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
 
             {/* Categories Grid */}
             {isLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i} className="rounded-2xl sm:rounded-3xl p-2 sm:p-3 bg-white/50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-white/6 h-full flex flex-col">
                     <div className="aspect-square rounded-xl sm:rounded-2xl skeleton-loader" />
@@ -670,7 +670,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
               <>
                 <div
                   key={selectedCategory}
-                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
+                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10"
                 >
                   {renderedProducts}
                 </div>

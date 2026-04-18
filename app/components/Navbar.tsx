@@ -97,16 +97,9 @@ export default function Navbar() {
         };
     }, [isSidebarOpen]);
 
-    // Lock page scroll when any desktop dropdown is hovered
-    useEffect(() => {
-        if (dropdownHovered) {
-            document.body.style.overflow = 'hidden';
-            document.documentElement.style.overflow = 'hidden';
-        } else if (!isSidebarOpen) {
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-        }
-    }, [dropdownHovered, isSidebarOpen]);
+    // NOTE: No body scroll-lock for desktop dropdowns — locking overflow causes
+    // scrollbar to vanish and shifts layout by ~15px. Dropdowns have their own
+    // internal scroll (max-h + overflow-y-auto), so background lock is unnecessary.
 
     return (
         <>
