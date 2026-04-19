@@ -67,22 +67,24 @@ export default function AdminPushNotifications() {
     }
     setPermission(Notification.permission as Permission);
 
-    // If already granted, make sure we have a subscription registered
+    // If already granted, ensure the current subscription is saved in DB
+    // (handles case where DB entry was deleted by 410 cleanup but browser still has it)
     if (Notification.permission === "granted") {
       void (async () => {
         const reg = await getAdminSW();
         if (!reg) return;
-        const existing = await reg.pushManager.getSubscription();
-        if (!existing) {
-          // Re-subscribe silently (e.g. after browser cleared subscriptions)
-          const sub = await subscribeToPush(reg);
-          if (sub) {
-            await fetch("/api/push/subscribe", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(sub.toJSON()),
-            });
-          }
+        let sub = await reg.pushManager.getSubscription();
+        if (!sub) {
+          // Browser cleared subscription — re-subscribe from scratch
+          sub = await subscribeToPush(reg);
+        }
+        if (sub) {
+          // Always upsert to DB so it's never out of sync
+          await fetch("/api/push/subscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(sub.toJSON()),
+          });
         }
       })();
     }
