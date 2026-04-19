@@ -11,7 +11,7 @@ interface Blog {
     slug: string;
     title: string;
     excerpt: string;
-    content: string;
+    content?: string;
     featuredImage?: string;
     category: string;
     categoryId: string | null;

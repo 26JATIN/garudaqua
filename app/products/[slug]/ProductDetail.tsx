@@ -209,7 +209,7 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
                                     height={56}
                                     className="w-full h-full object-contain"
                                     quality={40}
-                                    loading={index < 3 ? 'eager' : 'lazy'}
+                                    loading="eager"
                                 />
                             </button>
                         ))}

@@ -125,6 +125,7 @@ export default async function CategorySeoPage(
                     priority
                     fetchPriority="high"
                     decoding="sync"
+                    quality={85}
                 />
 
                 {/* Gradient overlays — pointer-events-none so image stays copyable */}
@@ -198,6 +199,7 @@ export default async function CategorySeoPage(
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                                            quality={50}
                                         />
                                     ) : (
                                         <div className="absolute inset-0 flex items-center justify-center">

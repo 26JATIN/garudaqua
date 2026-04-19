@@ -31,9 +31,25 @@ async function getInitialData() {
     }),
     prisma.blogPost.findMany({
       where: { isPublished: true },
-      include: { blogCategory: { select: { name: true } } },
       orderBy: { publishedAt: 'desc' },
       take: 1000,
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        featuredImage: true,
+        category: true,
+        categoryId: true,
+        tags: true,
+        readTime: true,
+        publishedAt: true,
+        author: true,
+        isPublished: true,
+        createdAt: true,
+        updatedAt: true,
+        blogCategory: { select: { name: true } },
+      },
     }),
   ]);
 

@@ -135,7 +135,19 @@ export default function Navbar() {
                             {/* Center Search Bar */}
                             <div className="flex-1 max-w-xl mx-12 flex items-center gap-2">
                                 <div className="flex-1">
-                                    <Suspense fallback={<div className="h-12 bg-white/60 dark:bg-white/6 rounded-2xl" />}>
+                                    <Suspense fallback={
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                placeholder="Search for water tanks, pipes..."
+                                                className="w-full px-6 py-4 text-sm bg-white/60 dark:bg-white/6 backdrop-blur-lg border border-white/30 dark:border-white/10 rounded-2xl outline-none shadow-sm pr-20 placeholder:text-gray-500 dark:placeholder:text-gray-400 dark:text-gray-100 lg:px-6 lg:py-4 sm:px-4 sm:py-3 cursor-text"
+                                            />
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                            </div>
+                                        </div>
+                                    }>
                                         <LazySearchBar />
                                     </Suspense>
                                 </div>
@@ -337,7 +349,19 @@ export default function Navbar() {
                     </NavigationLink>
                     {/* Search Bar */}
                     <div className="flex-1">
-                        <Suspense fallback={<div className="h-12 bg-white/60 dark:bg-white/6 rounded-2xl" />}>
+                        <Suspense fallback={
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    placeholder="Search water tanks, pipes..."
+                                    className="w-full px-6 py-4 text-sm bg-white/60 dark:bg-white/6 backdrop-blur-lg border border-white/30 dark:border-white/10 rounded-2xl outline-none shadow-sm pr-20 placeholder:text-gray-500 dark:placeholder:text-gray-400 dark:text-gray-100 lg:px-6 lg:py-4 sm:px-4 sm:py-3 cursor-text"
+                                />
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                </div>
+                            </div>
+                        }>
                             <LazySearchBar placeholder="Search water tanks, pipes..." />
                         </Suspense>
                     </div>

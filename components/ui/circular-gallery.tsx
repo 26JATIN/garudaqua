@@ -106,6 +106,8 @@ export default function ScrollGallery({
               sizes="(max-width: 640px) 260px, (max-width: 1024px) 30vw, 400px"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               draggable={false}
+              quality={50}
+              loading="lazy"
             />
             {/* Gradient overlay */}
             <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />

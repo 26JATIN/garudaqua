@@ -121,6 +121,7 @@ export default async function CategoriesIndexPage() {
                                         fetchPriority={index < 4 ? "high" : "auto"}
                                         decoding={index < 4 ? "sync" : "async"}
                                         loading={index < 4 ? undefined : "lazy"}
+                                        quality={50}
                                     />
                                 ) : (
                                     <svg className="w-16 h-16 text-gray-200 dark:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
