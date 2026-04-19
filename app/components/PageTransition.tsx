@@ -64,7 +64,6 @@ function PageTransitionInner({ children }: { children: React.ReactNode }) {
     const handleGlobalClick = (e: MouseEvent) => {
       // Only handle left-clicks without modifier keys
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      if (e.defaultPrevented) return;
 
       // Walk up the DOM to find the closest <a> tag
       let target = e.target as HTMLElement | null;
@@ -93,11 +92,14 @@ function PageTransitionInner({ children }: { children: React.ReactNode }) {
       const currentPath = pathnameRef.current;
       if (href === currentPath) return;
 
-      // This is an internal navigation — trigger loading immediately
-      // Don't preventDefault — let Next.js <Link> handle navigation normally
-      // We just set the loading state so the overlay appears instantly
-      setIsTransitioning(true);
-      pendingHref.current = href;
+      // Defer to a microtask so that synchronous onClick handlers
+      // (which may call e.preventDefault() for client-side filtering)
+      // run first. If the click was prevented, don't start the loading bar.
+      queueMicrotask(() => {
+        if (e.defaultPrevented) return;
+        setIsTransitioning(true);
+        pendingHref.current = href;
+      });
     };
 
     document.addEventListener("click", handleGlobalClick, true); // capture phase
@@ -110,14 +112,40 @@ function PageTransitionInner({ children }: { children: React.ReactNode }) {
     pendingHref.current = null;
   }, [pathname, searchParams]);
 
-  // Reset on browser back/forward buttons
+  // Reset on browser back/forward buttons and page visibility changes
   useEffect(() => {
-    const handlePopState = () => {
+    const resetTransition = () => {
       setIsTransitioning(false);
       pendingHref.current = null;
     };
+
+    // popstate fires on back/forward — reset immediately and also
+    // schedule a deferred reset in case React re-render lags behind
+    const handlePopState = () => {
+      resetTransition();
+      // Secondary reset catches edge cases where a 301 redirect
+      // causes a re-navigation before React processes the first reset
+      setTimeout(resetTransition, 100);
+    };
+
+    // pagehide fires when navigating away (including hard 301 redirects)
+    // so we cleanly reset state before the page is replaced
+    const handlePageHide = () => resetTransition();
+
+    // visibilitychange catches the case where the user switches tabs
+    // during a long transition (e.g., redirect chain over slow network)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") resetTransition();
+    };
+
     window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    window.addEventListener("pagehide", handlePageHide);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("pagehide", handlePageHide);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   // Safety timeout: if route takes too long, reset the loading state
@@ -126,7 +154,7 @@ function PageTransitionInner({ children }: { children: React.ReactNode }) {
     const timeout = setTimeout(() => {
       setIsTransitioning(false);
       pendingHref.current = null;
-    }, 8000);
+    }, 5000);
     return () => clearTimeout(timeout);
   }, [isTransitioning]);
 
