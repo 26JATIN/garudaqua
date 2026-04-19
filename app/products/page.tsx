@@ -68,17 +68,17 @@ export async function generateMetadata({
 
 
 // Build a Cloudinary URL for preloading (same logic as cloudinary-loader)
-function buildPreloadUrl(src: string, width: number, quality: number) {
+function buildPreloadUrl(src: string, width: number) {
   if (!src.includes('res.cloudinary.com')) return src;
-  const params = `w_${width},q_${quality},f_auto,c_limit`;
+  const params = `w_${width},q_auto:eco,f_webp,c_limit`;
   return src.replace('/upload/', `/upload/${params}/`);
 }
 
 // Build srcSet string for preload (matches Next.js Image deviceSizes)
-function buildPreloadSrcSet(src: string, quality: number) {
+function buildPreloadSrcSet(src: string) {
   const widths = [256, 384, 640, 750, 828];
   return widths
-    .map(w => `${buildPreloadUrl(src, w, quality)} ${w}w`)
+    .map(w => `${buildPreloadUrl(src, w)} ${w}w`)
     .join(', ');
 }
 
@@ -244,15 +244,15 @@ export default async function Page({
         url: "https://www.garudaqua.in/products",
       })) }} />
       {/* Preload LCP images — browser starts fetching immediately, before JS hydration */}
-      {products.slice(0, 4).map((product: { id: string; image?: string }, i: number) =>
+      {products.slice(0, 4).map((product: { id: string; image?: string }) =>
         product.image ? (
           <link
             key={`preload-${product.id}`}
             rel="preload"
             as="image"
-            imageSrcSet={buildPreloadSrcSet(product.image, 50)}
+            imageSrcSet={buildPreloadSrcSet(product.image)}
             imageSizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            fetchPriority={i === 0 ? "high" : "auto"}
+            fetchPriority="high"
           />
         ) : null
       )}

@@ -736,7 +736,7 @@ export default function ProductsPage({
 function ProductCard({ product, index }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
     const productHref = `/products/${productPath(product)}`;
-    const isLikelyLcpImage = index === 0;
+    const isLikelyLcpImage = index < 4;
 
     return (
         <div
@@ -790,7 +790,7 @@ function ProductCard({ product, index }: ProductCardProps) {
 function ProductListItem({ product, index = 0 }: ProductCardProps) {
     const categoryName = getCategoryName(product.category);
     const productHref = `/products/${productPath(product)}`;
-    const isLikelyLcpImage = index === 0;
+    const isLikelyLcpImage = index < 4;
     return (
         <div
             className="group"
