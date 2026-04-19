@@ -26,11 +26,13 @@ interface Blog {
 export default function BlogPostClient({
     blog,
     relatedBlogs = [],
-    categories = []
+    categories = [],
+    heroRenderedByServer = false,
 }: {
     blog: Blog;
     relatedBlogs?: Blog[];
     categories?: { name: string; slug: string }[];
+    heroRenderedByServer?: boolean;
 }) {
     if (!blog) {
         return null;
@@ -42,8 +44,8 @@ export default function BlogPostClient({
             <article className="w-full pb-16">
                 {/* Hero / Header Section: Contains Image + Overlay Buttons */}
                 <div className="relative w-full">
-                    {/* Featured Image */}
-                    {blog.featuredImage && (
+                    {/* Featured Image — only if server didn't already render it (LCP optimization) */}
+                    {blog.featuredImage && !heroRenderedByServer && (
                         <TransitionElement name={`blog-${blog.slug}`} className="relative w-full bg-gray-50 dark:bg-[#050505]">
                             <Image
                                 src={blog.featuredImage}

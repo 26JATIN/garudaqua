@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import Image from "next/image";
 import BlogPostClient from "./BlogPostClient";
 import { articleSchema, breadcrumbSchema } from "@/lib/jsonld";
 
@@ -176,7 +177,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         { name: "Blog", url: "https://www.garudaqua.in/blogs" },
         { name: blog.title, url: `https://www.garudaqua.in/blogs/${blog.slug}` },
       ])) }} />
-      <BlogPostClient blog={blog} relatedBlogs={relatedBlogs} categories={allCategories} />
+      {/* LCP image rendered in Server Component for instant discoverability + preload <link> */}
+      {blogData.featuredImage && (
+        <div className="relative w-full bg-gray-50 dark:bg-[#050505] pt-0.5 lg:pt-4.25">
+          <Image
+            src={blogData.featuredImage}
+            alt={blogData.title}
+            width={1200}
+            height={630}
+            className="w-full h-auto block"
+            priority
+            fetchPriority="high"
+            sizes="100vw"
+            quality={80}
+          />
+        </div>
+      )}
+      <BlogPostClient blog={blog} relatedBlogs={relatedBlogs} categories={allCategories} heroRenderedByServer={!!blogData.featuredImage} />
     </>
   );
 }
