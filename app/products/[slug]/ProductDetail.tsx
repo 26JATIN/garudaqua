@@ -202,10 +202,13 @@ function MobileImageGallery({ images, imageAlts = [], productName, controlledInd
                                 }`}
                                 aria-label={`View image ${index + 1}`}
                             >
-                                <img
+                                <Image
                                     src={img}
                                     alt={imageAlts?.[index] ?? `${productName} ${index + 1}`}
+                                    width={56}
+                                    height={56}
                                     className="w-full h-full object-contain"
+                                    quality={40}
                                     loading={index < 3 ? 'eager' : 'lazy'}
                                 />
                             </button>
@@ -613,7 +616,8 @@ export default function ProductDetail({ productSlug, initialProduct, initialRela
                                                     width={84}
                                                     height={84}
                                                     className="object-contain w-full h-full"
-                                                    quality={55}
+                                                    quality={40}
+                                                    sizes="84px"
                                                 />
                                                 {/* +N overlay on the 6th thumbnail */}
                                                 {isLastSlot && (

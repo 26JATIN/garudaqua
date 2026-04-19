@@ -166,7 +166,10 @@ export default function HeroClient({ initialSlides }: HeroProps) {
                             transitionTimingFunction: 'ease-in-out',
                         }}
                     >
-                        {loadedIndices.includes(index) && <SlideImage slide={slide} index={index} />}
+                        {/* Slide 0 renders unconditionally to avoid hydration re-paint
+                            that causes "Element Render Delay" on LCP.
+                            Non-LCP slides are deferred until they're about to be shown. */}
+                        {(index === 0 || loadedIndices.includes(index)) && <SlideImage slide={slide} index={index} />}
                     </div>
                 ))}
             </div>

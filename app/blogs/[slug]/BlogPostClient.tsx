@@ -45,12 +45,15 @@ export default function BlogPostClient({
                     {/* Featured Image */}
                     {blog.featuredImage && (
                         <TransitionElement name={`blog-${blog.slug}`} className="relative w-full bg-gray-50 dark:bg-[#050505]">
-                            <img
+                            <Image
                                 src={blog.featuredImage}
                                 alt={blog.title}
+                                width={1200}
+                                height={630}
                                 className="w-full h-auto block"
-                                loading="eager"
-                                decoding="async"
+                                priority
+                                sizes="100vw"
+                                quality={80}
                             />
                         </TransitionElement>
                     )}

@@ -105,7 +105,7 @@ const CategoryPreview = React.memo(({ category, className, priority = false }: C
             loading={priority ? undefined : "lazy"}
             decoding={priority ? "sync" : "async"}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            quality={70}
+            quality={50}
           />
 
           {/* Hover overlay */}
@@ -158,7 +158,7 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
               loading="lazy"
               decoding="async"
               sizes="80px"
-              quality={60}
+              quality={40}
             />
             {!isLoaded && (
               <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#111] dark:to-black shimmer" />
