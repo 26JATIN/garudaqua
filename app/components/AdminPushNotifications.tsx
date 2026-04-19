@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 type Permission = "default" | "granted" | "denied" | "unsupported";
 
@@ -70,8 +70,8 @@ async function subscribeToPush(reg: ServiceWorkerRegistration): Promise<PushSubs
 export default function AdminPushNotifications() {
   const [permission, setPermission] = useState<Permission>("default");
   const [isLoading, setIsLoading] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Sync with current browser permission state on mount
   useEffect(() => {
@@ -103,6 +103,22 @@ export default function AdminPushNotifications() {
       })();
     }
   }, []);
+
+  // Click-outside handler to dismiss the confirm popup
+  useEffect(() => {
+    if (!showConfirm) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowConfirm(false);
+      }
+    };
+    // Use a timeout so the current click doesn't immediately close it
+    const id = setTimeout(() => document.addEventListener("click", handleClickOutside), 0);
+    return () => {
+      clearTimeout(id);
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [showConfirm]);
 
   const handleEnable = useCallback(async () => {
     if (!("Notification" in window)) return;
@@ -171,19 +187,14 @@ export default function AdminPushNotifications() {
       : "Enable push notifications for new enquiries";
 
   return (
-    <div className="relative">
+    <div className="relative group" ref={containerRef}>
       <button
         id="admin-push-bell"
         onClick={() => {
-          if (permission === "denied") {
-            setShowTooltip((v) => !v);
-          } else {
-            setShowConfirm((v) => !v);
-          }
+          if (permission === "denied") return;
+          setShowConfirm((v) => !v);
         }}
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        disabled={isLoading}
+        disabled={isLoading || permission === "denied"}
         aria-label={tooltipText}
         className={`relative p-2 rounded-lg transition-all duration-200 focus:outline-none disabled:opacity-50 ${
           permission === "granted"
@@ -225,9 +236,9 @@ export default function AdminPushNotifications() {
         )}
       </button>
 
-      {/* Tooltip */}
-      {showTooltip && !showConfirm && (
-        <div className="absolute right-0 top-full mt-2 z-50 whitespace-nowrap bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg pointer-events-none">
+      {/* Tooltip — CSS hover only, hidden on mobile (sm:block), hidden when confirm popup is open */}
+      {!showConfirm && (
+        <div className="absolute right-0 top-full mt-2 z-50 whitespace-nowrap bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 hidden sm:block">
           {tooltipText}
           <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 rotate-45" />
         </div>

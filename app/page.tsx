@@ -13,7 +13,7 @@ const ImageGallery = dynamicImports(() => import('./components/ImageGallery'));
 const VideoShowcaseSection = dynamicImports(() => import('./components/HeroVideoShowcase'));
 const Testimonials = dynamicImports(() => import('./components/Testimonials'));
 const LatestBlogs = dynamicImports(() => import('./components/LatestBlogs'));
-const Newsletter = dynamicImports(() => import('./components/Newsletter'));
+
 const Footer = dynamicImports(() => import('./components/Footer'));
 
 
@@ -181,22 +181,21 @@ export default async function Home() {
         description: "Sriganganagar's trusted supplier of HDPE, LLDPE water tanks, PVC pipes, fittings & agricultural water management products.",
         url: "https://www.garudaqua.in",
       })) }} />
-      {videoData.length > 0 && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(
-          videoData.map(v => {
-            const safeThumbnail = v.thumbnailUrl?.trim() || "https://www.garudaqua.in/DesktopLogo.png";
+      {videoData.map(v => {
+        const safeThumbnail = v.thumbnailUrl?.trim() || "https://www.garudaqua.in/DesktopLogo.png";
 
-            return videoSchema({
-              name: v.title,
-              description: v.description || `${v.title} — product showcase by Garud Aqua Solutions`,
-              thumbnailUrl: safeThumbnail,
-              uploadDate: new Date().toISOString(),
-              contentUrl: v.videoUrl,
-              duration: v.duration ? `PT${v.duration}S` : undefined,
-            });
-          })
-        ) }} />
-      )}
+        return (
+          <script key={v.id} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema({
+            name: v.title,
+            description: v.description || `${v.title} — product showcase by Garud Aqua Solutions`,
+            thumbnailUrl: safeThumbnail,
+            uploadDate: "2026-01-01T00:00:00+05:30",
+            contentUrl: v.videoUrl,
+            duration: v.duration ? `PT${v.duration}S` : undefined,
+            watchPageUrl: "https://www.garudaqua.in",
+          })) }} />
+        );
+      })}
 
       {/* Gradient Background */}
       <div className="fixed inset-0 bg-linear-to-br from-white via-[#FEFEFE] to-[#F3F8FE] dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] -z-10" />
@@ -222,9 +221,7 @@ export default async function Home() {
           <LatestBlogs blogs={blogData.blogs} categories={blogData.categories} />
         </div>
       )}
-      <div className="section-lazy">
-        <Newsletter/>
-      </div>
+
       <Footer/>
       
       

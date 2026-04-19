@@ -76,7 +76,7 @@ export function organizationSchema() {
     ],
     sameAs: [
       "https://maps.app.goo.gl/LH69FP4CLybZSRAX7",
-      "https://www.facebook.com/garudaqua",
+      "https://www.facebook.com/garudtank/",
       "https://wa.me/919462594603"
     ],
   };
@@ -389,6 +389,8 @@ export function videoSchema(video: {
   contentUrl?: string;
   embedUrl?: string;
   duration?: string;
+  /** The public page URL where this video can be watched (required for Google indexing) */
+  watchPageUrl?: string;
 }) {
   const thumbnailUrl = video.thumbnailUrl?.trim() || LOGO_URL;
 
@@ -399,6 +401,7 @@ export function videoSchema(video: {
     description: video.description,
     thumbnailUrl,
     uploadDate: video.uploadDate,
+    url: video.watchPageUrl || SITE_URL,
     ...(video.contentUrl ? { contentUrl: video.contentUrl } : {}),
     ...(video.embedUrl ? { embedUrl: video.embedUrl } : {}),
     ...(video.duration ? { duration: video.duration } : {}),
