@@ -285,12 +285,11 @@ textarea:focus-visible {
 }
 
 /* ── Template Page Entry (fast, won't delay skeletons) ───────── */
-@keyframes template-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+/* ── Template Page Entry ───────── */
+/* Animation is intentionally a no-op for initial load (LCP paint must not be blocked).
+   Navigations that need a fade use JS-controlled inline styles instead. */
 .animate-template-in {
-  animation: template-in 100ms ease-out both;
+  /* no animation — content paints immediately for LCP */
 }
 
 /* ── Card Press Microinteraction ───────── */
