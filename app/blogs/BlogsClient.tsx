@@ -150,9 +150,9 @@ export default function BlogsClient({
                 {/* Category Filter */}
                 <div className="mb-8 md:mb-12 relative">
                     <div className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-2.5 md:gap-3 pb-6 pt-3 px-2 -mx-2 md:px-4 md:-mx-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                        <NavigationLink
-                            href="/blogs"
-                            onClick={(e) => { e.preventDefault(); setCategory("all"); }}
+                        <button
+                            type="button"
+                            onClick={() => setCategory("all")}
                             className={`shrink-0 snap-start whitespace-nowrap px-4 py-2 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 text-sm md:text-base ${
                                 category === "all"
                                     ? "bg-[#0369A1] text-white shadow-lg md:scale-105"
@@ -160,12 +160,12 @@ export default function BlogsClient({
                             }`}
                         >
                             All Articles
-                        </NavigationLink>
+                        </button>
                         {categories.map((cat) => (
-                            <NavigationLink
+                            <button
                                 key={cat.id}
-                                href={`/blogs/category/${cat.slug}`}
-                                onClick={(e) => { e.preventDefault(); setCategory(cat.slug); }}
+                                type="button"
+                                onClick={() => setCategory(cat.slug)}
                                 className={`shrink-0 snap-start whitespace-nowrap px-4 py-2 md:px-6 md:py-3 rounded-full font-light transition-all duration-300 text-sm md:text-base ${
                                     category === cat.slug
                                         ? "bg-[#0369A1] text-white shadow-lg md:scale-105"
@@ -173,7 +173,7 @@ export default function BlogsClient({
                                 }`}
                             >
                                 {cat.name}
-                            </NavigationLink>
+                            </button>
                         ))}
                     </div>
                 </div>
