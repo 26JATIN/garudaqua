@@ -6,9 +6,15 @@ export default function PWARegister() {
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
 
-    // Unregister any existing service worker — Cloudflare CDN handles caching
+    // Unregister stale caching service workers — Cloudflare CDN handles caching.
+    // IMPORTANT: preserve admin-sw.js which handles push notifications.
     navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((reg) => reg.unregister());
+      registrations.forEach((reg) => {
+        const swUrl = reg.active?.scriptURL || "";
+        // Keep the admin push-notification SW alive
+        if (swUrl.includes("admin-sw.js")) return;
+        reg.unregister();
+      });
     });
   }, []);
 

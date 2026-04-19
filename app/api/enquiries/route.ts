@@ -52,13 +52,18 @@ export async function POST(request: Request) {
       }
     });
 
-    // Fire push notifications to all registered admin devices (non-blocking)
+    // Fire push notifications to all registered admin devices.
+    // Must be awaited — Vercel serverless kills unawaited work after response.
     const productLabel = body.product?.trim() ? ` — ${body.product.trim()}` : "";
-    sendPushNotifications({
-      title: "🔔 New Enquiry Received",
-      body: `${body.name.trim()}${productLabel}`,
-      url: "/admin/enquiries",
-    }).catch((err) => console.error("[push] Failed:", err));
+    try {
+      await sendPushNotifications({
+        title: "🔔 New Enquiry Received",
+        body: `${body.name.trim()}${productLabel}`,
+        url: "/admin/enquiries",
+      });
+    } catch (pushErr) {
+      console.error("[push] Failed:", pushErr);
+    }
 
     return NextResponse.json(
       { success: true, id: enquiry.id },

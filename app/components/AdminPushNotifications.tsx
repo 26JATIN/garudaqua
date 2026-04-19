@@ -29,7 +29,20 @@ async function getAdminSW(): Promise<ServiceWorkerRegistration | null> {
     const reg = await navigator.serviceWorker.register("/admin-sw.js", {
       scope: "/admin/",
     });
-    await navigator.serviceWorker.ready;
+
+    // Wait for the SW to become active (installing → activated)
+    if (reg.installing || reg.waiting) {
+      await new Promise<void>((resolve) => {
+        const sw = reg.installing || reg.waiting;
+        if (!sw) { resolve(); return; }
+        sw.addEventListener("statechange", () => {
+          if (sw.state === "activated") resolve();
+        });
+        // Safety timeout — don't block forever
+        setTimeout(resolve, 5000);
+      });
+    }
+
     return reg;
   } catch (err) {
     console.error("[AdminPush] SW registration failed:", err);
@@ -58,6 +71,7 @@ export default function AdminPushNotifications() {
   const [permission, setPermission] = useState<Permission>("default");
   const [isLoading, setIsLoading] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Sync with current browser permission state on mount
   useEffect(() => {
@@ -161,9 +175,11 @@ export default function AdminPushNotifications() {
       <button
         id="admin-push-bell"
         onClick={() => {
-          if (permission === "granted") handleDisable();
-          else if (permission !== "denied") handleEnable();
-          else setShowTooltip((v) => !v);
+          if (permission === "denied") {
+            setShowTooltip((v) => !v);
+          } else {
+            setShowConfirm((v) => !v);
+          }
         }}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
@@ -210,10 +226,48 @@ export default function AdminPushNotifications() {
       </button>
 
       {/* Tooltip */}
-      {showTooltip && (
+      {showTooltip && !showConfirm && (
         <div className="absolute right-0 top-full mt-2 z-50 whitespace-nowrap bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg pointer-events-none">
           {tooltipText}
           <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 rotate-45" />
+        </div>
+      )}
+
+      {/* Confirmation popup */}
+      {showConfirm && (
+        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#1A1A1A] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl p-4 w-64">
+          <div className="absolute -top-1.5 right-4 w-3 h-3 bg-white dark:bg-[#1A1A1A] border-l border-t border-gray-200 dark:border-white/10 rotate-45" />
+          <p className="text-sm text-gray-800 dark:text-gray-200 font-medium mb-1">
+            {permission === "granted" ? "Disable notifications?" : "Enable notifications?"}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+            {permission === "granted"
+              ? "You will stop receiving alerts for new enquiries on this device."
+              : "Get instant alerts when a new enquiry is submitted."}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowConfirm(false)}
+              className="flex-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                setShowConfirm(false);
+                if (permission === "granted") handleDisable();
+                else handleEnable();
+              }}
+              disabled={isLoading}
+              className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-lg text-white transition ${
+                permission === "granted"
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-[#0EA5E9] hover:bg-[#0284C7]"
+              } disabled:opacity-50`}
+            >
+              {permission === "granted" ? "Disable" : "Enable"}
+            </button>
+          </div>
         </div>
       )}
     </div>
