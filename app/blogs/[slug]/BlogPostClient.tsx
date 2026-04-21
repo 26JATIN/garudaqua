@@ -191,39 +191,48 @@ export default function BlogPostClient({
                                 <NavigationLink
                                     key={relatedBlog.id}
                                     href={`/blogs/${relatedBlog.slug}`}
-                                    className="group bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1"
+                                    className="group bg-white dark:bg-[#0A0A0A] rounded-2xl md:rounded-3xl shadow-md dark:shadow-none dark:border dark:border-white/6 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
                                 >
                                     {relatedBlog.featuredImage ? (
-                                        <div className="relative h-44 w-full overflow-hidden bg-gray-50 dark:bg-[#050505]">
+                                        <div className="relative aspect-video w-full overflow-hidden bg-gray-50 dark:bg-[#050505]">
                                             <Image
                                                 src={relatedBlog.featuredImage}
                                                 alt={relatedBlog.title}
                                                 fill
-                                                className="object-contain group-hover:scale-110 transition-transform duration-700"
-                                                sizes="(max-width: 768px) 100vw, 33vw"
+                                                className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                                quality={30}
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         </div>
                                     ) : (
-                                        <div className="h-44 bg-linear-to-br from-[#0EA5E9]/20 via-[#0369A1]/10 to-[#0EA5E9]/20 flex items-center justify-center">
-                                            <svg className="w-12 h-12 text-[#0EA5E9]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="aspect-video bg-linear-to-br from-[#0EA5E9]/20 via-[#0369A1]/10 to-[#0EA5E9]/20 flex items-center justify-center">
+                                            <svg className="w-16 h-16 text-[#0EA5E9]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         </div>
                                     )}
-                                    <div className="p-5">
-                                        <h3 className="font-light text-lg mb-2 group-hover:text-[#0EA5E9] transition-colors line-clamp-2 tracking-wide dark:text-gray-100">
+                                    <div className="p-6 flex flex-col flex-1">
+                                        <h3 className="text-xl font-normal mb-3 text-gray-900 dark:text-gray-100 group-hover:text-[#0369A1] dark:group-hover:text-[#0EA5E9] transition-colors line-clamp-2 tracking-wide">
                                             {relatedBlog.title}
                                         </h3>
-                                        <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-3 font-light leading-relaxed">
+                                        <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 font-light leading-relaxed text-sm">
                                             {relatedBlog.excerpt}
                                         </p>
-                                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                                            <span className="flex items-center gap-1.5 font-light">
+                                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-white/6 mt-auto">
+                                            <div className="flex items-center gap-4 font-light">
+                                                <span className="flex items-center gap-1.5">
+                                                    <svg className="w-4 h-4 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    {relatedBlog.readTime} min
+                                                </span>
+                                            </div>
+                                            <span className="flex items-center gap-1.5 text-xs font-light">
                                                 <svg className="w-3.5 h-3.5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
-                                                {relatedBlog.readTime} min
+                                                <span suppressHydrationWarning>{new Date(relatedBlog.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
                                             </span>
                                         </div>
                                     </div>
