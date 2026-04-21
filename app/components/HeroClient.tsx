@@ -133,8 +133,8 @@ export default function HeroClient({ initialSlides }: HeroProps) {
         setTimeout(() => setIsPaused(false), 8000);
     };
 
-    if (loading) {
-        return null; // The server component placeholder handles this now
+    if (loading || !mounted) {
+        return null; // The server component placeholder handles the static LCP instantly
     }
 
     if (slides.length === 0) return null;
