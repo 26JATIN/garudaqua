@@ -6,6 +6,7 @@ import ConditionalNavbar from "./components/ConditionalNavbar";
 import { PageTransitionProvider } from "./components/PageTransition";
 import RouteChangeOverlay from "./components/RouteChangeOverlay";
 import PWARegister from "./components/PWARegister";
+import PullToRefresh from "./components/PullToRefresh";
 import LazyToaster from "./components/LazyToaster";
 import type { Metadata } from "next";
 import { organizationSchema, websiteSchema } from "@/lib/jsonld";
@@ -159,6 +160,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100">
         <PWARegister />
+        <PullToRefresh />
         <ThemeProvider>
           <LazyToaster />
           <NavbarProvider>

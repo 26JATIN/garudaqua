@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+export const revalidate = 86400;
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.garudaqua.in";
 
 // Use the deploy date env var if set (set it in your CI/CD), otherwise fall back to build time.
@@ -80,7 +82,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const blogs = await prisma.blogPost.findMany({
       where: { isPublished: true },
-      select: { slug: true, updatedAt: true },
+      select: { slug: true, updatedAt: true, featuredImage: true },
       orderBy: { updatedAt: "desc" },
     });
     blogRoutes = blogs.map((b) => ({
@@ -88,6 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: b.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.6,
+      images: b.featuredImage ? [b.featuredImage] : undefined,
     }));
   } catch {
     // DB unavailable at build time — skip dynamic routes
@@ -98,7 +101,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const categories = await prisma.category.findMany({
       where: { isActive: true, hasSeoPage: true },
-      select: { slug: true, updatedAt: true },
+      select: { slug: true, updatedAt: true, image: true, seoHeroImage: true },
       orderBy: { updatedAt: "desc" },
     });
     categoryRoutes = categories.map((c) => ({
@@ -106,12 +109,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: c.updatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.8,
+      images: [c.seoHeroImage, c.image].filter(Boolean) as string[],
     }));
   } catch {
     // DB unavailable at build time — skip dynamic routes
   }
 
-  // ── Blog category pages ─────────────────────────────────────────────────
+// ── Blog category pages ─────────────────────────────────────────────────
   let blogCategoryRoutes: MetadataRoute.Sitemap = [];
   try {
     const blogCategories = await prisma.blogCategory.findMany({
