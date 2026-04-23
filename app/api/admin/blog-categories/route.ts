@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         isActive: body.isActive ?? true,
       },
     });
-    await revalidateAndWarm(["/","/blogs", "/api/blog-categories","/api/blogs"]);
+    await revalidateAndWarm(["/","/blogs", "/api/blog-categories","/api/blogs", `/blogs/category/${category.slug}`]);
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
     console.error("Error creating blog category:", error);

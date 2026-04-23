@@ -21,7 +21,7 @@ export async function PUT(
         isActive: body.isActive,
       },
     });
-    await revalidateAndWarm(["/","/blogs", "/api/blog-categories"]);
+    await revalidateAndWarm(["/","/blogs", "/api/blog-categories", `/blogs/category/${category.slug}`]);
     return NextResponse.json(category);
   } catch (error) {
     console.error("Error updating blog category:", error);
@@ -41,6 +41,11 @@ export async function DELETE(
   try {
     const { id } = await params;
 
+    const category = await prisma.blogCategory.findUnique({ where: { id } });
+    if (!category) {
+      return NextResponse.json({ error: "Category not found" }, { status: 404 });
+    }
+
     // Set posts in this category to have no categoryId
     await prisma.blogPost.updateMany({
       where: { categoryId: id },
@@ -48,7 +53,7 @@ export async function DELETE(
     });
 
     await prisma.blogCategory.delete({ where: { id } });
-    await revalidateAndWarm(["/","/blogs", "/api/blog-categories","/api/blogs"]);
+    await revalidateAndWarm(["/","/blogs", "/api/blog-categories","/api/blogs", `/blogs/category/${category.slug}`]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting blog category:", error);

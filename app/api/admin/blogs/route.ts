@@ -54,7 +54,11 @@ export async function POST(request: Request) {
           : new Date(),
       },
     });
-    await revalidateAndWarm(["/","/blogs", "/api/blogs"]);
+    const pathsToPurge = ["/","/blogs", "/api/blogs"];
+    if (blog.category) {
+      pathsToPurge.push(`/blogs/category/${blog.category}`);
+    }
+    await revalidateAndWarm(pathsToPurge);
     return NextResponse.json(blog, { status: 201 });
   } catch (error) {
     console.error("Error creating blog:", error);

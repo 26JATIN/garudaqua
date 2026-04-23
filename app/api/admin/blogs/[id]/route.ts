@@ -79,6 +79,14 @@ export async function PUT(
     const pathsToPurge = ["/","/blogs", "/api/blogs", ...(blog.slug ? [`/blogs/${blog.slug}`, `/api/blogs/${blog.slug}`] : [])];
     if (slugChanged && existing.slug) pathsToPurge.push(`/blogs/${existing.slug}`);
     (existing.formerSlugs ?? []).forEach((s) => pathsToPurge.push(`/blogs/${s}`));
+
+    if (blog.category) {
+      pathsToPurge.push(`/blogs/category/${blog.category}`);
+    }
+    if (existing.category && existing.category !== blog.category) {
+      pathsToPurge.push(`/blogs/category/${existing.category}`);
+    }
+
     await revalidateAndWarm(pathsToPurge);
     return NextResponse.json(blog);
   } catch (error) {
@@ -112,6 +120,9 @@ export async function DELETE(
     }
     if (blog?.formerSlugs?.length) {
       blog.formerSlugs.forEach((s) => pathsToPurge.push(`/blogs/${s}`));
+    }
+    if (blog?.category) {
+      pathsToPurge.push(`/blogs/category/${blog.category}`);
     }
     await revalidateAndWarm(pathsToPurge);
     return NextResponse.json({ success: true });
