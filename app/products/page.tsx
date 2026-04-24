@@ -65,8 +65,6 @@ export async function generateMetadata({
 }
 
 
-
-
 // Build a Cloudinary URL for preloading (same logic as cloudinary-loader)
 function buildPreloadUrl(src: string, width: number) {
   if (!src.includes('res.cloudinary.com')) return src;
