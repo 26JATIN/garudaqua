@@ -155,11 +155,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}} />
       </head>
       <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100">
-        <DeferredLayoutWidgets />
         <ThemeProvider>
           <LazyToaster />
           <NavbarProvider>
             <PageTransitionProvider>
+              <DeferredLayoutWidgets />
               <ConditionalNavbar />
               <main className="app-main">
                 {children}
