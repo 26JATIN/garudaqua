@@ -78,37 +78,12 @@ export default async function Page() {
         description: "Expert tips, guides, and insights on water tanks, pipes & plumbing solutions from Garud Aqua Solutions.",
         url: "https://www.garudaqua.in/blogs",
       })) }} />
-      <Suspense fallback={
-        <div className="min-h-screen bg-gray-50 dark:bg-black">
-          <div className="bg-[#2C2C2C] py-24">
-            <div className="container mx-auto px-4 text-center">
-              <div className="h-14 w-64 bg-white/10 rounded mx-auto mb-6 animate-pulse" />
-              <div className="h-6 w-96 bg-white/10 rounded mx-auto animate-pulse" />
-            </div>
-          </div>
-          <div className="container mx-auto px-4 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="rounded-3xl overflow-hidden bg-white dark:bg-[#0A0A0A] shadow-md">
-                  <div className="h-56 bg-gray-200 dark:bg-white/10 animate-pulse" />
-                  <div className="p-6 space-y-3">
-                    <div className="h-5 w-24 bg-gray-200 dark:bg-white/10 rounded-full animate-pulse" />
-                    <div className="h-6 w-full bg-gray-200 dark:bg-white/10 rounded animate-pulse" />
-                    <div className="h-4 w-3/4 bg-gray-200 dark:bg-white/10 rounded animate-pulse" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      }>
         <BlogsClient
           initialCategories={categories}
           initialBlogs={blogs}
           initialTotal={blogs.length}
           initialTotalPages={totalPages}
         />
-      </Suspense>
     </>
   );
 }

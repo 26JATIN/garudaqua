@@ -39,7 +39,10 @@ export default function PullToRefresh() {
     wrap.style.transition  = "transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease";
     wrap.style.transform   = "translateY(-100%) translateX(-50%)";
     wrap.style.opacity     = "0";
-    if (spinner) spinner.style.transform = "";
+    if (spinner) {
+      spinner.style.transform = "";
+      spinner.classList.remove("ptr-spinning");
+    }
     if (label)   label.textContent = "Pull to refresh";
   }, []);
 
@@ -84,16 +87,31 @@ export default function PullToRefresh() {
       if (spinner) spinner.style.transform = `rotate(${progress * 270}deg)`;
 
       // Update label
-      if (label) {
-        label.textContent = progress >= 1 ? "Release to refresh" : "Pull to refresh";
+      if (label && !triggeredRef.current) {
+        label.textContent = dist >= THRESHOLD ? "Release to refresh" : "Pull to refresh";
       }
+    };
 
-      // Trigger once threshold crossed
+    const onTouchEnd = () => {
+      if (!activeRef.current) return;
+      
+      const dist = pullDistRef.current;
+      
       if (dist >= THRESHOLD && !triggeredRef.current) {
         triggeredRef.current = true;
 
         // Brief haptic if available
         if ("vibrate" in navigator) navigator.vibrate(30);
+
+        const spinner = spinnerRef.current;
+        const label = labelRef.current;
+        const wrap = wrapRef.current;
+
+        // Visual "snap back to loading position"
+        if (wrap) {
+          wrap.style.transition = "transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease";
+          wrap.style.transform = `translateY(calc(-50% + ${THRESHOLD}px)) translateX(-50%)`;
+        }
 
         // Switch spinner to spinning animation
         if (spinner) {
@@ -104,13 +122,10 @@ export default function PullToRefresh() {
 
         // Short delay so the user sees the "refreshing" state before reload
         setTimeout(() => window.location.reload(), 400);
+      } else if (!triggeredRef.current) {
+        // Didn't reach threshold — animate back
+        reset();
       }
-    };
-
-    const onTouchEnd = () => {
-      if (!activeRef.current) return;
-      // Didn't reach threshold — animate back
-      if (!triggeredRef.current) reset();
     };
 
     document.addEventListener("touchstart", onTouchStart, { passive: true });

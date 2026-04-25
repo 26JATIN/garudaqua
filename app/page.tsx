@@ -3,7 +3,7 @@ import dynamicImports from "next/dynamic";
 import Hero from './components/hero';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema, videoSchema } from '@/lib/jsonld';
-import { getVideoPosterUrl } from '@/lib/utils';
+import { getVideoPosterUrl, getCdnUrl } from '@/lib/utils';
 
 export const dynamic = "force-static";
 
@@ -183,7 +183,9 @@ export default async function Home() {
         url: "https://www.garudaqua.in",
       })) }} />
       {videoData.map(v => {
-        const safeThumbnail = v.thumbnailUrl?.trim() || getVideoPosterUrl(v.videoUrl) || "https://www.garudaqua.in/DesktopLogo.png";
+        const manualThumb = v.thumbnailUrl?.trim() ? getCdnUrl(v.thumbnailUrl.trim()) : null;
+        const autoThumb = v.videoUrl ? getVideoPosterUrl(v.videoUrl) : null;
+        const safeThumbnail = manualThumb || autoThumb || "https://www.garudaqua.in/DesktopLogo.png";
 
         return (
           <script key={v.id} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema({
@@ -191,7 +193,7 @@ export default async function Home() {
             description: v.description || `${v.title} — product showcase by Garud Aqua Solutions`,
             thumbnailUrl: safeThumbnail,
             uploadDate: "2026-01-01T00:00:00+05:30",
-            contentUrl: v.videoUrl,
+            contentUrl: getCdnUrl(v.videoUrl) || v.videoUrl,
             duration: v.duration ? `PT${v.duration}S` : undefined,
             watchPageUrl: "https://www.garudaqua.in",
           })) }} />
