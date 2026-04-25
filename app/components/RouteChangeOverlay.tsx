@@ -13,9 +13,13 @@ export default function RouteChangeOverlay() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    let frame = 0;
+
     if (isTransitioning) {
-      setVisible(true);
-      setProgress(0);
+      frame = requestAnimationFrame(() => {
+        setVisible(true);
+        setProgress(0);
+      });
 
       // Animate progress bar: fast start, slow down as it approaches 90%
       const t1 = setTimeout(() => setProgress(30), 50);
@@ -24,6 +28,7 @@ export default function RouteChangeOverlay() {
       const t4 = setTimeout(() => setProgress(90), 2000);
 
       return () => {
+        cancelAnimationFrame(frame);
         clearTimeout(t1);
         clearTimeout(t2);
         clearTimeout(t3);
@@ -32,12 +37,15 @@ export default function RouteChangeOverlay() {
     } else {
       // Complete the progress bar then fade out
       if (visible) {
-        setProgress(100);
+        frame = requestAnimationFrame(() => setProgress(100));
         const hideTimer = setTimeout(() => {
           setVisible(false);
           setProgress(0);
         }, 200);
-        return () => clearTimeout(hideTimer);
+        return () => {
+          cancelAnimationFrame(frame);
+          clearTimeout(hideTimer);
+        };
       }
     }
   }, [isTransitioning, visible]);

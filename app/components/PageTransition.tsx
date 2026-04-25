@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useCallback, useState, useEffect, useRef, useTransition } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface PageTransitionContextType {
   navigate: (href: string) => void;
@@ -21,7 +21,6 @@ import { Suspense } from "react";
 function PageTransitionInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [, startTransition] = useTransition();
   const pendingHref = useRef<string | null>(null);
@@ -106,11 +105,13 @@ function PageTransitionInner({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener("click", handleGlobalClick, true);
   }, []);
 
-  // Reset transitioning state when pathname or search parameters change (route completed)
+  // Reset transitioning state when pathname changes (route completed).
+  // Schedule this outside the synchronous effect body to avoid cascading renders.
   useEffect(() => {
-    setIsTransitioning(false);
     pendingHref.current = null;
-  }, [pathname, searchParams]);
+    const id = requestAnimationFrame(() => setIsTransitioning(false));
+    return () => cancelAnimationFrame(id);
+  }, [pathname]);
 
   // Reset on browser back/forward buttons and page visibility changes
   useEffect(() => {

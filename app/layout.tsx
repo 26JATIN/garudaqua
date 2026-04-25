@@ -160,11 +160,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <NavbarProvider>
             <PageTransitionProvider>
               <DeferredLayoutWidgets />
-              <ConditionalNavbar />
-              <main className="app-main">
-                {children}
-              </main>
             </PageTransitionProvider>
+            <ConditionalNavbar />
+            <main className="app-main">
+              {children}
+            </main>
           </NavbarProvider>
         </ThemeProvider>
       </body>
