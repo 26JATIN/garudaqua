@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function cloudinaryUrl(src: string, width: number, quality: number = 80): string {
   if (!src || !src.includes("res.cloudinary.com")) return src;
-  const params = `w_${width},q_${quality},f_auto,c_fill`;
+  const params = `w_${width},q_${quality},f_webp,c_fill`;
   return src
     .replace("/upload/", `/upload/${params}/`)
     .replace("https://res.cloudinary.com", "/cdn-img");
@@ -19,7 +19,7 @@ export function cloudinaryUrl(src: string, width: number, quality: number = 80):
 
 /**
  * Routes a raw Cloudinary URL through the domain's /cdn-img/ proxy for edge caching.
- * Adds auto-format and auto-quality if it's a naked upload URL.
+ * Adds webp format and auto-quality if it's a naked upload URL.
  */
 export function getCdnUrl(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
@@ -27,7 +27,7 @@ export function getCdnUrl(url: string | null | undefined): string | undefined {
   
   let optimizedUrl = url;
   if (optimizedUrl.includes("/upload/") && !optimizedUrl.includes("q_") && !optimizedUrl.includes("f_")) {
-     optimizedUrl = optimizedUrl.replace("/upload/", "/upload/q_auto,f_auto/");
+     optimizedUrl = optimizedUrl.replace("/upload/", "/upload/q_auto,f_webp/");
   }
   
   return optimizedUrl.replace("https://res.cloudinary.com", "/cdn-img");
