@@ -12,9 +12,11 @@ export default function PullToRefresh() {
 
   // Refs — never trigger re-renders during touch tracking
   const startYRef     = useRef<number | null>(null);
+  const startXRef     = useRef<number | null>(null);
   const pullDistRef   = useRef(0);
   const activeRef     = useRef(false);   // are we currently tracking a pull?
   const triggeredRef  = useRef(false);   // did we fire the reload already?
+  const isDirLockedRef = useRef(false);  // have we locked the swipe direction?
 
   // DOM refs for the indicator elements
   const wrapRef    = useRef<HTMLDivElement>(null);
@@ -27,7 +29,9 @@ export default function PullToRefresh() {
   const reset = useCallback(() => {
     activeRef.current    = false;
     triggeredRef.current = false;
+    isDirLockedRef.current = false;
     startYRef.current    = null;
+    startXRef.current    = null;
     pullDistRef.current  = 0;
 
     const wrap    = wrapRef.current;
@@ -56,20 +60,34 @@ export default function PullToRefresh() {
       if (e.touches.length !== 1) return;
 
       startYRef.current   = e.touches[0].clientY;
+      startXRef.current   = e.touches[0].clientX;
       activeRef.current   = true;
       triggeredRef.current = false;
+      isDirLockedRef.current = false;
       pullDistRef.current  = 0;
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!activeRef.current || startYRef.current === null) return;
+      if (!activeRef.current || startYRef.current === null || startXRef.current === null) return;
       if (window.scrollY > 0) { reset(); return; }
 
-      const delta = e.touches[0].clientY - startYRef.current;
-      if (delta <= 0) { reset(); return; }
+      const deltaY = e.touches[0].clientY - startYRef.current;
+      const deltaX = Math.abs(e.touches[0].clientX - startXRef.current);
+      
+      if (deltaY <= 0) { reset(); return; }
+
+      // Lock direction after moving a tiny bit
+      if (!isDirLockedRef.current && (deltaY > 5 || deltaX > 5)) {
+        // If swiping horizontally (or diagonally), kill the pull-to-refresh for this swipe
+        if (deltaX * 1.5 > deltaY) {
+          activeRef.current = false;
+          return;
+        }
+        isDirLockedRef.current = true;
+      }
 
       // Apply resistance so it feels natural
-      const dist = Math.min(delta * RESIST, MAX_PULL);
+      const dist = Math.min(deltaY * RESIST, MAX_PULL);
       pullDistRef.current = dist;
 
       const wrap    = wrapRef.current;
