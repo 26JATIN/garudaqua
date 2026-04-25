@@ -16,3 +16,12 @@ export function cloudinaryUrl(src: string, width: number, quality: number = 80):
     .replace("/upload/", `/upload/${params}/`)
     .replace("https://res.cloudinary.com", "/cdn-img");
 }
+
+/**
+ * Auto-generates a first-frame poster thumbnail URL for a Cloudinary video.
+ * Assumes videoUrl is a Cloudinary URL (or our /cdn-img/ proxy).
+ */
+export function getVideoPosterUrl(videoUrl: string | undefined | null): string | undefined {
+  if (!videoUrl) return undefined;
+  return videoUrl.replace(/\.(mp4|webm|mov|ogg)$/i, '.jpg');
+}

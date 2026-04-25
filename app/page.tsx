@@ -3,6 +3,7 @@ import dynamicImports from "next/dynamic";
 import Hero from './components/hero';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema, videoSchema } from '@/lib/jsonld';
+import { getVideoPosterUrl } from '@/lib/utils';
 
 export const dynamic = "force-static";
 
@@ -182,7 +183,7 @@ export default async function Home() {
         url: "https://www.garudaqua.in",
       })) }} />
       {videoData.map(v => {
-        const safeThumbnail = v.thumbnailUrl?.trim() || "https://www.garudaqua.in/DesktopLogo.png";
+        const safeThumbnail = v.thumbnailUrl?.trim() || getVideoPosterUrl(v.videoUrl) || "https://www.garudaqua.in/DesktopLogo.png";
 
         return (
           <script key={v.id} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema({
