@@ -32,7 +32,9 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
     // Generate tiny Cloudinary blur placeholder for perceived instant load
     function blurUrl(src: string): string {
         if (!src || !src.includes("res.cloudinary.com")) return "";
-        return src.replace("/upload/", "/upload/w_20,q_10,e_blur:1000,f_webp/");
+        return src
+            .replace("/upload/", "/upload/w_20,q_10,e_blur:1000,f_webp/")
+            .replace("https://res.cloudinary.com", "/cdn-img");
     }
 
     const responsiveSizes = "(max-width: 640px) 640px, (max-width: 1024px) 1024px, 100vw";

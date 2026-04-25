@@ -119,8 +119,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-IN" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://res.cloudinary.com" />
-        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" id="theme-color-light" />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" id="theme-color-dark" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }} />

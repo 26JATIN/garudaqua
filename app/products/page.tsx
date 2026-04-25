@@ -69,7 +69,9 @@ export async function generateMetadata({
 function buildPreloadUrl(src: string, width: number) {
   if (!src.includes('res.cloudinary.com')) return src;
   const params = `w_${width},q_auto:eco,f_webp,c_limit`;
-  return src.replace('/upload/', `/upload/${params}/`);
+  return src
+    .replace('/upload/', `/upload/${params}/`)
+    .replace('https://res.cloudinary.com', '/cdn-img');
 }
 
 // Build srcSet string for preload (matches Next.js Image deviceSizes)

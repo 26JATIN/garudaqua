@@ -43,5 +43,7 @@ export default function cloudinaryLoader({
     "c_limit",         // don't upscale
   ].join(",");
 
-  return src.replace("/upload/", `/upload/${params}/`);
+  return src
+    .replace("/upload/", `/upload/${params}/`)
+    .replace("https://res.cloudinary.com", "/cdn-img");
 }

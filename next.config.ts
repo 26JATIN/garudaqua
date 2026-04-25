@@ -20,6 +20,15 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  async rewrites() {
+    return [
+      {
+        source: "/cdn-img/:path*",
+        destination: "https://res.cloudinary.com/:path*",
+      },
+    ];
+  },
+
   experimental: {
     viewTransition: false,
     inlineCss: true,
