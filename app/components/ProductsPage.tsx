@@ -427,9 +427,9 @@ export default function ProductsPage({
                                                             src={category.image}
                                                             alt={category.name}
                                                             className="w-full h-full object-cover"
-                                                            loading={shouldEagerLoad ? "eager" : "lazy"}
+                                                            loading={shouldEagerLoad ? undefined : "lazy"}
                                                             fetchPriority={shouldPrioritize ? "high" : "auto"}
-                                                            decoding={shouldEagerLoad ? "sync" : "async"}
+                                                            decoding="async"
                                                             width={64}
                                                             height={64}
                                                             quality={50}
@@ -553,9 +553,9 @@ export default function ProductsPage({
                                                             src={subcategory.image}
                                                             alt={subcategory.name}
                                                             className="w-full h-full object-cover"
-                                                            loading={shouldEagerLoad ? "eager" : "lazy"}
+                                                            loading={shouldEagerLoad ? undefined : "lazy"}
                                                             fetchPriority={shouldPrioritize ? "high" : "auto"}
-                                                            decoding={shouldEagerLoad ? "sync" : "async"}
+                                                            decoding="async"
                                                             width={80}
                                                             height={80}
                                                             quality={50}
@@ -755,9 +755,9 @@ function ProductCard({ product, index }: ProductCardProps) {
                                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                     quality={50}
                                     priority={isLikelyLcpImage}
-                                    loading={isLikelyLcpImage ? "eager" : "lazy"}
+                                    loading={isLikelyLcpImage ? undefined : "lazy"}
                                     fetchPriority={isLikelyLcpImage ? "high" : "auto"}
-                                    decoding={isLikelyLcpImage ? "sync" : "async"}
+                                    decoding="async"
                                 />
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center">
@@ -809,9 +809,9 @@ function ProductListItem({ product, index = 0 }: ProductCardProps) {
                                         sizes="(max-width: 640px) 100px, 200px"
                                         quality={50}
                                         priority={isLikelyLcpImage}
-                                        loading={isLikelyLcpImage ? "eager" : "lazy"}
+                                        loading={isLikelyLcpImage ? undefined : "lazy"}
                                         fetchPriority={isLikelyLcpImage ? "high" : "auto"}
-                                        decoding={isLikelyLcpImage ? "sync" : "async"}
+                                        decoding="async"
                                     />
                                 ) : (
                                     <div className="absolute inset-0 flex items-center justify-center">

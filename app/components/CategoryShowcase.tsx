@@ -103,7 +103,7 @@ const CategoryPreview = React.memo(({ category, className, priority = false }: C
             priority={priority}
             fetchPriority={priority ? "high" : "auto"}
             loading={priority ? undefined : "lazy"}
-            decoding={priority ? "sync" : "async"}
+            decoding="async"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             quality={50}
           />

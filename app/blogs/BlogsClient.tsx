@@ -229,7 +229,7 @@ export default function BlogsClient({
                                                 quality={30}
                                                 priority={index < 3}
                                                 fetchPriority={index < 3 ? "high" : "auto"}
-                                                decoding={index < 3 ? "sync" : "async"}
+                                                decoding="async"
                                                 loading={index < 3 ? undefined : "lazy"}
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
