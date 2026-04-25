@@ -119,28 +119,13 @@ export default function BlogsClient({
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-[#050505] dark:to-[#0A0A0A] md:py-4">
-            {/* Hero Section */}
-            <div className="relative bg-linear-to-br from-[#2C2C2C] via-[#3A3A3A] to-[#2C2C2C] text-white py-14 md:py-24 overflow-hidden">
-                <div className="absolute inset-0 opacity-5" aria-hidden="true">
-                    <div className="absolute top-0 left-0 w-64 h-64 md:w-96 md:h-96 bg-[#2C2C2C] rounded-full"></div>
-                    <div className="absolute bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-[#2C2C2C] rounded-full"></div>
-                </div>
-
-                <div className="container mx-auto px-4 relative z-10 mt-6 md:mt-0">
-                    <div className="text-center mb-8 md:mb-12">
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-wide mb-4 md:mb-6 text-white">
-                            Our <span className="text-[#7DD3FC]">Blog</span>
-                        </h1>
-                        <p className="text-base sm:text-lg md:text-xl font-light text-gray-300 max-w-2xl mx-auto leading-relaxed px-2 md:px-0">
-                            Expert tips, guides, and insights on water tanks, pipes & plumbing solutions
-                        </p>
-                    </div>
-
-                    {/* Search Bar */}
+        <div className="container mx-auto px-4 py-8 md:py-16">
+            {/* Search Bar */}
+            <div className="mb-8 md:mb-12">
+                <div className="max-w-2xl mx-auto">
                     <form
                         onSubmit={(e) => e.preventDefault()}
-                        className="max-w-2xl mx-auto px-2 md:px-0"
+                        className="px-2 md:px-0"
                     >
                         <div className="relative">
                             <svg className="absolute left-5 md:left-6 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +143,6 @@ export default function BlogsClient({
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-8 md:py-16">
                 {/* Category Filter */}
                 <div className="mb-8 md:mb-12 relative">
                     <div className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-2.5 md:gap-3 pb-6 pt-3 px-2 -mx-2 md:px-4 md:-mx-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -322,7 +306,6 @@ export default function BlogsClient({
                         </button>
                     </div>
                 )}
-            </div>
         </div>
     );
 }
