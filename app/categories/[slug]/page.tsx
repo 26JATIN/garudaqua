@@ -124,7 +124,7 @@ export default async function CategorySeoPage(
                     sizes="100vw"
                     priority
                     fetchPriority="high"
-                    decoding="sync"
+                    decoding="async"
                     quality={85}
                 />
 
