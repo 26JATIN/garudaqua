@@ -1,10 +1,11 @@
-import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import BlogsClient from './BlogsClient';
 import { collectionPageSchema } from '@/lib/jsonld';
 
 export const dynamic = "force-static";
+
+const BLOGS_PAGE_SIZE = 12;
 
 export const metadata: Metadata = {
   title: 'Blog — Tips, Guides & Insights | Garud Aqua Solutions',
@@ -32,7 +33,7 @@ async function getInitialData() {
     prisma.blogPost.findMany({
       where: { isPublished: true },
       orderBy: { publishedAt: 'desc' },
-      take: 1000,
+      take: BLOGS_PAGE_SIZE,
       select: {
         id: true,
         slug: true,
@@ -64,7 +65,7 @@ async function getInitialData() {
       publishedAt: b.publishedAt ? b.publishedAt.toISOString() : new Date().toISOString(),
     })),
     total,
-    totalPages: Math.ceil(total / 1000),
+    totalPages: Math.ceil(total / BLOGS_PAGE_SIZE),
   };
 }
 

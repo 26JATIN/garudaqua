@@ -5,6 +5,8 @@ import NavigationLink from "@/app/components/NavigationLink";
 import Image from "next/image";
 import { toast } from "sonner";
 
+const BLOGS_PAGE_SIZE = 12;
+
 // ===== Type Definitions =====
 interface Blog {
     id: string;
@@ -50,6 +52,7 @@ export default function BlogsClient({
     const [blogs, setBlogs] = useState<Blog[]>(initialBlogs ?? []);
     const [categories, setCategories] = useState<BlogCategory[]>(initialCategories ?? []);
     const [loading, setLoading] = useState(!hasInitialData);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(initialTotalPages ?? 1);
 
@@ -61,27 +64,36 @@ export default function BlogsClient({
             .catch(() => setCategories([]));
     }, [hasInitialData]);
 
-    const fetchBlogs = useCallback(async () => {
-        setLoading(true);
+    const fetchBlogs = useCallback(async (nextPage = 1, append = false) => {
+        if (append) {
+            setLoadingMore(true);
+        } else {
+            setLoading(true);
+        }
         try {
             const params = new URLSearchParams();
             if (category !== "all") params.set("category", category);
             if (searchTerm.trim()) params.set("search", searchTerm.trim());
-            params.set("page", "1");
-            params.set("limit", "1000");
+            params.set("page", String(nextPage));
+            params.set("limit", String(BLOGS_PAGE_SIZE));
 
             const res = await fetch(`/api/blogs?${params.toString()}`);
             if (!res.ok) throw new Error("Failed to fetch blogs");
 
             const data = await res.json();
-            setBlogs(data.blogs);
+            setBlogs((current) => append ? [...current, ...data.blogs] : data.blogs);
+            setPage(nextPage);
             setTotalPages(data.totalPages);
         } catch {
             toast.error("Failed to load blogs.");
         } finally {
-            setLoading(false);
+            if (append) {
+                setLoadingMore(false);
+            } else {
+                setLoading(false);
+            }
         }
-    }, [category, searchTerm, page]);
+    }, [category, searchTerm]);
 
     useEffect(() => {
         // Skip the very first fetch if we have server-prefetched data
@@ -90,7 +102,7 @@ export default function BlogsClient({
             return;
         }
         isInitialMount.current = false;
-        fetchBlogs();
+        fetchBlogs(1);
     }, [fetchBlogs, hasInitialData]);
 
     // Reset to page 1 when filters change
@@ -227,9 +239,9 @@ export default function BlogsClient({
                                                 className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                                 quality={30}
-                                                priority={index < 3}
-                                                fetchPriority={index < 3 ? "high" : "auto"}
-                                                loading={index < 3 ? undefined : "lazy"}
+                                                priority={index === 0}
+                                                fetchPriority={index === 0 ? "high" : "auto"}
+                                                loading={index === 0 ? undefined : "lazy"}
                                             />
                                             <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         </div>
@@ -298,7 +310,18 @@ export default function BlogsClient({
                     </div>
                 )}
 
-                {/* Pagination Removed */}
+                {!loading && page < totalPages && (
+                    <div className="mt-10 flex justify-center">
+                        <button
+                            type="button"
+                            onClick={() => fetchBlogs(page + 1, true)}
+                            disabled={loadingMore}
+                            className="px-6 py-3 rounded-full bg-[#0369A1] text-white text-sm md:text-base font-medium shadow-md hover:bg-[#075985] disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
+                        >
+                            {loadingMore ? "Loading..." : "Load more"}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
