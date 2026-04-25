@@ -111,8 +111,8 @@ export default function BlogsClient({
             {/* Hero Section */}
             <div className="relative bg-linear-to-br from-[#2C2C2C] via-[#3A3A3A] to-[#2C2C2C] text-white py-14 md:py-24 overflow-hidden">
                 <div className="absolute inset-0 opacity-5" aria-hidden="true">
-                    <div className="absolute top-0 left-0 w-64 h-64 md:w-96 md:h-96 bg-[#2C2C2C] rounded-full filter blur-3xl"></div>
-                    <div className="absolute bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-[#2C2C2C] rounded-full filter blur-3xl"></div>
+                    <div className="absolute top-0 left-0 w-64 h-64 md:w-96 md:h-96 bg-[#2C2C2C] rounded-full"></div>
+                    <div className="absolute bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-[#2C2C2C] rounded-full"></div>
                 </div>
 
                 <div className="container mx-auto px-4 relative z-10 mt-6 md:mt-0">
