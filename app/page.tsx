@@ -3,7 +3,7 @@ import dynamicImports from "next/dynamic";
 import Hero from './components/hero';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema, videoSchema } from '@/lib/jsonld';
-import { getCdnUrl } from '@/lib/utils';
+import { getCdnUrl, getRawCdnUrl } from '@/lib/utils';
 
 export const dynamic = "force-static";
 
@@ -193,7 +193,7 @@ export default async function Home() {
             description: v.description || `${v.title} — product showcase by Garud Aqua Solutions`,
             thumbnailUrl: safeThumbnail,
             uploadDate: "2026-01-01T00:00:00+05:30",
-            contentUrl: getCdnUrl(v.videoUrl) || v.videoUrl,
+            contentUrl: getRawCdnUrl(v.videoUrl) || v.videoUrl,
             duration: v.duration ? `PT${v.duration}S` : undefined,
             watchPageUrl: "https://www.garudaqua.in",
           })) }} />

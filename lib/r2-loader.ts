@@ -1,28 +1,51 @@
 import type { ImageLoaderProps } from "next/image";
 
-export default function r2Loader({ src, width, quality }: ImageLoaderProps) {
-  const params = [
-    `width=${width}`,
-    `quality=${quality || 75}`,
-    `format=webp`,
-    `fit=scale-down`
-  ].join(",");
+/**
+ * Cloudflare Image Transformation URL builder.
+ * Used by next/image custom loader AND by raw <img> / CSS background helpers.
+ *
+ * Routing rules:
+ *   - R2 bucket images (img.garudaqua.in)  → img.garudaqua.in/cdn-cgi/image/…
+ *   - Local /public assets (e.g. logos)    → www.garudaqua.in/cdn-cgi/image/…
+ */
 
-  // Extract the relative path if the src is an absolute URL to our current bucket domain.
-  // This produces a cleaner /cdn-cgi/image/w=...,q=.../garudaqua/products/... URL.
+const R2_DOMAIN = "img.garudaqua.in";
+const MAIN_DOMAIN = "www.garudaqua.in";
+
+/** Core builder — generates a full Cloudflare Image Transformation URL. */
+export function cfImageUrl(
+  src: string,
+  opts: { width?: number; quality?: number; format?: string; fit?: string } = {}
+): string {
+  const { width, quality = 75, format = "webp", fit = "scale-down" } = opts;
+
+  const parts: string[] = [
+    `quality=${quality}`,
+    `format=${format}`,
+    `fit=${fit}`,
+  ];
+  if (width) parts.unshift(`width=${width}`);
+
+  const params = parts.join(",");
+
+  // Strip known R2 domain prefix to get the relative object key.
   let imagePath = src;
-  if (src.startsWith("https://img.garudaqua.in/")) {
-    imagePath = src.replace("https://img.garudaqua.in/", "");
-  } else if (src.startsWith("http://img.garudaqua.in/")) {
-    imagePath = src.replace("http://img.garudaqua.in/", "");
-  }
-  
-  // If the path starts with a slash, it is a local asset hosted on Vercel.
-  // We point Cloudflare Image Resizing to the absolute URL of the main domain.
-  if (imagePath.startsWith("/")) {
-    return `https://www.garudaqua.in/cdn-cgi/image/${params}/https://www.garudaqua.in${imagePath}`;
+  if (src.startsWith(`https://${R2_DOMAIN}/`)) {
+    imagePath = src.replace(`https://${R2_DOMAIN}/`, "");
+  } else if (src.startsWith(`http://${R2_DOMAIN}/`)) {
+    imagePath = src.replace(`http://${R2_DOMAIN}/`, "");
   }
 
-  // Otherwise, it's an R2 bucket object, resize from the R2 custom domain
-  return `https://img.garudaqua.in/cdn-cgi/image/${params}/${imagePath}`;
+  // Local assets hosted on Vercel (/public folder)
+  if (imagePath.startsWith("/")) {
+    return `https://${MAIN_DOMAIN}/cdn-cgi/image/${params}/https://${MAIN_DOMAIN}${imagePath}`;
+  }
+
+  // R2 bucket objects
+  return `https://${R2_DOMAIN}/cdn-cgi/image/${params}/${imagePath}`;
+}
+
+/** next/image custom loader — called automatically by every <Image> component. */
+export default function r2Loader({ src, width, quality }: ImageLoaderProps) {
+  return cfImageUrl(src, { width, quality: quality || 75 });
 }

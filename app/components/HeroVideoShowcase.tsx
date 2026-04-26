@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import NavigationLink from "@/app/components/NavigationLink";
 import { useAnimateOnView } from "@/lib/useAnimateOnView";
-import { getCdnUrl } from "@/lib/utils";
+import { getCdnUrl, getRawCdnUrl } from "@/lib/utils";
 
 interface HeroVideo {
     id: string;
@@ -151,7 +151,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                                         poster={video.thumbnailUrl ? getCdnUrl(video.thumbnailUrl) : ""}
                                     >
                                         {video.videoUrl && (
-                                            <source src={getCdnUrl(video.videoUrl)} />
+                                            <source src={getRawCdnUrl(video.videoUrl)} />
                                         )}
                                         Your browser does not support the video tag.
                                     </video>
