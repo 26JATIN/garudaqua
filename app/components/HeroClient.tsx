@@ -33,7 +33,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
                 height={1080}
                 sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 100vw"
                 quality={85}
-                decoding="async"
+                decoding={index === 0 ? "sync" : "async"}
                 className="w-full h-auto"
             />
         );
@@ -70,7 +70,7 @@ const SlideImage = ({ slide, index }: { slide: HeroSlide; index: number }) => {
             <img
                 {...rest}
                 alt={slide.title || "Garud"}
-                decoding="async"
+                decoding={index === 0 ? "sync" : "async"}
                 className="w-full h-auto"
             />
         </picture>

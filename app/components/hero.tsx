@@ -54,7 +54,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
                     height={1080}
                     sizes={responsiveSizes}
                     quality={85}
-                    decoding="async"
+                    decoding="sync"
                     className="w-full h-auto"
                 />
             </>
@@ -94,7 +94,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
                     <img
                         {...rest}
                         alt={slide.title || "Garud"}
-                        decoding="async"
+                        decoding="sync"
                         className="w-full h-auto"
                     />
                 </picture>
