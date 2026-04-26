@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { permanentRedirect, notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import ProductsPage from "../components/ProductsPage";
+import r2Loader from '@/lib/r2-loader';
 import { collectionPageSchema } from '@/lib/jsonld';
 
 export const dynamic = "force-static";
@@ -69,7 +70,7 @@ export async function generateMetadata({
 function buildPreloadSrcSet(src: string) {
   const widths = [256, 384, 640, 750, 828];
   return widths
-    .map(w => `${src}?w=${w}&q=75  ${w}w`) // using basic params, Next.js handles it or we pass it straight through if not processed by Next's server resizer in preload
+    .map(w => `${r2Loader({ src, width: w, quality: 75 })} ${w}w`) 
     .join(', ');
 }
 

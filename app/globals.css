@@ -176,8 +176,7 @@ html {
 
 /* Prevent text selection on interactive elements */
 button,
-a,
-img {
+a {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
