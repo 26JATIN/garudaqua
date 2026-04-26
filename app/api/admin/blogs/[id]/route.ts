@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
+import { deleteR2ByUrl } from "@/lib/r2";
 import { revalidateAndWarm } from "@/lib/revalidate";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
@@ -71,7 +71,7 @@ export async function PUT(
     });
 
     if (existing?.featuredImage && existing.featuredImage !== body.featuredImage) {
-      await deleteCloudinaryByUrl(existing.featuredImage);
+      await deleteR2ByUrl(existing.featuredImage);
     }
 
     // Purge new slug path, old slug path (if changed), and every previously-known
@@ -110,7 +110,7 @@ export async function DELETE(
     const blog = await prisma.blogPost.findUnique({ where: { id } });
     await prisma.blogPost.delete({ where: { id } });
 
-    if (blog?.featuredImage) await deleteCloudinaryByUrl(blog.featuredImage);
+    if (blog?.featuredImage) await deleteR2ByUrl(blog.featuredImage);
 
     // Purge current slug + all former slugs so no stale page remains in Cloudflare
     const pathsToPurge = ["/","/blogs", "/api/blogs"];

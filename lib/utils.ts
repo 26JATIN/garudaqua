@@ -6,38 +6,32 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Add Cloudinary transforms to a URL for optimized delivery.
- * Returns the original URL if it's not a Cloudinary URL.
+ * Build a CDN image URL for use in raw <img> tags.
+ * For Next.js <Image>, just pass the src directly — the default optimiser handles it.
+ * Returns the original URL as-is (R2 images are served via img.garudaqua.in CDN).
  */
-export function cloudinaryUrl(src: string, width: number, quality: number = 80): string {
-  if (!src || !src.includes("res.cloudinary.com")) return src;
-  const params = `w_${width},q_${quality},f_webp,c_fill`;
-  return src
-    .replace("/upload/", `/upload/${params}/`)
-    .replace("https://res.cloudinary.com", "/cdn-img");
+export function cdnImageUrl(src: string, _width?: number, _quality?: number): string {
+  return src || "";
 }
 
 /**
- * Routes a raw Cloudinary URL through the domain's /cdn-img/ proxy for edge caching.
- * Adds webp format and auto-quality if it's a naked upload URL.
+ * Returns the public CDN URL for an R2 asset.
+ * R2 images served via custom domain are already on Cloudflare CDN —
+ * no proxy rewrite needed.
  */
 export function getCdnUrl(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
-  if (!url.includes("res.cloudinary.com")) return url;
-  
-  let optimizedUrl = url;
-  if (optimizedUrl.includes("/upload/") && !optimizedUrl.includes("q_") && !optimizedUrl.includes("f_")) {
-     optimizedUrl = optimizedUrl.replace("/upload/", "/upload/q_auto,f_webp/");
-  }
-  
-  return optimizedUrl.replace("https://res.cloudinary.com", "/cdn-img");
+  return url;
 }
 
 /**
- * Auto-generates a first-frame poster thumbnail URL for a Cloudinary video.
- * Assumes videoUrl is a Cloudinary URL (or our /cdn-img/ proxy).
+ * Returns the manually-uploaded thumbnail URL for a video.
+ * R2 does not auto-generate video thumbnails (unlike Cloudinary),
+ * so we rely on the manually-provided thumbnailUrl field.
  */
 export function getVideoPosterUrl(videoUrl: string | undefined | null): string | undefined {
   if (!videoUrl) return undefined;
-  return getCdnUrl(videoUrl.replace(/\.(mp4|webm|mov|ogg)$/i, '.jpg'));
+  // Return undefined — the caller should use the manual thumbnailUrl instead.
+  // This function is kept for backward compatibility.
+  return undefined;
 }

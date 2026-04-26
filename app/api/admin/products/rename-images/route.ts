@@ -1,46 +1,7 @@
 import { NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-/**
- * Helper to extract public ID from a Cloudinary URL
- * Example: https://res.cloudinary.com/demo/image/upload/v12345/garudaqua/products/old-name.jpg
- * Returns: garudaqua/products/old-name
- */
-function getPublicIdFromUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
-  try {
-    // URL format: .../upload/v12345/garudaqua/products/filename.jpg
-    // or .../upload/garudaqua/products/filename.jpg
-    const uploadIndex = url.indexOf("/upload/");
-    if (uploadIndex === -1) return null;
-    
-    // Everything after /upload/
-    let afterUpload = url.substring(uploadIndex + 8);
-    
-    // Remove the version string (e.g. v1234567890/) if it exists
-    if (afterUpload.match(/^v\d+\//)) {
-      afterUpload = afterUpload.substring(afterUpload.indexOf("/") + 1);
-    }
-    
-    // Remove the file extension
-    const lastDotIndex = afterUpload.lastIndexOf(".");
-    if (lastDotIndex !== -1) {
-      return afterUpload.substring(0, lastDotIndex);
-    }
-    return afterUpload;
-  } catch (e) {
-    console.error("Failed to parse public ID from URL", url, e);
-    return null;
-  }
-}
+import { extractR2Key, copyR2Object, deleteFromR2 } from "@/lib/r2";
 
 // Utility to delay execution to avoid hitting rate limits
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -74,61 +35,47 @@ export async function POST() {
         const urlMap: Record<string, string> = {};
         
         // Let's store updates for prisma
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updates: { image?: string; images?: string[]; variantOptions?: any } = {};
         let needsUpdate = false;
 
         const processImageUrl = async (url: string, suffix: string): Promise<string> => {
-          const oldPublicId = getPublicIdFromUrl(url);
-          if (!oldPublicId) return url; // Cannot parse, skip
+          const oldKey = extractR2Key(url);
+          if (!oldKey) return url; // Cannot parse, skip
 
           // Avoid touching images that aren't in our expected folder structure
-          if (!oldPublicId.startsWith("garudaqua/products/")) {
+          if (!oldKey.startsWith("garudaqua/products/")) {
              return url;
           }
 
-          const filename = oldPublicId.split("/").pop() || "";
+          const filename = oldKey.split("/").pop() || "";
           
-          // If it's already properly named, skip (checking if it matches our slug standard)
+          // If it's already properly named, skip
           if (filename.startsWith(slugifiedStr + "-")) {
              return url; // Already renamed recently
           }
 
+          // Extract file extension
+          const ext = filename.includes(".") ? filename.split(".").pop() : "jpg";
           const shortTimestamp = Math.floor(Date.now() / 1000).toString(36);
-          const newPublicId = `garudaqua/products/${slugifiedStr}-${shortTimestamp}${suffix}`;
+          const newKey = `garudaqua/products/${slugifiedStr}-${shortTimestamp}${suffix}.${ext}`;
 
           try {
-             // Delay to prevent Cloudinary 420 Rate Limiting errors
-             await delay(1500); 
+             // Delay to prevent rate limiting
+             await delay(500);
              
-             // Retry logic for 420 timeouts
-             let attempt = 0;
-             let maxAttempts = 3;
+             const newUrl = await copyR2Object(oldKey, newKey);
              
-             while (attempt < maxAttempts) {
-                 try {
-                     const result = await cloudinary.uploader.rename(oldPublicId, newPublicId, { overwrite: true });
-                     urlMap[url] = result.secure_url; // Store mapping for variants
-                     return result.secure_url;
-                 } catch (retryErr: any) {
-                     attempt++;
-                     if (retryErr && retryErr.http_code === 420 && attempt < maxAttempts) {
-                         console.log(`Rate limited (420) on ${oldPublicId}. Retrying in ${attempt * 3} seconds...`);
-                         await delay(attempt * 3000); // 3s, 6s...
-                     } else {
-                         throw retryErr; // Pass error down to the main catch block
-                     }
-                 }
-             }
-             return url; // Fallback return if while loop exits unexpectedly
-          } catch (renameErr: any) {
-             // If the error is a 404 (Resource not found), it means the image doesn't exist in Cloudinary anymore
-             if (renameErr && renameErr.http_code === 404) {
-                 console.warn(`Cloudinary Resource not found (404) for: ${oldPublicId}. It may have been deleted.`);
-                 return url;
-             }
+             // Delete the old object
+             await deleteFromR2(oldKey).catch((err) =>
+               console.warn(`Failed to delete old R2 key ${oldKey}:`, err)
+             );
              
-             console.error(`Failed to rename ${oldPublicId} to ${newPublicId}`, renameErr);
-             return url; // Fallback to old URL if rename fails for other reasons
+             urlMap[url] = newUrl;
+             return newUrl;
+          } catch (renameErr) {
+             console.error(`Failed to rename ${oldKey} to ${newKey}`, renameErr);
+             return url; // Fallback to old URL if rename fails
           }
         };
 
@@ -152,8 +99,10 @@ export async function POST() {
               let variantNameSuffix = "";
               if (product.variantOptions && Array.isArray(product.variantOptions)) {
                   for (const optBase of product.variantOptions) {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       const opt = optBase as { values?: any[] };
                       if (opt && opt.values && Array.isArray(opt.values)) {
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                           const matchedVal = opt.values.find((v: any) => v.imageUrl === url);
                           if (matchedVal) {
                               const vName = (matchedVal.displayName || matchedVal.name).toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -180,8 +129,10 @@ export async function POST() {
         // Process variant options (replace any old URLs with new URLs)
         if (product.variantOptions && Array.isArray(product.variantOptions)) {
            let variantsChanged = false;
+           // eslint-disable-next-line @typescript-eslint/no-explicit-any
            const newVariantOptions = product.variantOptions.map((opt: any) => {
               if (opt.values && Array.isArray(opt.values)) {
+                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                  const newValues = opt.values.map((val: any) => {
                     if (val.imageUrl && urlMap[val.imageUrl]) {
                        variantsChanged = true;

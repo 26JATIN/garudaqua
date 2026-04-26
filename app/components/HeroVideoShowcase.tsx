@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import NavigationLink from "@/app/components/NavigationLink";
 import { useAnimateOnView } from "@/lib/useAnimateOnView";
-import { getVideoPosterUrl, getCdnUrl } from "@/lib/utils";
+import { getCdnUrl } from "@/lib/utils";
 
 interface HeroVideo {
     id: string;
@@ -148,7 +148,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                                         muted={isMuted}
                                         playsInline
                                         preload="none"
-                                        poster={video.thumbnailUrl ? getCdnUrl(video.thumbnailUrl) : getVideoPosterUrl(video.videoUrl)}
+                                        poster={video.thumbnailUrl ? getCdnUrl(video.thumbnailUrl) : ""}
                                     >
                                         {video.videoUrl && (
                                             <source src={getCdnUrl(video.videoUrl)} />

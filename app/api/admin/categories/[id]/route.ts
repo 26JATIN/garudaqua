@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
+import { deleteR2ByUrl } from "@/lib/r2";
 import { revalidateAndWarm } from "@/lib/revalidate";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
@@ -74,10 +74,10 @@ export async function PUT(
 
     // Delete old image from Cloudinary if changed
     if (existing?.image && existing.image !== body.image) {
-      await deleteCloudinaryByUrl(existing.image);
+      await deleteR2ByUrl(existing.image);
     }
     if (existing?.seoHeroImage && existing.seoHeroImage !== body.seoHeroImage) {
-      await deleteCloudinaryByUrl(existing.seoHeroImage);
+      await deleteR2ByUrl(existing.seoHeroImage);
     }
 
     // Purge listing page, new + old category filter URLs
@@ -122,8 +122,8 @@ export async function DELETE(
     const category = await prisma.category.findUnique({ where: { id } });
     await prisma.category.delete({ where: { id } });
 
-    if (category?.image) await deleteCloudinaryByUrl(category.image);
-    if (category?.seoHeroImage) await deleteCloudinaryByUrl(category.seoHeroImage);
+    if (category?.image) await deleteR2ByUrl(category.image);
+    if (category?.seoHeroImage) await deleteR2ByUrl(category.seoHeroImage);
 
     // Purge the listing page, the live category filter URL, and every former
     // slug filter URL so no stale Cloudflare-cached page survives the deletion.

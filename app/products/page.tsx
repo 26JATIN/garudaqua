@@ -65,20 +65,11 @@ export async function generateMetadata({
 }
 
 
-// Build a Cloudinary URL for preloading (same logic as cloudinary-loader)
-function buildPreloadUrl(src: string, width: number) {
-  if (!src.includes('res.cloudinary.com')) return src;
-  const params = `w_${width},q_auto:eco,f_webp,c_limit`;
-  return src
-    .replace('/upload/', `/upload/${params}/`)
-    .replace('https://res.cloudinary.com', '/cdn-img');
-}
-
 // Build srcSet string for preload (matches Next.js Image deviceSizes)
 function buildPreloadSrcSet(src: string) {
   const widths = [256, 384, 640, 750, 828];
   return widths
-    .map(w => `${buildPreloadUrl(src, w)} ${w}w`)
+    .map(w => `${src}?w=${w}&q=75  ${w}w`) // using basic params, Next.js handles it or we pass it straight through if not processed by Next's server resizer in preload
     .join(', ');
 }
 

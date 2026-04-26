@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
+import { deleteR2ByUrl } from "@/lib/r2";
 import { revalidateAndWarm } from "@/lib/revalidate";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
@@ -138,7 +138,7 @@ export async function PUT(
 
     // Delete old main image from Cloudinary if changed
     if (existing.image && existing.image !== body.image) {
-      await deleteCloudinaryByUrl(existing.image);
+      await deleteR2ByUrl(existing.image);
     }
 
     // Delete removed gallery images from Cloudinary
@@ -146,7 +146,7 @@ export async function PUT(
     const removedImages = (existing.images || []).filter(
       (img: string) => !newImages.includes(img)
     );
-    await Promise.all(removedImages.map((img: string) => deleteCloudinaryByUrl(img)));
+    await Promise.all(removedImages.map((img: string) => deleteR2ByUrl(img)));
 
     // Revalidate new slug, old slug (if changed), and every formerSlug so no
     // stale Cloudflare-cached page can serve the wrong product.
@@ -188,9 +188,9 @@ export async function DELETE(
     await prisma.product.delete({ where: { id } });
 
     // Delete all images from Cloudinary
-    if (product.image) await deleteCloudinaryByUrl(product.image);
+    if (product.image) await deleteR2ByUrl(product.image);
     await Promise.all(
-      (product.images || []).map((img: string) => deleteCloudinaryByUrl(img))
+      (product.images || []).map((img: string) => deleteR2ByUrl(img))
     );
 
     // Purge current slug + all former slugs so no stale page remains in Cloudflare

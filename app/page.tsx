@@ -3,7 +3,7 @@ import dynamicImports from "next/dynamic";
 import Hero from './components/hero';
 import { prisma } from '@/lib/prisma';
 import { webPageSchema, videoSchema } from '@/lib/jsonld';
-import { getVideoPosterUrl, getCdnUrl } from '@/lib/utils';
+import { getCdnUrl } from '@/lib/utils';
 
 export const dynamic = "force-static";
 
@@ -184,7 +184,7 @@ export default async function Home() {
       })) }} />
       {videoData.map(v => {
         const manualThumb = v.thumbnailUrl?.trim() ? getCdnUrl(v.thumbnailUrl.trim()) : null;
-        const autoThumb = v.videoUrl ? getVideoPosterUrl(v.videoUrl) : null;
+        const autoThumb = null; // R2 videos don't have auto-generated thumbnails
         const safeThumbnail = manualThumb || autoThumb || "https://www.garudaqua.in/DesktopLogo.png";
 
         return (

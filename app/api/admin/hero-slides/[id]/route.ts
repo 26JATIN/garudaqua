@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
+import { deleteR2ByUrl } from "@/lib/r2";
 import { revalidateAndWarm } from "@/lib/revalidate";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
@@ -28,10 +28,10 @@ export async function PUT(
     });
 
     if (existing?.image && existing.image !== body.image) {
-      await deleteCloudinaryByUrl(existing.image);
+      await deleteR2ByUrl(existing.image);
     }
     if (existing?.mobileImage && existing.mobileImage !== body.mobileImage) {
-      await deleteCloudinaryByUrl(existing.mobileImage);
+      await deleteR2ByUrl(existing.mobileImage);
     }
 
     await revalidateAndWarm(["/", "/api/hero-slides"]);
@@ -57,8 +57,8 @@ export async function DELETE(
     const slide = await prisma.heroSlide.findUnique({ where: { id } });
     await prisma.heroSlide.delete({ where: { id } });
 
-    if (slide?.image) await deleteCloudinaryByUrl(slide.image);
-    if (slide?.mobileImage) await deleteCloudinaryByUrl(slide.mobileImage);
+    if (slide?.image) await deleteR2ByUrl(slide.image);
+    if (slide?.mobileImage) await deleteR2ByUrl(slide.mobileImage);
 
     await revalidateAndWarm(["/", "/api/hero-slides"]);
     return NextResponse.json({ success: true });

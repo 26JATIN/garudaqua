@@ -20,15 +20,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  async rewrites() {
-    return [
-      {
-        source: "/cdn-img/:path*",
-        destination: "https://res.cloudinary.com/:path*",
-      },
-    ];
-  },
-
   experimental: {
     viewTransition: false,
     inlineCss: true,
@@ -39,15 +30,17 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    loader: "custom",
-    loaderFile: "./lib/cloudinary-loader.ts",
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 31536000,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     qualities: [30, 40, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [128, 256, 384],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "res.cloudinary.com",
+        hostname: "img.garudaqua.in",
         pathname: "/**",
       },
     ],

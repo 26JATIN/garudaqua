@@ -3,7 +3,7 @@ import "@/app/styles/animations.css";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePageTransition } from './PageTransition';
-import { cloudinaryUrl } from '@/lib/utils';
+import { cdnImageUrl } from '@/lib/utils';
 
 interface Suggestion {
     id: string;
@@ -351,7 +351,7 @@ export default function SearchBar({ className = "", placeholder = "Search for wa
                                                 {suggestion.image ? (
                                                     // eslint-disable-next-line @next/next/no-img-element
                                                     <img
-                                                        src={cloudinaryUrl(suggestion.image, 80)}
+                                                        src={cdnImageUrl(suggestion.image, 80)}
                                                         alt={suggestion.text}
                                                         className="w-full h-full object-cover"
                                                         loading="lazy"

@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
+import { getPresignedUploadUrl, r2PublicUrl } from "@/lib/r2";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 /**
- * Generate a signed upload URL so the browser can upload directly to Cloudinary
+ * Generate a presigned PUT URL so the browser can upload directly to R2
  * without going through our server. This removes file-size restrictions imposed
  * by Vercel's serverless function body limits.
  */
@@ -17,33 +11,28 @@ export async function POST(request: Request) {
   const session = await requireAdmin();
   if (!session) return unauthorizedResponse();
   try {
-    const { folder = "garudaqua", resourceType = "auto", publicId } = await request.json();
+    const { key, contentType = "application/octet-stream" } =
+      await request.json();
 
-    const timestamp = Math.round(Date.now() / 1000);
-    const paramsToSign: Record<string, string | number> = { timestamp, folder };
-    
-    if (publicId) {
-      paramsToSign.public_id = publicId;
+    if (!key) {
+      return NextResponse.json(
+        { error: "Missing 'key' in request body" },
+        { status: 400 }
+      );
     }
 
-    const signature = cloudinary.utils.api_sign_request(
-      paramsToSign,
-      process.env.CLOUDINARY_API_SECRET!
-    );
+    const presignedUrl = await getPresignedUploadUrl(key, contentType);
+    const publicUrl = r2PublicUrl(key);
 
     return NextResponse.json({
-      signature,
-      timestamp,
-      folder,
-      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      apiKey: process.env.CLOUDINARY_API_KEY,
-      resourceType,
-      publicId,
+      presignedUrl,
+      publicUrl,
+      key,
     });
   } catch (error) {
-    console.error("Error generating Cloudinary signature:", error);
+    console.error("Error generating R2 presigned URL:", error);
     return NextResponse.json(
-      { error: "Failed to generate upload signature" },
+      { error: "Failed to generate upload URL" },
       { status: 500 }
     );
   }

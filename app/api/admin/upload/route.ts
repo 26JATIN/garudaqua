@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { uploadToCloudinary } from "@/lib/cloudinary";
+import { uploadToR2 } from "@/lib/r2";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
 // Allow up to 60s for large video uploads on Vercel
@@ -17,19 +17,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Convert file to base64 data URL
+    // Convert file to Buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const base64 = buffer.toString("base64");
-    const mimeType = file.type || "application/octet-stream";
-    const dataUrl = `data:${mimeType};base64,${base64}`;
 
-    // Determine resource type
-    const resourceType = file.type.startsWith("video/") ? "video" : "image";
+    // Generate a unique filename
+    const ext = file.name.split(".").pop() || "bin";
+    const timestamp = Math.floor(Date.now() / 1000).toString(36);
+    const rand = Math.random().toString(36).slice(2, 8);
+    const fileName = `${timestamp}-${rand}.${ext}`;
 
-    const result = await uploadToCloudinary(dataUrl, folder, resourceType);
+    const result = await uploadToR2(buffer, folder, fileName, file.type);
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(
+      { url: result.url, publicId: result.key },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error uploading file:", error);
     return NextResponse.json(

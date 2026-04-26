@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
+import { deleteR2ByUrl } from "@/lib/r2";
 import { revalidateAndWarm } from "@/lib/revalidate";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
@@ -31,10 +31,10 @@ export async function PUT(
     });
 
     if (existing?.videoUrl && existing.videoUrl !== body.videoUrl) {
-      await deleteCloudinaryByUrl(existing.videoUrl, "video");
+      await deleteR2ByUrl(existing.videoUrl);
     }
     if (existing?.thumbnailUrl && existing.thumbnailUrl !== body.thumbnailUrl) {
-      await deleteCloudinaryByUrl(existing.thumbnailUrl);
+      await deleteR2ByUrl(existing.thumbnailUrl);
     }
 
     await revalidateAndWarm(["/", "/api/hero-videos"]);
@@ -60,8 +60,8 @@ export async function DELETE(
     const video = await prisma.heroVideo.findUnique({ where: { id } });
     await prisma.heroVideo.delete({ where: { id } });
 
-    if (video?.videoUrl) await deleteCloudinaryByUrl(video.videoUrl, "video");
-    if (video?.thumbnailUrl) await deleteCloudinaryByUrl(video.thumbnailUrl);
+    if (video?.videoUrl) await deleteR2ByUrl(video.videoUrl);
+    if (video?.thumbnailUrl) await deleteR2ByUrl(video.thumbnailUrl);
 
     await revalidateAndWarm(["/", "/api/hero-videos"]);
     return NextResponse.json({ success: true });

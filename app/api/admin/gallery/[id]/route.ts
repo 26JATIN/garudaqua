@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { deleteCloudinaryByUrl } from "@/lib/cloudinary";
+import { deleteR2ByUrl } from "@/lib/r2";
 import { revalidateAndWarm } from "@/lib/revalidate";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth-guard";
 
@@ -32,11 +32,10 @@ export async function PUT(
     });
 
     if (existing?.mediaUrl && existing.mediaUrl !== body.mediaUrl) {
-      const resType = existing.mediaType === "VIDEO" ? "video" : "image";
-      await deleteCloudinaryByUrl(existing.mediaUrl, resType as "image" | "video");
+      await deleteR2ByUrl(existing.mediaUrl);
     }
     if (existing?.thumbnailUrl && existing.thumbnailUrl !== body.thumbnailUrl) {
-      await deleteCloudinaryByUrl(existing.thumbnailUrl);
+      await deleteR2ByUrl(existing.thumbnailUrl);
     }
 
     await revalidateAndWarm(["/", "/api/gallery"]);
@@ -63,10 +62,9 @@ export async function DELETE(
     await prisma.galleryItem.delete({ where: { id } });
 
     if (item?.mediaUrl) {
-      const resType = item.mediaType === "VIDEO" ? "video" : "image";
-      await deleteCloudinaryByUrl(item.mediaUrl, resType as "image" | "video");
+      await deleteR2ByUrl(item.mediaUrl);
     }
-    if (item?.thumbnailUrl) await deleteCloudinaryByUrl(item.thumbnailUrl);
+    if (item?.thumbnailUrl) await deleteR2ByUrl(item.thumbnailUrl);
 
     await revalidateAndWarm(["/", "/api/gallery"]);
     return NextResponse.json({ success: true });
