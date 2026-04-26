@@ -30,8 +30,8 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 31536000,
+    loader: "custom",
+    loaderFile: "./lib/r2-loader.ts",
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     qualities: [30, 40, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100],
