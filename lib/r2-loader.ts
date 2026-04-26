@@ -17,11 +17,12 @@ export default function r2Loader({ src, width, quality }: ImageLoaderProps) {
     imagePath = src.replace("http://img.garudaqua.in/", "");
   }
   
-  // If the path starts with a slash, simply remove it
+  // If the path starts with a slash, it is a local asset hosted on Vercel.
+  // We point Cloudflare Image Resizing to the absolute URL of the main domain.
   if (imagePath.startsWith("/")) {
-      imagePath = imagePath.slice(1);
+    return `https://www.garudaqua.in/cdn-cgi/image/${params}/https://www.garudaqua.in${imagePath}`;
   }
 
-  // Cloudflare's cdn-cgi/image requires the hostname to be the proxied zone
+  // Otherwise, it's an R2 bucket object, resize from the R2 custom domain
   return `https://img.garudaqua.in/cdn-cgi/image/${params}/${imagePath}`;
 }
