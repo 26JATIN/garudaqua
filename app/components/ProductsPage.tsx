@@ -766,7 +766,7 @@ function ProductCard({ product, index }: ProductCardProps) {
                                     </svg>
                                 </div>
                             )}
-                            <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
                         </div>
                         <div className="p-3 md:p-4 lg:p-6 flex flex-col flex-1 relative bg-white dark:bg-[#0A0A0A]">
                             <h3 className="text-[#2C2C2C] dark:text-gray-100 font-medium text-[13px] sm:text-sm md:text-base lg:text-lg mb-2 md:mb-3 group-hover:text-[#0EA5E9] transition-colors leading-tight line-clamp-2 min-h-10 md:min-h-12 lg:min-h-14 flex items-start">

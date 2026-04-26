@@ -109,7 +109,7 @@ const CategoryPreview = React.memo(({ category, className, priority = false }: C
           />
 
           {/* Hover overlay */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none" />
         </>
       ) : null}
 
@@ -128,8 +128,6 @@ const CategoryPreview = React.memo(({ category, className, priority = false }: C
         </div>
       )}
 
-      {/* Click overlay for cards */}
-      <div className="absolute inset-0 bg-transparent cursor-pointer z-10" />
     </div>
   );
 });
@@ -171,10 +169,10 @@ const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: Subcategor
         )}
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent pointer-events-none"></div>
 
         {/* Subcategory Name */}
-        <div className="absolute inset-x-0 bottom-0 p-2">
+        <div className="absolute inset-x-0 bottom-0 p-2 pointer-events-none">
           <p className="text-white text-xs font-medium text-center line-clamp-2 drop-shadow-lg">
             {subcategory.name}
           </p>
