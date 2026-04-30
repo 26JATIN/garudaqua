@@ -52,7 +52,6 @@ export const metadata: Metadata = {
   creator: "Garud Aqua Solutions",
   publisher: "Garud Aqua Solutions",
   category: "Business",
-  manifest: "/manifest.json",
   alternates: {
     canonical: SITE_URL,
   },
@@ -92,25 +91,9 @@ export const metadata: Metadata = {
     images: [`${SITE_URL}/DesktopLogo.png`],
     creator: "@garudaqua",
   },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Garud",
-    startupImage: ["/icons/icon-512x512.png"],
-  },
   icons: {
     icon: [
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
       { url: "/favicon.png", type: "image/png" },
-    ],
-    shortcut: "/icons/icon-192x192.png",
-    apple: [
-      { url: "/icons/icon-152x152.png", sizes: "152x152", type: "image/png" },
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
-    ],
-    other: [
-      { rel: "mask-icon", url: "/icons/icon-512x512-maskable.png" },
     ],
   },
 };
