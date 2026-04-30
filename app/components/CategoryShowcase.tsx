@@ -310,7 +310,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
     loadData();
   }, [fetchCategories, fetchProducts, initialCategories, initialProducts]);
 
-  const MAX_DISPLAYED = 50;
+  const MAX_DISPLAYED = 12;
 
   // Function to scroll to the top of the section smoothly
   const scrollToSection = useCallback(() => {
@@ -556,23 +556,27 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                         }).length;
 
                       return (
-                        <button
+                        <div
                           key={filter}
-                          onClick={() => handleCategoryChange(filter)}
-                          className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-500 ease-out hover:scale-105 flex items-center justify-between group ${selectedCategory === filter
-                            ? 'bg-linear-to-r from-[#0EA5E9] to-[#0284C7] text-white shadow-lg shadow-[#0EA5E9]/20'
-                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
-                            } ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+                          className={`transform transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
                           style={{ transitionDelay: `${250 + index * 80}ms` }}
                         >
-                          <span className="truncate">{filter}</span>
-                          <span className={`ml-2 text-xs px-2 py-1 rounded-full transition-colors ${selectedCategory === filter
-                            ? 'bg-white/20 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-[#0EA5E9] group-hover:text-white'
-                            }`}>
-                            {count}
-                          </span>
-                        </button>
+                          <button
+                            onClick={() => handleCategoryChange(filter)}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ease-out hover:scale-105 flex items-center justify-between group ${selectedCategory === filter
+                              ? 'bg-linear-to-r from-[#0EA5E9] to-[#0284C7] text-white shadow-lg shadow-[#0EA5E9]/20'
+                              : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
+                              }`}
+                          >
+                            <span className="truncate">{filter}</span>
+                            <span className={`ml-2 text-xs px-2 py-1 rounded-full transition-colors ${selectedCategory === filter
+                              ? 'bg-white/20 text-white'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-[#0EA5E9] group-hover:text-white'
+                              }`}>
+                              {count}
+                            </span>
+                          </button>
+                        </div>
                       );
                     })}
                   </div>

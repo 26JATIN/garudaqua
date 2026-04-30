@@ -10,8 +10,8 @@ export const dynamic = "force-static";
 // Lazy load below-the-fold components to reduce initial JS bundle
 const CategoryShowcase = dynamicImports(() => import('./components/CategoryShowcase'));
 const Benefits = dynamicImports(() => import('./components/Benefits'));
-const ImageGallery = dynamicImports(() => import('./components/ImageGallery'));
-const VideoShowcaseSection = dynamicImports(() => import('./components/HeroVideoShowcase'));
+const ImageGallery = dynamicImports(() => import('./components/ImageGallery'), { ssr: false });
+const VideoShowcaseSection = dynamicImports(() => import('./components/HeroVideoShowcase'), { ssr: false });
 const Testimonials = dynamicImports(() => import('./components/Testimonials'));
 const LatestBlogs = dynamicImports(() => import('./components/LatestBlogs'));
 
