@@ -75,31 +75,15 @@ interface CardProps {
 
 // Category Preview Component
 const CategoryPreview = React.memo(({ category, className, priority = false }: CategoryPreviewProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
-
-  const handleLoad = useCallback(() => {
-    setIsLoaded(true);
-    setHasError(false);
-  }, []);
-
-  const handleError = useCallback(() => {
-    setHasError(true);
-    setIsLoaded(false);
-  }, []);
-
   return (
-    <div className={`relative w-full h-full overflow-hidden ${className || ''}`}>
+    <div className={`relative w-full h-full overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0A] ${className || ''}`}>
       {category.image ? (
         <>
           <Image
             src={category.image}
             alt={`${category.name} — water management category`}
             fill={true}
-            className={`object-cover object-top transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'
-              } ${hasError ? 'hidden' : 'block'}`}
-            onLoad={handleLoad}
-            onError={handleError}
+            className="object-cover object-top transition-transform duration-700"
             priority={priority}
             fetchPriority={priority ? "high" : "auto"}
             loading={priority ? undefined : "lazy"}
@@ -107,27 +91,17 @@ const CategoryPreview = React.memo(({ category, className, priority = false }: C
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             quality={50}
           />
-
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none" />
         </>
-      ) : null}
-
-      {/* Loading state */}
-      {(!isLoaded && !hasError) && category.image && (
-        <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#111] dark:to-black shimmer" />
-      )}
-
-      {/* Fallback when no image */}
-      {(!category.image || hasError) && (
-        <div className="absolute inset-0 bg-linear-to-br from-[#FAFAFA] to-[#F5F5F5] dark:from-[#0A0A0A] dark:to-black flex items-center justify-center">
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-gray-500 dark:text-gray-400 p-4">
             <Droplets className="w-12 h-12 mx-auto mb-2 opacity-40 text-[#0EA5E9]" />
             <div className="text-sm font-medium mb-1">{category.name}</div>
           </div>
         </div>
       )}
-
     </div>
   );
 });
@@ -136,32 +110,24 @@ CategoryPreview.displayName = 'CategoryPreview';
 
 // Subcategory Badge Component
 const SubcategoryBadge = React.memo(({ subcategory, onClick, index }: SubcategoryBadgeProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
   return (
     <div
       onClick={onClick}
-      className={`cursor-pointer group/sub transition-all duration-300 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} hover:scale-105 hover:-translate-y-1 active:scale-95`}
+      className="cursor-pointer group/sub transition-all duration-300 hover:scale-105 hover:-translate-y-1 active:scale-95"
     >
       {/* Subcategory Badge */}
       <div className="relative aspect-square rounded-lg overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#0A0A0A] dark:to-black border border-gray-200 dark:border-white/10 group-hover/sub:border-[#0EA5E9] transition-all duration-300">
         {subcategory.image ? (
-          <>
-            <Image
-              src={subcategory.image}
-              alt={`${subcategory.name} subcategory`}
-              fill={true}
-              className={`object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-              onLoad={() => setIsLoaded(true)}
-              loading="lazy"
-              decoding="async"
-              sizes="80px"
-              quality={40}
-            />
-            {!isLoaded && (
-              <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 dark:from-[#111] dark:to-black shimmer" />
-            )}
-          </>
+          <Image
+            src={subcategory.image}
+            alt={`${subcategory.name} subcategory`}
+            fill={true}
+            className="object-cover"
+            loading="lazy"
+            decoding="async"
+            sizes="80px"
+            quality={40}
+          />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
             <Droplets className="w-8 h-8 text-[#0EA5E9] opacity-30" />
@@ -192,8 +158,6 @@ export const Card = React.memo(({
   subcategories = [],
   onSubcategoryClick
 }: CardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   const isPriority = index < 4;
 
   // Memoize the card preview to prevent unnecessary re-renders
@@ -230,19 +194,13 @@ export const Card = React.memo(({
   return (
     <div
       onClick={handleOpen}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm group card-interactive",
-        isHovered && "shadow-lg"
+        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm group card-interactive hover:shadow-lg transition-shadow duration-300"
       )}
     >
       {/* Hover spotlight background */}
       <div
-        className={cn(
-          "absolute inset-0 h-full w-full bg-neutral-100 dark:bg-slate-800/70 block rounded-2xl sm:rounded-3xl transition-opacity duration-150",
-          isHovered ? "opacity-100" : "opacity-0"
-        )}
+        className="absolute inset-0 h-full w-full bg-neutral-100 dark:bg-slate-800/70 block rounded-2xl sm:rounded-3xl transition-opacity duration-150 opacity-0 group-hover:opacity-100 pointer-events-none"
       />
 
       {/* Card content — above the spotlight */}
