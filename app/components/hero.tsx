@@ -38,7 +38,7 @@ export default function Hero({ initialSlides = [] }: HeroProps) {
     ` : '';
 
     return (
-        <section className="relative w-full overflow-hidden bg-black text-white lg:mt-4.25 aspect-[4/5] sm:aspect-[16/9]">
+        <section className="relative w-full overflow-hidden bg-black text-white lg:mt-4.25 aspect-[9/16] sm:aspect-[16/9]">
             <h1 className="sr-only">Garud Aqua Solutions — Premium Water Tanks, Agriculture Sprayer Tanks, and CPVC Pipes & Fittings Supplier in India</h1>
             
             {N > 1 && <style dangerouslySetInnerHTML={{ __html: dynamicStyle }} />}
