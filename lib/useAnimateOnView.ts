@@ -1,5 +1,5 @@
 "use client";
-import "@/app/styles/animations.css";
+
 import { useEffect, useRef } from "react";
 
 /**

@@ -1,6 +1,6 @@
 "use client";
 
-import "@/app/styles/animations.css";
+
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState, useCallback } from "react";
 
