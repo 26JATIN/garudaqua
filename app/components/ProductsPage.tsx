@@ -797,7 +797,7 @@ function ProductListItem({ product, index = 0 }: ProductCardProps) {
         >
             <NavigationLink href={productHref} className="block w-full">
                 <TransitionElement name={`product-${product.slug}`}>
-                    <div className="bg-white dark:bg-[#0A0A0A] rounded-xl border border-gray-100 dark:border-white/6 overflow-hidden shadow-sm flex flex-col sm:flex-row card-interactive">
+                    <div className="bg-white dark:bg-[#0A0A0A] rounded-xl border border-gray-100 dark:border-white/6 overflow-hidden shadow-sm flex flex-col sm:flex-row transition-all duration-300 active:scale-95 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-[#0EA5E9]/10">
                         <div className="flex gap-3 md:gap-4 lg:gap-6 w-full p-3 md:p-4 lg:p-6">
                             <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-48 xl:h-48 shrink-0 relative bg-gray-100 dark:bg-gray-800 rounded-lg md:rounded-xl overflow-hidden">
                                 {product.image ? (

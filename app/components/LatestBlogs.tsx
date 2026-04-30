@@ -49,7 +49,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                         ))}
                         <Link
                             href="/blogs"
-                            className="px-4 py-2.5 text-xs font-semibold text-[#0369A1] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors btn-shine"
+                            className="px-4 py-2.5 text-xs font-semibold text-[#0369A1] dark:text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-colors relative overflow-hidden active:scale-95 transition-[transform] duration-150 after:absolute after:top-0 after:-left-full after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/15 after:to-transparent after:transition-[left] after:duration-500 after:ease-out hover:after:left-full"
                         >
                             View All
                         </Link>
@@ -62,7 +62,7 @@ export default function LatestBlogs({ blogs, categories }: LatestBlogsProps) {
                         <Link
                             key={blog.id}
                             href={`/blogs/${blog.slug}`}
-                            className="group bg-white dark:bg-[#0A0A0A] rounded-2xl overflow-hidden shadow-sm dark:shadow-none border border-gray-100 dark:border-white/6 hover:border-[#0EA5E9]/30 flex flex-col h-full card-interactive"
+                            className="group bg-white dark:bg-[#0A0A0A] rounded-2xl overflow-hidden shadow-sm dark:shadow-none border border-gray-100 dark:border-white/6 hover:border-[#0EA5E9]/30 flex flex-col h-full transition-all duration-300 active:scale-95 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-[#0EA5E9]/10"
                         >
                             {/* Image */}
                             {blog.featuredImage ? (

@@ -1,5 +1,5 @@
 "use client";
-import "@/app/styles/animations.css";
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import NavigationLink from "@/app/components/NavigationLink";
 import Image from "next/image";

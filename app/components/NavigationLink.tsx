@@ -4,7 +4,7 @@ import React from "react";
 
 /**
  * Drop-in replacement for Next.js <Link> that adds the
- * card-interactive microinteraction class.
+ * transition-all duration-300 active:scale-95 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-[#0EA5E9]/10 microinteraction class.
  *
  * The instant loading overlay is now handled globally by
  * PageTransitionProvider's document-level click interceptor,

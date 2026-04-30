@@ -1,4 +1,4 @@
-import "@/app/styles/animations.css";
+
 import { Suspense } from "react";
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";

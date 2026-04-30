@@ -1,6 +1,6 @@
 "use client";
 
-import "@/app/styles/animations.css";
+
 import React, {
   useEffect,
   useRef,
@@ -195,7 +195,7 @@ export const Card = React.memo(({
     <div
       onClick={handleOpen}
       className={cn(
-        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm group card-interactive hover:shadow-lg transition-shadow duration-300"
+        "relative flex flex-col h-full cursor-pointer rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-gray-200 dark:border-white/6 bg-white/50 dark:bg-[#0A0A0A] shadow-sm group transition-all duration-300 active:scale-95 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-[#0EA5E9]/10"
       )}
     >
       {/* Hover spotlight background */}
@@ -310,7 +310,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
     loadData();
   }, [fetchCategories, fetchProducts, initialCategories, initialProducts]);
 
-  const MAX_DISPLAYED = 12;
+  const MAX_DISPLAYED = 50;
 
   // Function to scroll to the top of the section smoothly
   const scrollToSection = useCallback(() => {
@@ -456,7 +456,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
           </h2>
           <button
             onClick={() => navigate(getCategoryInfoLink())}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all mb-1 btn-shine"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all mb-1 relative overflow-hidden active:scale-95 transition-[transform] duration-150 after:absolute after:top-0 after:-left-full after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/15 after:to-transparent after:transition-[left] after:duration-500 after:ease-out hover:after:left-full"
           >
             <Info className="w-4 h-4" />
             <span>{selectedCategory === 'ALL' ? 'All Categories' : 'Category Info'}</span>
@@ -523,7 +523,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                 </h2>
                 <button
                   onClick={() => navigate(getCategoryInfoLink())}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all w-fit group btn-shine"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#0EA5E9]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#0EA5E9]/20 rounded-full hover:bg-[#0EA5E9] hover:text-white transition-all w-fit group relative overflow-hidden active:scale-95 transition-[transform] duration-150 after:absolute after:top-0 after:-left-full after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/15 after:to-transparent after:transition-[left] after:duration-500 after:ease-out hover:after:left-full"
                 >
                   <Info className="w-4 h-4" />
                   <span>{selectedCategory === 'ALL' ? 'All Categories Info' : 'Category Info'}</span>
@@ -651,7 +651,7 @@ export default function CategoryShowcase({ initialCategories, initialProducts }:
                             navigate('/products');
                           }
                         }}
-                        className="group relative px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 font-medium tracking-wide overflow-hidden btn-shine"
+                        className="group relative px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 font-medium tracking-wide overflow-hidden relative overflow-hidden active:scale-95 transition-[transform] duration-150 after:absolute after:top-0 after:-left-full after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/15 after:to-transparent after:transition-[left] after:duration-500 after:ease-out hover:after:left-full"
                       >
                         <span className="relative z-10 flex items-center gap-3">
                           Explore All {filteredProducts.length} Products

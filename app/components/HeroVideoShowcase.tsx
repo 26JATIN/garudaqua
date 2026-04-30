@@ -139,7 +139,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                                 className="animate-on-view shrink-0 snap-center w-70 md:w-80 lg:w-90"
                                 style={{ animationDelay: `${index * 0.1}s` }}
                             >
-                                <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl aspect-9/16 group card-interactive">
+                                <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl aspect-9/16 group transition-all duration-300 active:scale-95 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-[#0EA5E9]/10">
                                     {/* Video Player */}
                                     <video
                                         ref={(el: HTMLVideoElement | null) => { videoElementRefs.current[index] = el; }}
@@ -227,7 +227,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                 <div className="animate-on-view text-center mt-16" style={{ animationDelay: '0.3s' }}>
                     <NavigationLink
                         href="/products"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 group btn-shine"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-full hover:shadow-xl transition-all duration-300 group relative overflow-hidden active:scale-95 transition-[transform] duration-150 after:absolute after:top-0 after:-left-full after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/15 after:to-transparent after:transition-[left] after:duration-500 after:ease-out hover:after:left-full"
                     >
                         <span className="font-medium">Browse All Products</span>
                         <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

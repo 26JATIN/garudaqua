@@ -92,7 +92,7 @@ export default function Benefits() {
                             className={`animate-on-view group relative`}
                             style={{ animationDelay: `${index * 0.1}s` }}
                         >
-                            <div className="relative bg-white dark:bg-[#0A0A0A] rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-white/6 group-hover:border-[#0EA5E9]/30 h-full card-interactive">
+                            <div className="relative bg-white dark:bg-[#0A0A0A] rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-white/6 group-hover:border-[#0EA5E9]/30 h-full transition-all duration-300 active:scale-95 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-[#0EA5E9]/10">
                                 {/* Icon */}
                                 <div className="relative mb-6">
                                     <div className={`w-20 h-20 rounded-2xl bg-linear-to-br ${benefit.color} flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform duration-300`}>

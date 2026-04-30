@@ -1,5 +1,5 @@
 "use client";
-import "@/app/styles/animations.css";
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePageTransition } from './PageTransition';

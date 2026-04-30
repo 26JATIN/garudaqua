@@ -1,5 +1,5 @@
 "use client";
-import "@/app/styles/animations.css";
+
 import React, { useState } from "react";
 import { useAnimateOnView } from "@/lib/useAnimateOnView";
 
@@ -140,7 +140,7 @@ export default function Newsletter() {
                                         <button
                                             type="submit"
                                             disabled={isLoading}
-                                            className="px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-light tracking-wide hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 btn-shine"
+                                            className="px-8 py-4 bg-linear-to-r from-[#0EA5E9] to-[#0369A1] text-white rounded-xl font-light tracking-wide hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 relative overflow-hidden transition-[transform] after:absolute after:top-0 after:-left-full after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/15 after:to-transparent after:transition-[left] after:duration-500 after:ease-out hover:after:left-full"
                                         >
                                             {isLoading ? (
                                                 <>
