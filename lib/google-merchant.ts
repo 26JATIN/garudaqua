@@ -299,59 +299,34 @@ export async function deleteProductFromMerchant(
 }
 
 /**
- * Batch-syncs an array of Prisma products using the custombatch endpoint.
- * Much faster than individual inserts for bulk operations.
+ * Batch-syncs an array of Prisma products using concurrent individual inserts.
+ * The custombatch path (/products/batch) requires specific scoping; using
+ * individual POST /{merchantId}/products is simpler and equally fast for
+ * typical catalogue sizes (runs 5 at a time in parallel).
  */
 export async function batchSyncProducts(
   products: PrismaProduct[]
 ): Promise<MerchantSyncResult[]> {
-  const mid = merchantId();
+  const withImages = products.filter((p) => !!p.image);
+  const skipped: MerchantSyncResult[] = products
+    .filter((p) => !p.image)
+    .map((p) => ({ ok: false, offerId: p.slug, error: "No image — skipped." }));
 
-  const entries = products
-    .map((p, i) => ({
-      batchId: i + 1,
-      merchantId: mid,
-      method: "insert",
-      product: mapProductToMerchant(p),
-    }))
-    .filter((e) => !!e.product.imageLink); // skip products without images
+  if (withImages.length === 0) return skipped;
 
-  if (entries.length === 0) return [];
+  // Run in chunks of 5 to stay well within rate limits
+  const CONCURRENCY = 5;
+  const results: MerchantSyncResult[] = [];
 
-  const res = await merchantFetch(`/products/custombatch`, {
-    method: "POST",
-    body: JSON.stringify({ entries }),
-  });
-
-  if (!res.ok) {
-    const errBody = await res.text();
-    // Return one error for all
-    return products.map((p) => ({
-      ok: false,
-      offerId: p.slug,
-      error: `Batch HTTP ${res.status}: ${errBody}`,
-    }));
+  for (let i = 0; i < withImages.length; i += CONCURRENCY) {
+    const chunk = withImages.slice(i, i + CONCURRENCY);
+    const chunkResults = await Promise.all(
+      chunk.map((p) => syncProductToMerchant(p))
+    );
+    results.push(...chunkResults);
   }
 
-  const data = (await res.json()) as {
-    entries: Array<{
-      batchId: number;
-      errors?: { errors: Array<{ message: string }> };
-    }>;
-  };
-
-  return data.entries.map((entry) => {
-    const original = entries.find((e) => e.batchId === entry.batchId);
-    const offerId = original?.product.offerId || `batch-${entry.batchId}`;
-    if (entry.errors?.errors?.length) {
-      return {
-        ok: false,
-        offerId,
-        error: entry.errors.errors.map((e) => e.message).join("; "),
-      };
-    }
-    return { ok: true, offerId, action: "inserted" as const };
-  });
+  return [...results, ...skipped];
 }
 
 /**
