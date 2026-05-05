@@ -34,7 +34,7 @@ export async function GET(_req: Request, { params }: Params) {
     name: product.name,
     slug: product.slug,
     isActive: product.isActive,
-    merchantOfferId: `online:en:IN:${product.slug}`,
+    merchantOfferId: `online:en:IN:${product.id}`,
   });
 }
 
@@ -69,14 +69,14 @@ export async function DELETE(_req: Request, { params }: Params) {
   const { id } = await params;
   const product = await prisma.product.findUnique({
     where: { id },
-    select: { slug: true },
+    select: { id: true, slug: true },
   });
 
   if (!product) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
-  const result = await deleteProductFromMerchant(product.slug);
+  const result = await deleteProductFromMerchant(product.id);
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }

@@ -177,7 +177,9 @@ export function mapProductToMerchant(product: PrismaProduct): MerchantProduct {
   if (product.subcategory?.name) productTypes.push(product.subcategory.name);
 
   const mapped: MerchantProduct = {
-    offerId: product.slug,
+    // Use MongoDB id (24 chars) — slugs can exceed Merchant Center's 50-char limit.
+    // The `link` field still uses the full slug so SEO is unaffected.
+    offerId: product.id,
     title: product.name,
     description: product.metaDesc || product.description || product.name,
     link: `${siteUrl}/products/${product.slug}`,
@@ -276,17 +278,17 @@ export async function syncProductToMerchant(
 }
 
 /**
- * Deletes a product from Google Merchant Center by its offerId (slug).
+ * Deletes a product from Google Merchant Center by its offerId (MongoDB id).
  */
 export async function deleteProductFromMerchant(
-  slug: string
+  productId: string
 ): Promise<{ ok: boolean; error?: string }> {
   const mid = merchantId();
   // productId format: online:en:IN:<offerId>
-  const productId = `online:en:IN:${slug}`;
+  const fullProductId = `online:en:IN:${productId}`;
 
   const res = await merchantFetch(
-    `/${mid}/products/${encodeURIComponent(productId)}`,
+    `/${mid}/products/${encodeURIComponent(fullProductId)}`,
     { method: "DELETE" }
   );
 
