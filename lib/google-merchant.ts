@@ -47,8 +47,22 @@ async function getAccessToken(): Promise<string> {
     );
   }
 
-  // Decode base64-encoded PEM (restore newlines stripped by env var storage)
-  const pem = Buffer.from(rawKey, "base64").toString("utf-8");
+  // Decode base64 → could be a full JSON key file or a raw PEM
+  const decoded = Buffer.from(rawKey, "base64").toString("utf-8");
+
+  let pem: string;
+  try {
+    // Case 1: full service account JSON  { "private_key": "-----BEGIN..." }
+    const json = JSON.parse(decoded) as { private_key?: string };
+    if (!json.private_key) {
+      throw new Error("Service account JSON does not contain a private_key field.");
+    }
+    // The JSON stores \n as the two-char escape sequence — convert to real newlines
+    pem = json.private_key.replace(/\\n/g, "\n");
+  } catch {
+    // Case 2: already a raw PEM string (base64-encoded PEM directly)
+    pem = decoded.replace(/\\n/g, "\n");
+  }
 
   const header = base64UrlEncode(JSON.stringify({ alg: "RS256", typ: "JWT" }));
   const payload = base64UrlEncode(
