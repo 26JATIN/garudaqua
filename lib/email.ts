@@ -62,10 +62,13 @@ export async function sendEnquiryNotificationToAdmin(enquiry: {
   email: string;
   phone: string;
   company: string;
+  city: string;
+  state: string;
   product: string;
   quantity: string;
   message: string;
 }) {
+  const location = [enquiry.city, enquiry.state].filter(Boolean).join(", ");
   await getTransporter().sendMail({
     from: `"GarudAqua" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to: process.env.ADMIN_EMAIL,
@@ -96,6 +99,10 @@ export async function sendEnquiryNotificationToAdmin(enquiry: {
             <tr style="border-bottom: 1px solid #e5e7eb;">
               <td style="padding: 10px; font-weight: bold; color: #374151;">Company</td>
               <td style="padding: 10px; color: #4b5563;">${enquiry.company || "N/A"}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 10px; font-weight: bold; color: #374151;">Location</td>
+              <td style="padding: 10px; color: #4b5563;">${location || "N/A"}</td>
             </tr>
             <tr style="border-bottom: 1px solid #e5e7eb;">
               <td style="padding: 10px; font-weight: bold; color: #374151;">Product</td>

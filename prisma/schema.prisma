@@ -131,6 +131,8 @@ model Enquiry {
   email     String        @default("")
   phone     String
   company   String        @default("")
+  city      String        @default("")
+  state     String        @default("")
   product   String        @default("")
   quantity  String        @default("")
   message   String        @default("")

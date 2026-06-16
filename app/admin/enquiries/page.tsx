@@ -10,6 +10,8 @@ interface Enquiry {
     email: string;
     phone: string;
     company: string;
+    city: string;
+    state: string;
     product: string;
     quantity: string;
     message: string;
@@ -219,6 +221,11 @@ export default function AdminEnquiriesPage() {
                                             <div className="text-xs text-gray-500 mt-0.5">
                                                 {enq.product && <span className="font-medium text-[#0EA5E9]">{enq.product}</span>}
                                                 {enq.quantity && <span className="ml-2">Qty: {enq.quantity}</span>}
+                                                {(enq.city || enq.state) && (
+                                                    <span className="ml-2 text-gray-400">
+                                                        📍 {[enq.city, enq.state].filter(Boolean).join(", ")}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
 
@@ -263,6 +270,14 @@ export default function AdminEnquiriesPage() {
                                                     <div>
                                                         <span className="text-xs text-gray-500">Quantity</span>
                                                         <p className="text-sm font-medium text-gray-900">{enq.quantity}</p>
+                                                    </div>
+                                                )}
+                                                {(enq.city || enq.state) && (
+                                                    <div>
+                                                        <span className="text-xs text-gray-500">Location</span>
+                                                        <p className="text-sm font-medium text-gray-900">
+                                                            {[enq.city, enq.state].filter(Boolean).join(", ")}
+                                                        </p>
                                                     </div>
                                                 )}
                                             </div>

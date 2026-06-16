@@ -93,15 +93,15 @@ function SetupGuide() {
       <p className="text-sm text-blue-800 mb-3">
         Add these env vars to your <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs font-mono">.env</code> to enable sync:
       </p>
-      <div className="overflow-x-auto">
-        <div className="bg-white/70 rounded-xl p-4 font-mono text-xs space-y-1.5 border border-blue-100 min-w-max">
+      <div className="mt-3">
+        <div className="bg-white/70 rounded-xl p-3 sm:p-4 font-mono text-[10px] sm:text-xs space-y-1.5 border border-blue-100 break-all">
           <p><span className="text-purple-600">GOOGLE_MERCHANT_ID</span>=<span className="text-gray-500">&quot;123456789&quot;</span></p>
           <p><span className="text-purple-600">GOOGLE_SERVICE_ACCOUNT_EMAIL</span>=<span className="text-gray-500">&quot;service@project.iam.gserviceaccount.com&quot;</span></p>
           <p><span className="text-purple-600">GOOGLE_SERVICE_ACCOUNT_KEY</span>=<span className="text-gray-500">&quot;base64-encoded-json-key&quot;</span></p>
           <p><span className="text-purple-600">NEXT_PUBLIC_SITE_URL</span>=<span className="text-gray-500">&quot;https://www.garudaqua.in&quot;</span></p>
         </div>
       </div>
-      <p className="text-xs text-blue-700 mt-3">
+      <p className="text-xs text-blue-700 mt-3 break-words">
         Encode key: <code className="bg-blue-100 px-1 rounded">base64 -w 0 service-account.json</code> · Then grant <strong>Standard access</strong> in Merchant Center → Settings → Account access.
       </p>
     </div>
