@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import NavigationLink from "@/app/components/NavigationLink";
 import { useAnimateOnView } from "@/lib/useAnimateOnView";
+import Link from "next/link";
 import { getCdnUrl, getRawCdnUrl } from "@/lib/utils";
 
 interface HeroVideo {
@@ -24,9 +25,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
     const [videos, setVideos] = useState<HeroVideo[]>(initialVideos || []);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(!initialVideos || initialVideos.length === 0);
-    const [isMuted, setIsMuted] = useState(true);
     const videoRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const videoElementRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const ref = useAnimateOnView();
@@ -51,33 +50,7 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
         }
     }, [fetchVideos, initialVideos]);
 
-    // Auto-play videos when they come into view
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries: IntersectionObserverEntry[]) => {
-                entries.forEach((entry) => {
-                    const video = entry.target as HTMLVideoElement;
-                    if (entry.isIntersecting) {
-                        video.play().catch(() => {});
-                    } else {
-                        video.pause();
-                    }
-                });
-            },
-            { root: null, rootMargin: "0px", threshold: 0.5 }
-        );
 
-        videoElementRefs.current.forEach((video) => {
-            if (video) observer.observe(video);
-        });
-
-        const elements = videoElementRefs.current;
-        return () => {
-            elements.forEach((video) => {
-                if (video) observer.unobserve(video);
-            });
-        };
-    }, [videos]);
 
     const scrollToVideo = useCallback((index: number) => {
         setCurrentIndex(index);
@@ -139,16 +112,15 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                                 className="animate-on-view shrink-0 snap-center w-70 md:w-80 lg:w-90"
                                 style={{ animationDelay: `${index * 0.1}s` }}
                             >
-                                <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl aspect-9/16 group transition-all duration-300 active:scale-95 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-[#0EA5E9]/10">
+                                <Link href={`/watch/${video.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}--${video.id}`} target="_blank" className="block relative bg-black rounded-2xl overflow-hidden shadow-2xl aspect-9/16 group transition-all duration-300 active:scale-95 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-[#0EA5E9]/10 cursor-pointer">
                                     {/* Video Player */}
                                     <video
-                                        ref={(el: HTMLVideoElement | null) => { videoElementRefs.current[index] = el; }}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                         loop
-                                        muted={isMuted}
+                                        muted
                                         playsInline
-                                        preload="none"
-                                        poster={video.thumbnailUrl ? getCdnUrl(video.thumbnailUrl) : ""}
+                                        preload="metadata"
+                                        poster={video.thumbnailUrl ? getCdnUrl(video.thumbnailUrl) : undefined}
                                     >
                                         {video.videoUrl && (
                                             <source src={getRawCdnUrl(video.videoUrl)} />
@@ -157,34 +129,27 @@ export default function VideoShowcaseSection({ initialVideos }: VideoShowcasePro
                                     </video>
 
                                     {/* Gradient Overlay */}
-                                    <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/60 pointer-events-none" />
+                                    <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/80 pointer-events-none transition-opacity duration-300" />
+                                    
+                                    {/* Play Icon Overlay (Always Visible) */}
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none">
+                                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center shadow-2xl border border-white/40 transform scale-90 group-hover:scale-100 transition-all duration-500">
+                                            <svg className="w-8 h-8 text-white ml-1 drop-shadow-md" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z" />
+                                            </svg>
+                                        </div>
+                                    </div>
 
-                                    {/* Mute toggle */}
-                                    <button
-                                        onClick={() => setIsMuted(!isMuted)}
-                                        className="absolute top-3 right-3 z-20 bg-black/50 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        aria-label={isMuted ? "Unmute" : "Mute"}
-                                    >
-                                        {isMuted ? (
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                                            </svg>
-                                        ) : (
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                                            </svg>
-                                        )}
-                                    </button>
+
 
                                     {/* Video Info */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white pointer-events-none z-20">
-                                        <h3 className="text-xl font-semibold mb-2">{video.title}</h3>
+                                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white pointer-events-none z-20 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                        <h3 className="text-xl font-semibold mb-2 drop-shadow-md">{video.title}</h3>
                                         {video.description && (
-                                            <p className="text-sm text-white/90 line-clamp-2">{video.description}</p>
+                                            <p className="text-sm text-white/90 line-clamp-2 drop-shadow-md">{video.description}</p>
                                         )}
                                     </div>
-                                </div>
+                                </Link>
 
                                 {/* Video Number */}
                                 <div className="text-center mt-4">

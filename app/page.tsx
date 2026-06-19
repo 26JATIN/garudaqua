@@ -184,7 +184,7 @@ export default async function Home() {
       {videoData.map(v => {
         const manualThumb = v.thumbnailUrl?.trim() ? getCdnUrl(v.thumbnailUrl.trim()) : null;
         const autoThumb = null; // R2 videos don't have auto-generated thumbnails
-        const safeThumbnail = manualThumb || autoThumb || "https://www.garudaqua.in/DesktopLogo.png";
+        const safeThumbnail = manualThumb || autoThumb || undefined;
 
         return (
           <script key={v.id} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema({

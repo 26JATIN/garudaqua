@@ -93,12 +93,12 @@ function SetupGuide() {
       <p className="text-sm text-blue-800 mb-3">
         Add these env vars to your <code className="bg-blue-100 px-1.5 py-0.5 rounded text-xs font-mono">.env</code> to enable sync:
       </p>
-      <div className="mt-3">
-        <div className="bg-white/70 rounded-xl p-3 sm:p-4 font-mono text-[10px] sm:text-xs space-y-1.5 border border-blue-100 break-all">
-          <p><span className="text-purple-600">GOOGLE_MERCHANT_ID</span>=<span className="text-gray-500">&quot;123456789&quot;</span></p>
-          <p><span className="text-purple-600">GOOGLE_SERVICE_ACCOUNT_EMAIL</span>=<span className="text-gray-500">&quot;service@project.iam.gserviceaccount.com&quot;</span></p>
-          <p><span className="text-purple-600">GOOGLE_SERVICE_ACCOUNT_KEY</span>=<span className="text-gray-500">&quot;base64-encoded-json-key&quot;</span></p>
-          <p><span className="text-purple-600">NEXT_PUBLIC_SITE_URL</span>=<span className="text-gray-500">&quot;https://www.garudaqua.in&quot;</span></p>
+      <div className="mt-3 w-full min-w-0 overflow-hidden">
+        <div className="bg-white/70 rounded-xl p-3 sm:p-4 font-mono text-[10px] sm:text-xs space-y-1.5 border border-blue-100 w-full overflow-x-auto">
+          <p className="whitespace-nowrap"><span className="text-purple-600">GOOGLE_MERCHANT_ID</span>=<span className="text-gray-500">&quot;123456789&quot;</span></p>
+          <p className="whitespace-nowrap"><span className="text-purple-600">GOOGLE_SERVICE_ACCOUNT_EMAIL</span>=<span className="text-gray-500">&quot;service@project.iam.gserviceaccount.com&quot;</span></p>
+          <p className="whitespace-nowrap"><span className="text-purple-600">GOOGLE_SERVICE_ACCOUNT_KEY</span>=<span className="text-gray-500">&quot;base64-encoded-json-key&quot;</span></p>
+          <p className="whitespace-nowrap"><span className="text-purple-600">NEXT_PUBLIC_SITE_URL</span>=<span className="text-gray-500">&quot;https://www.garudaqua.in&quot;</span></p>
         </div>
       </div>
       <p className="text-xs text-blue-700 mt-3 break-words">
@@ -335,7 +335,7 @@ export default function MerchantPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-5 w-full">
+      <div className="space-y-5 w-full min-w-0 max-w-full overflow-x-hidden sm:overflow-visible pb-10">
 
         {/* ── Header ── */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -352,32 +352,32 @@ export default function MerchantPage() {
           </div>
 
           {/* Action buttons — stack on mobile, row on sm+ */}
-          <div className="flex flex-col xs:flex-row gap-2 sm:shrink-0">
+          <div className="flex flex-col sm:flex-row gap-2 sm:shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
             <button
               onClick={fetchStatus}
               disabled={statusLoading}
-              className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 px-4 py-2 w-full sm:w-auto text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition disabled:opacity-50"
             >
               {statusLoading ? <Spinner className="w-4 h-4" /> : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               )}
-              Refresh
+              <span>Refresh</span>
             </button>
             <button
               onClick={handleBulkSync}
               disabled={syncing || !status?.configured}
-              className="flex items-center justify-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#0EA5E9] to-[#0369A1] rounded-xl hover:opacity-90 transition disabled:opacity-50 shadow-sm"
+              className="flex items-center justify-center gap-2 px-5 py-2 w-full sm:w-auto text-sm font-semibold text-white bg-gradient-to-r from-[#0EA5E9] to-[#0369A1] rounded-xl hover:opacity-90 transition disabled:opacity-50 shadow-sm"
             >
               {syncing ? (
-                <><Spinner className="w-4 h-4" /> Syncing…</>
+                <><Spinner className="w-4 h-4 shrink-0" /> <span>Syncing…</span></>
               ) : (
                 <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                   </svg>
-                  Sync All ({activeProducts.length})
+                  <span>Sync All ({activeProducts.length})</span>
                 </>
               )}
             </button>
@@ -410,21 +410,20 @@ export default function MerchantPage() {
         )}
 
         {/* ── Stats ── */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 min-w-0">
           {[
             { label: "Total", value: products.length },
             { label: "Active", value: activeProducts.length, green: true },
             { label: "Inactive", value: inactiveProducts.length },
           ].map((s) => (
-            <div key={s.label} className={`border rounded-2xl p-3 sm:p-4 ${s.green ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"}`}>
-              <p className="text-xs text-gray-500 mb-1">{s.label}</p>
-              <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+            <div key={s.label} className={`border rounded-2xl p-2 sm:p-4 min-w-0 ${s.green ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"}`}>
+              <p className="text-[10px] sm:text-xs text-gray-500 mb-1 truncate">{s.label}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{s.value}</p>
             </div>
           ))}
         </div>
-
         {/* ── Products Panel ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-w-0">
           {/* Panel header + search */}
           <div className="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
             <div className="flex items-center gap-2">
@@ -457,7 +456,7 @@ export default function MerchantPage() {
           ) : (
             <>
               {/* Desktop table — hidden on mobile */}
-              <div className="hidden sm:block overflow-x-auto">
+              <div className="hidden sm:block overflow-x-auto w-full">
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-gray-400 text-xs uppercase tracking-wide">
                     <tr>

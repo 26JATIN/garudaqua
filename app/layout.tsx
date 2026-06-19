@@ -113,7 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               var theme = localStorage.getItem('theme');
               var metaLight = document.getElementById('theme-color-light');
               var metaDark = document.getElementById('theme-color-dark');
-              var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+              var isDark = theme === 'dark';
               if (isDark) {
                 document.documentElement.classList.add('dark');
                 if (metaLight) metaLight.content = '#000000';
@@ -123,11 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 if (metaLight) metaLight.content = '#ffffff';
                 if (metaDark) metaDark.content = '#ffffff';
               }
-            } catch(e) {
-              if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.classList.add('dark');
-              }
-            }
+            } catch(e) {}
             // iOS: overflow-x:clip on <html> breaks position:fixed.
             // Must run before first paint so Chrome locks in the correct context.
             var ua = navigator.userAgent;

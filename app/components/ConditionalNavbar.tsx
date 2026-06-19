@@ -1,12 +1,12 @@
 "use client";
-import { usePathname } from 'next/navigation';
+import { useSelectedLayoutSegment } from 'next/navigation';
 import Navbar from './Navbar';
 
 export default function ConditionalNavbar() {
-    const pathname = usePathname();
+    const segment = useSelectedLayoutSegment();
     
-    // Don't show the main navbar on admin pages
-    if (pathname?.startsWith('/admin')) {
+    // Don't show the main navbar on admin pages or the dedicated watch page
+    if (segment === 'admin' || segment === 'watch') {
         return null;
     }
     
