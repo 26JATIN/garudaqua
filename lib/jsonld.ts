@@ -392,14 +392,14 @@ export function videoSchema(video: {
   /** The public page URL where this video can be watched (required for Google indexing) */
   watchPageUrl?: string;
 }) {
-  const thumbnailUrl = video.thumbnailUrl?.trim() || undefined;
+  const thumbnailUrl = video.thumbnailUrl?.trim() || LOGO_URL;
 
   return {
     "@context": "https://schema.org",
     "@type": "VideoObject",
     name: video.name,
     description: video.description,
-    ...(thumbnailUrl ? { thumbnailUrl } : {}),
+    thumbnailUrl: thumbnailUrl,
     uploadDate: video.uploadDate,
     url: video.watchPageUrl || SITE_URL,
     ...(video.contentUrl ? { contentUrl: video.contentUrl } : {}),
